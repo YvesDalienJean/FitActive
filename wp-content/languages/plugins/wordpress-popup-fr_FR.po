@@ -1,0 +1,1282 @@
+# Translation of Plugins - Hustle &#8211; Pop-Ups, Slide-ins and Email Opt-ins - Development (trunk) in French (France)
+# This file is distributed under the same license as the Plugins - Hustle &#8211; Pop-Ups, Slide-ins and Email Opt-ins - Development (trunk) package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2017-07-19 08:50:22+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: GlotPress/2.4.0-alpha\n"
+"Language: fr\n"
+"Project-Id-Version: Plugins - Hustle &#8211; Pop-Ups, Slide-ins and Email Opt-ins - Development (trunk)\n"
+
+#. Author URI of the plugin/theme
+msgid "http://premium.wpmudev.org"
+msgstr "http://premium.wpmudev.org"
+
+#. Author of the plugin/theme
+msgid "WPMU DEV"
+msgstr "WPMU DEV"
+
+#. Description of the plugin/theme
+msgid "Allows you to display a fancy PopUp to visitors sitewide or per blog. A *very* effective way of advertising a mailing list, special offer or running a plain old ad."
+msgstr "Permet d’afficher une fenêtre contextuelle fantaisie aux visiteurs sur tout le site ou sur le blogue. Une manière *très* efficace de faire la publicité d'une liste de diffusion, offre spéciale ou l'exécution d'une ancienne annonce ordinaire."
+
+#. Plugin URI of the plugin/theme
+msgid "http://premium.wpmudev.org/project/the-pop-over-plugin/"
+msgstr "http://premium.wpmudev.org/project/the-pop-over-plugin/"
+
+#. Plugin Name of the plugin/theme
+msgid "WordPress PopUp"
+msgstr "Fenêtre surgissante WordPress"
+
+#: views/settings.php:180
+msgid "Not available for global PopUps"
+msgstr "Non disponible pour une fenêtre surgissante globale"
+
+#: views/settings.php:176
+msgid "Available in the <a href=\"%s\" target=\"_blank\">PRO version</a>"
+msgstr "Disponible uniquement dans la <a href=\"%s\" target=\"_blank\">version PRO</a>"
+
+#: views/settings.php:149
+msgid "Activated Rules"
+msgstr "Règles activées"
+
+#: views/settings.php:146
+msgid "Name"
+msgstr "Nom"
+
+#: views/settings.php:131 views/settings.php:229
+msgid "Save All Changes"
+msgstr "Enregistrer toutes les modifications"
+
+#: views/settings.php:121
+msgid "Supported Shortcodes"
+msgstr "Codes courts supportés"
+
+#: views/settings.php:99
+msgid "Theme compatibility"
+msgstr "Compatibilité des thèmes"
+
+#: views/settings.php:98 views/settings.php:120
+msgid "Click to toggle"
+msgstr "Cliquez pour permuter"
+
+#: views/settings.php:60
+msgid "Load PopUp using"
+msgstr "Charger la fenêtre surgissante en utilisant"
+
+#: views/settings.php:49
+msgid "Select how you would like to load PopUp."
+msgstr "Sélectionnez la façon dont vous souhaitez charger le Pop-Up."
+
+#: views/settings.php:44
+msgid "PopUp Loading Method"
+msgstr "Méthode de chargement des fenêtres surgissantes"
+
+#: views/settings.php:33
+msgid "PopUp Settings"
+msgstr "Réglages des fenêtres surgissantes"
+
+#: views/network.php:56
+msgid "Hide the menu items here!"
+msgstr "Cache les items du menu&nbsp;!"
+
+#: views/meta-submitdiv.php:69 views/meta-submitdiv.php:109
+msgid "Duplicate"
+msgstr "Dupliquer"
+
+#: views/meta-submitdiv.php:60 views/meta-submitdiv.php:86
+msgid "Move to Trash"
+msgstr "Déplacer dans la corbeille"
+
+#: views/meta-submitdiv.php:47 views/meta-submitdiv.php:101
+msgid "Preview PopUp"
+msgstr "Prévisualisation la fenêtre surgissante"
+
+#: views/meta-submitdiv.php:39
+msgid "Status: Inactive"
+msgstr "Statut : Inactif"
+
+#: views/meta-submitdiv.php:38
+msgid "Status: <strong>Active</strong>"
+msgstr "Statut : <strong>Actif</strong>"
+
+#: views/meta-submitdiv.php:19 views/meta-submitdiv.php:74
+#: views/meta-submitdiv.php:94
+msgid "Save"
+msgstr "Enregistrer"
+
+#: views/meta-rules.php:16
+msgid "Show this PopUp if all of the following conditions are met"
+msgstr "Afficher ce Pop-Up si toutes les conditions suivantes sont réunies"
+
+#: views/meta-rules.php:13 views/settings.php:135
+msgid "Available Conditions"
+msgstr "Conditions disponibles"
+
+#: views/meta-customcss.php:30
+msgid "Note: To target this PopUp you need to prefix all rules with <code>#popup</code>, e.g. <code>#popup .wdpu-text { font-family: sans }</code>"
+msgstr "Note&nbsp;: pour cibler cette fenêtre surgissante, vous devez préfixer toutes les règles avec <code>#popup</code>, par exemple <code>#popup .wdpu-text { font-family: sans }</code>"
+
+#: views/meta-customcss.php:14
+msgid "Provide custom CSS rules to customize this PopUp"
+msgstr "Fournir des règles CSS pour personnaliser cette fenêtre surgissante"
+
+#: views/meta-content.php:145
+msgid "Hide image for mobile devices"
+msgstr "Cacher les images pour les périphériques mobiles"
+
+#: views/meta-content.php:131
+msgid "Remove image"
+msgstr "Retirer l’image"
+
+#: views/meta-content.php:125
+msgid "Drop here"
+msgstr "Lâcher ici"
+
+#: views/meta-content.php:122
+msgid "(No image selected)"
+msgstr "(Aucune image sélectionnée)"
+
+#: views/meta-content.php:103
+msgid "Add Image"
+msgstr "Ajouter une image"
+
+#: views/meta-content.php:101
+msgid "Select Image"
+msgstr "Sélectionner une image"
+
+#: views/meta-content.php:100
+msgid "PopUp Featured Image"
+msgstr "Image mise en avant dans la fenêtre surgissante"
+
+#: views/meta-content.php:99
+msgid "Add featured image to PopUp."
+msgstr "Ajouter une image mise en avant au popup."
+
+#: views/meta-content.php:93
+msgid "PopUp Feature Image (optional)"
+msgstr "Image mise en avant dans la fenêtre surgissante (facultatif)"
+
+#: views/meta-content.php:83
+msgid "Default: _self / To open link in new window use: _blank"
+msgstr "Par défaut _self / Pour ouvrir le lien en nouvelle fenêtre, utilisez _blank"
+
+#: views/meta-content.php:82
+msgid "Optional Link target"
+msgstr "Cible optionnelle du lien"
+
+#: views/meta-content.php:74
+msgid "Button Link (http://www.example.com)"
+msgstr "Lien du bouton (http://www.exemple.com)"
+
+#: views/meta-content.php:66
+msgid "Button Label"
+msgstr "Étiquette de bouton"
+
+#: views/meta-content.php:57
+msgid "Call To Action Button (optional)"
+msgstr "Bouton appel à l'action"
+
+#: views/meta-content.php:42
+msgid "Main PopUp Content"
+msgstr "Contenu principal de la fenêtre surgissante"
+
+#: views/meta-content.php:35
+msgid "Enter your subheading here..."
+msgstr "Entrez votre sous-titre ici..."
+
+#: views/meta-content.php:27
+msgid "Enter your heading here..."
+msgstr "Entrez votre titre ici..."
+
+#: views/meta-content.php:18
+msgid "Subheading (optional)"
+msgstr "Sous-titre (optionnel)"
+
+#: views/meta-content.php:15
+msgid "Heading (optional)"
+msgstr "Titre (facultatif)"
+
+#: views/meta-behavior.php:225
+msgid "Redirect to form target URL"
+msgstr "Rediriger vers la l'URL cible du formulaire"
+
+#: views/meta-behavior.php:222
+msgid "Refresh PopUp or do nothing (use for Ajax Forms)"
+msgstr "Rafraîchir la fenêtre surgissante ou ne rien faire (cas pour les formulaires Ajax)"
+
+#: views/meta-behavior.php:219
+msgid "Refresh PopUp or close (default)"
+msgstr "Rafraîchir la fenêtre surgissante ou fermer (défaut)"
+
+#: views/meta-behavior.php:216
+msgid "Always close after form submit"
+msgstr "Toujours fermer après la soumission du formulaire"
+
+#: views/meta-behavior.php:210
+msgid "In case your PopUp contains a form (e.g. a contact form) then you can change the form-submit behavior here."
+msgstr "Si votre fenêtre surgissante contient un formulaire, alors vous pouvez changer le comportement de soumission de formulaire ici."
+
+#: views/meta-behavior.php:204
+msgid "Form submit"
+msgstr "Soumission du formulaire"
+
+#: views/meta-behavior.php:187
+msgid "Click on the background does not close PopUp."
+msgstr "Cliquer sur l'arrière-plan ne ferme pas le popup."
+
+#: views/meta-behavior.php:177
+msgid "Closing Pop-up conditions"
+msgstr "Conditions de fermeture de la popup"
+
+#: views/meta-behavior.php:156
+msgid "(upon expiry, user will see this PopUp again)"
+msgstr "(à l'expiration, l'utilisateur ne verra plus jamais cette popup)"
+
+#: views/meta-behavior.php:155
+msgid "days"
+msgstr "jours"
+
+#: views/meta-behavior.php:148
+msgid "Expiry time"
+msgstr "Durée avant expiration"
+
+#: views/meta-behavior.php:143
+msgid "Close button acts as \"Never see this message again\" link"
+msgstr "Le bouton fermer agît comme lien «&nbsp;Ne plus voir ce message&nbsp;»."
+
+#: views/meta-behavior.php:130
+msgid "Add \"Never see this message again\" link"
+msgstr "Ajouter un lien «&nbsp;Ne plus voir ce message&nbsp;»"
+
+#: views/meta-behavior.php:118
+msgid "\"Never see this message again\" settings:"
+msgstr "Réglages «&nbsp;Ne plus voir ce message&nbsp;»&nbsp;:"
+
+#: views/meta-behavior.php:96
+msgid ".class or #id"
+msgstr ".class ou #id"
+
+#: views/meta-behavior.php:89
+msgid "Appear after user scrolled until CSS selector"
+msgstr "Apparaît après le défilement de l’utilisateur jusqu’au sélecteur CSS"
+
+#: views/meta-behavior.php:77
+msgid "of the page has been scrolled."
+msgstr "de la page a été défilé."
+
+#: views/meta-behavior.php:73
+msgid "px"
+msgstr "px"
+
+#: views/meta-behavior.php:70
+msgid "%"
+msgstr "%"
+
+#: views/meta-behavior.php:40
+msgid "Minutes"
+msgstr "Minutes"
+
+#: views/meta-behavior.php:37
+msgid "Seconds"
+msgstr "Secondes"
+
+#: views/meta-behavior.php:24 views/meta-behavior.php:57
+msgid "Appear after"
+msgstr "Apparaît après"
+
+#: views/meta-behavior.php:12
+msgid "When to show the PopUp:"
+msgstr "Quand afficher le Pop-Up : "
+
+#: views/meta-appearance.php:176
+msgid "PopUp closing animation"
+msgstr "Animation de fermeture de fenêtre surgissante"
+
+#: views/meta-appearance.php:171
+msgid "PopUp display animation"
+msgstr "Animation d'affichage de fenêtre surgissante"
+
+#: views/meta-appearance.php:161
+msgid "Allow page to be scrolled while PopUp is visible"
+msgstr "Autoriser le défilement de la page pendant que la fenêtre surgissante est affichée"
+
+#: views/meta-appearance.php:143
+msgid "Height:"
+msgstr "Hauteur&nbsp;: "
+
+#: views/meta-appearance.php:134
+msgid "Width:"
+msgstr "Largeur&nbsp;: "
+
+#: views/meta-appearance.php:128
+msgid "Use custom size (if selected the PopUp won't be responsive)"
+msgstr "Utiliser une taille personnalisée (si sélectionné, la fenêtre surgissante ne sera pas responsive)"
+
+#: views/meta-appearance.php:116
+msgid "Button text"
+msgstr "Texte du bouton"
+
+#: views/meta-appearance.php:108
+msgid "Links, button background, heading and subheading"
+msgstr "Liens, arrière-plan de bouton, titres et sous-titres"
+
+#: views/meta-appearance.php:97
+msgid "Use custom colors"
+msgstr "Utiliser des couleurs personnalisées"
+
+#: views/meta-appearance.php:66
+msgid "No rounded corners"
+msgstr "Aucun coin arrondi"
+
+#: views/meta-appearance.php:53
+msgid "PRO Version only"
+msgstr "Seulement dans la version Pro"
+
+#: views/meta-appearance.php:17
+msgid "Select which style you want to use:"
+msgstr "Sélectionnez le style vous voulez utiliser&nbsp;:"
+
+#: views/info-shortcodes.php:132
+msgid "Shortcode does not work"
+msgstr "Le code court ne fonctionne pas"
+
+#: views/info-shortcodes.php:128
+msgid "Might have issues"
+msgstr "Peut engendrer des erreurs"
+
+#: views/info-shortcodes.php:124
+msgid "Shortcode supported"
+msgstr "Supporte les codes courts"
+
+#: views/info-shortcodes.php:103
+msgid "When opening a PopUp-Preview in the Editor"
+msgstr "À l’ouverture d’une prévisualisation de fenêtre surgissante dans l’éditeur"
+
+#: views/info-shortcodes.php:99
+msgid "Script"
+msgstr "Script"
+
+#: views/info-shortcodes.php:98
+msgid "Loading method 'Anonymous Script'"
+msgstr "Méthode de chargement « Script anonyme »"
+
+#: views/info-shortcodes.php:94
+msgid "Cust AJAX"
+msgstr "Ajax personnalisé"
+
+#: views/info-shortcodes.php:93
+msgid "Loading method 'Custom AJAX'"
+msgstr "Méthode de chargement « Ajax personnalisé »"
+
+#: views/info-shortcodes.php:89
+msgid "WP AJAX"
+msgstr "Ajax WP"
+
+#: views/info-shortcodes.php:88
+msgid "Loading method 'WordPress AJAX'"
+msgstr "Méthode de chargement « Ajax WordPress »"
+
+#: views/info-shortcodes.php:83
+msgid "Loading method 'Page Footer'"
+msgstr "Méthode de chargement « Pied de page »"
+
+#: views/info-shortcodes.php:79
+msgid "Shortcode"
+msgstr "Code court"
+
+#: popover.php:76
+msgid "Get Tips!"
+msgstr "Obtenir des astuces&nbsp;!"
+
+#: inc/rules/class-popup-rule-user.php:48
+msgid "Visitor has commented before"
+msgstr "Le visiteur a commenté précédemment"
+
+#: inc/rules/class-popup-rule-user.php:40
+msgid "Shows the PopUp if the user is not logged in to your site."
+msgstr "Afficher la fenêtre surgissante si l’utilisateur n’est connecté au site."
+
+#: inc/rules/class-popup-rule-user.php:31
+msgid "Shows the PopUp if the user is logged in to your site."
+msgstr "Afficher la fenêtre surgissante si l’utilisateur est connecté au site."
+
+#: inc/rules/class-popup-rule-url.php:141
+msgid "Not on these URLs (one per line):"
+msgstr "Pas sur une de ces URLs (une par ligne)&nbsp;:"
+
+#: inc/rules/class-popup-rule-url.php:88 inc/rules/class-popup-rule-url.php:148
+msgid "URLs should not include \"http://\" or \"https://\""
+msgstr "Les URL ne devraient pas include http:// ou https://"
+
+#: inc/rules/class-popup-rule-url.php:81
+msgid "Show on these URLs (one per line):"
+msgstr "Afficher sur ces URL (une par ligne)&nbsp;:"
+
+#: inc/rules/class-popup-rule-url.php:40
+msgid "Shows the PopUp if the user is not on a certain URL."
+msgstr "Afficher la fenêtre surgissante si l’utilisateur n’est pas sur une URL spécifique."
+
+#: inc/rules/class-popup-rule-url.php:31
+msgid "Shows the PopUp if the user is on a certain URL."
+msgstr "Afficher la fenêtre surgissante si l’utilisateur est sur une URL spécifique."
+
+#: inc/rules/class-popup-rule-referrer.php:97
+#: inc/rules/class-popup-rule-referrer.php:149
+msgid "Referrers. Can be full URL or a pattern like \".example.com\" (one per line):"
+msgstr "Référants. Peut être une URL complète ou une formule comme « .exemple.com » (une par ligne)&nbsp;:"
+
+#: inc/rules/class-popup-rule-referrer.php:58
+msgid "Shows the PopUp if the user arrived via a search engine."
+msgstr "Afficher la fenêtre surgissante si l’utilisateur arrive depuis un moteur de recherche."
+
+#: inc/rules/class-popup-rule-referrer.php:57
+msgid "From a search engine"
+msgstr "Depuis un moteur de recherche"
+
+#: inc/rules/class-popup-rule-referrer.php:49
+msgid "Shows the PopUp if the user did not arrive on this page via another page on your site."
+msgstr "Afficher la fenêtre surgissante si l’utilisateur n’est pas arrivé sur cette page depuis une autre page du site."
+
+#: inc/rules/class-popup-rule-referrer.php:48
+msgid "Not from an internal link"
+msgstr "Pas depuis un lien interne"
+
+#: inc/rules/class-popup-rule-referrer.php:40
+msgid "Hides the PopUp if the user arrived via a specific referrer."
+msgstr "Cache la fenêtre surgissante si l’utilisateur arrive depuis un référant spécifique."
+
+#: inc/rules/class-popup-rule-referrer.php:39
+msgid "Not from a specific referrer"
+msgstr "Pas depuis un référant spécifique"
+
+#: inc/rules/class-popup-rule-referrer.php:31
+msgid "Shows the PopUp if the user arrived via a specific referrer."
+msgstr "Afficher la fenêtre surgissante si l’utilisateur arrive depuis un référant spécifique."
+
+#: inc/rules/class-popup-rule-referrer.php:30
+msgid "From a specific referrer"
+msgstr "Depuis un référant spécifique"
+
+#: inc/rules/class-popup-rule-popup.php:72
+msgid "Display PopUp this often:"
+msgstr "Afficher la fenêtre contextuelle à cette fréquence&nbsp;:"
+
+#: inc/rules/class-popup-rule-popup.php:31
+msgid "Shows the PopUp if the user has only seen it less than a specific number of times."
+msgstr "Afficher la fenêtre surgissante si l’utilisateur l’a seulement vu moins qu’un nombre spécifique de fois."
+
+#: inc/rules/class-popup-rule-popup.php:30
+msgid "PopUp shown less than"
+msgstr "Fenêtre montrée moins de"
+
+#: inc/rules/class-popup-rule-browser.php:40
+msgid "Shows the PopUp to visitors that are using a normal computer or laptop (i.e. not a Phone or Tablet)."
+msgstr "Afficher la fenêtre surgissante aux utilisateurs sur un ordinateur de bureau ou portable (ni téléphone ni tablette)."
+
+#: inc/rules/class-popup-rule-browser.php:39
+msgid "Not on mobile devices"
+msgstr "Pas sur périphérique mobile"
+
+#: inc/rules/class-popup-rule-browser.php:31
+msgid "Shows the PopUp to visitors that are using a mobile device (Phone or Tablet)."
+msgstr "Afficher la fenêtre surgissante aux utilisateurs sur un périphérique mobile (téléphone ou tablette)."
+
+#: inc/rules/class-popup-rule-browser.php:30
+msgid "Only on mobile devices"
+msgstr "Seulement sur périphérique mobile"
+
+#: inc/external/wpmu-lib/inc/class-thelib-ui.php:494
+msgid "Dismiss this notice."
+msgstr "Ignorer ce message."
+
+#: inc/external/wdev-frash/module.php:430
+msgid "Rate %s"
+msgstr "Évaluez %s"
+
+#: inc/external/wdev-frash/module.php:420
+msgid "Hey %s, you've been using %s for a while now, and we hope you're happy with it.<br />We've spent countless hours developing this free plugin for you, and we would really appreciate it if you dropped us a quick rating!"
+msgstr "Bonjour %s, vous utilisez %s depuis quelques temps, et nous espérons que vous en êtes satisfaits.<br />Nous avons passé des heures à développer cette extension gratuite pour vous, et apprécierions si vous pouviez le noter."
+
+#: inc/external/wdev-frash/module.php:400
+#: inc/external/wdev-frash/module.php:435
+msgid "No thanks"
+msgstr "Non merci"
+
+#: inc/external/wdev-frash/module.php:399
+#: inc/external/wdev-frash/module.php:434
+msgid "Saving"
+msgstr "Enregistrement en cours"
+
+#: inc/external/wdev-frash/module.php:396
+#: inc/external/wdev-frash/module.php:427
+msgid "Thanks :)"
+msgstr "Merci :)"
+
+#: inc/external/wdev-frash/module.php:389
+msgid "We're happy that you've chosen to install %s! Are you interested in how to make the most of this plugin? How would you like a quick 5 day email crash course with actionable advice on building your membership site? Only the info you want, no subscription!"
+msgstr "Nous sommes heureux que vous ayez choisi d’installer %s&nbsp;! Êtes-vous intéressé par savoir comment utiliser cette extension&nbsp;? Souhaiteriez-vous une formation accélérée de 5 jours par email avec des conseils pour construire un site avec espace membres&nbsp;? Seulement si vous le voulez, sans abonnement&nbsp;!"
+
+#: inc/class-popup-posttype.php:98
+msgid "Display PopUp messages on your website!"
+msgstr "Afficher des messages en fenêtre contextuelle sur votre site web&nbsp;!"
+
+#: inc/class-popup-posttype.php:93 views/network.php:29
+msgid "Global PopUps"
+msgstr "Fenêtres surgissantes globales"
+
+#: inc/class-popup-posttype.php:92
+msgctxt "Post Type Singular Name"
+msgid "Global PopUp"
+msgstr "Fenêtre surgissante globale"
+
+#: inc/class-popup-posttype.php:87
+msgid "No PopUp found in Trash"
+msgstr "Aucune fenêtre surgissante trouvée dans la corbeille"
+
+#: inc/class-popup-posttype.php:86
+msgid "Not found"
+msgstr "Non trouvé"
+
+#: inc/class-popup-posttype.php:85
+msgid "Search PopUp"
+msgstr "Rechercher une fenêtre surgissante"
+
+#: inc/class-popup-posttype.php:84
+msgid "Update PopUp"
+msgstr "Mettre à jour la fenêtre surgissante"
+
+#: inc/class-popup-posttype.php:83
+msgid "Edit PopUp"
+msgstr "Modifier la fenêtre contextuelle"
+
+#: inc/class-popup-posttype.php:81
+msgid "Add New PopUp"
+msgstr "Ajouter une nouvelle fenêtre surgissante"
+
+#: inc/class-popup-posttype.php:80
+msgid "View Item"
+msgstr "Voir l’élément"
+
+#: inc/class-popup-posttype.php:79
+msgid "PopUps"
+msgstr "Fenêtres surgissantes"
+
+#: inc/class-popup-posttype.php:78
+msgid "Parent Item:"
+msgstr "Élément parent&nbsp;:"
+
+#: inc/class-popup-posttype.php:76
+msgctxt "Post Type Singular Name"
+msgid "PopUp"
+msgstr "Fenêtre surgissante"
+
+#: inc/class-popup-posttype.php:75
+msgctxt "Post Type General Name"
+msgid "PopUps"
+msgstr "Fenêtres surgissantes"
+
+#: inc/class-popup-item.php:1143
+msgid "Trashed"
+msgstr "Supprimés"
+
+#: inc/class-popup-item.php:1142
+msgid "Inactive"
+msgstr "Inactif"
+
+#: inc/class-popup-item.php:1127
+msgid "Popover shown less than x times"
+msgstr "Fenêtre montrée moins de x fois"
+
+#: inc/class-popup-item.php:1126
+msgid "Visit via specific referer"
+msgstr "Visite depuis un référant spécifique"
+
+#: inc/class-popup-item.php:1125
+msgid "Visit not via an Internal link"
+msgstr "Visite pas depuis un lien interne"
+
+#: inc/class-popup-item.php:1124 inc/rules/class-popup-rule-user.php:61
+msgid "Visitor has never commented"
+msgstr "Le visiteur n’a jamais commenté précédemment"
+
+#: inc/class-popup-item.php:1123
+msgid "Visit via a search engine"
+msgstr "Visite depuis un moteur de recherche"
+
+#: inc/class-popup-item.php:1122
+msgid "Site is not a Pro-site"
+msgstr "Le site n’est pas un site Pro"
+
+#: inc/class-popup-item.php:1121
+msgid "Not in a specific country"
+msgstr "Pas depuis un pays spécifique"
+
+#: inc/class-popup-item.php:1120
+msgid "In a specific country"
+msgstr "Dans un pays spécifique"
+
+#: inc/class-popup-item.php:1119 inc/rules/class-popup-rule-url.php:39
+msgid "Not on specific URL"
+msgstr "Pas sur une URL spécifique"
+
+#: inc/class-popup-item.php:1118 inc/rules/class-popup-rule-url.php:30
+msgid "On specific URL"
+msgstr "Sur l’URL spécifique"
+
+#: inc/class-popup-item.php:1117 inc/rules/class-popup-rule-user.php:39
+msgid "Visitor is not logged in"
+msgstr "Le visiteur n’est pas connecté"
+
+#: inc/class-popup-item.php:1116 inc/rules/class-popup-rule-user.php:30
+msgid "Visitor is logged in"
+msgstr "Le visiteur est connecté"
+
+#: inc/class-popup-item.php:715
+msgid "Shortcode <code>%s</code> requires a different <a href=\"%s\">loading method</a> to work.<br />Try \"Page Footer\", though sometimes the method \"Custom AJAX\" also works (please test the result)"
+msgstr "Code court <code>%s</code> requiert une différente <a href=\"%s\">méthode de chargement</a> pour fonctionner.<br />Essayer « Pied de page », même si parfois la méthode « Ajax personnalisé » fonctionne aussi (veuillez tester le résultat)."
+
+#: inc/class-popup-item.php:695
+msgid "You are using Gravity Forms inside this PopUp. It is best to switch to the <a href=\"%s\">loading method</a> \"Page Footer\" to ensure the form works as expected."
+msgstr "Vous utilisez Gravity Forms dans la fenêtre surgissante. Il est préférable de basculer vers la <a href=\"%s\">méthode de chargement</a> « Pied de page » pour assurer son bon fonctionnement."
+
+#: inc/class-popup-item.php:666
+msgid "Could not save PopUp."
+msgstr "Impossible d’enregistrer la fenêtre contextuelle."
+
+#: inc/class-popup-item.php:660
+msgid "Saved PopUp \"<strong>%1$s</strong>\"."
+msgstr "Fenêtre surgissante « <strong>%1$s</strong> » enregistrée."
+
+#: inc/class-popup-item.php:656
+msgid "Moved PopUp \"<strong>%1$s</strong>\" to trash."
+msgstr "Déplacé la fenêtre surgissante «&nbsp;<strong>%1$s</strong>&nbsp;» à la corbeille."
+
+#: inc/class-popup-item.php:652
+msgid "Deactivated PopUp \"<strong>%1$s</strong>\"."
+msgstr "Désactiver la fenêtre contextuelle «&nbsp;<strong>%1$s</strong>&nbsp;»."
+
+#: inc/class-popup-item.php:648
+msgid "Activated PopUp \"<strong>%1$s</strong>\"."
+msgstr "Activer la fenêtre surgissante «&nbsp;<strong>%1$s</strong>&nbsp;»."
+
+#: inc/class-popup-item.php:644
+msgid "Saved PopUp \"<strong>%1$s</strong>\""
+msgstr "Enregistrer la fenêtre surgissante « <strong>%1$s</strong> »"
+
+#: inc/class-popup-item.php:440
+msgid "New PopUp"
+msgstr "Nouvelle fenêtre surgissante"
+
+#: inc/class-popup-help.php:60
+msgid "Shortcodes"
+msgstr "Codes courts"
+
+#: inc/class-popup-database.php:604
+msgid "Load PopUp separately from the page via a custom front-end AJAX call."
+msgstr "Charger la fenêtre surgissante séparément de la page grâce à un appel Ajax personnalisé."
+
+#: inc/class-popup-database.php:603
+msgid "Custom AJAX"
+msgstr "Ajax personnalisé"
+
+#: inc/class-popup-database.php:593
+msgid "WordPress AJAX"
+msgstr "Ajax de WordPress"
+
+#: inc/class-popup-database.php:585
+msgid "Include PopUp as part of your site's HTML (no AJAX call)."
+msgstr "Inclure la fenêtre surgissante comme partie du html de votre site (aucun appel Ajax)."
+
+#: inc/class-popup-database.php:584 views/info-shortcodes.php:84
+msgid "Page Footer"
+msgstr "Pied de page"
+
+#: inc/class-popup-base.php:808
+msgid "In the free version you can activate 1 PopUp. The PRO Version allows you to have unlimited active PopUps! <a href=\\\"%1$s\\\" target=\\\"_blank\\\">Find out more &raquo;</a>"
+msgstr "Dans la version gratuite, vous pouvez activer 1 fenêtre surgissante. La version PRO permet d’activer un nombre illimité de fenêtres surgissantes. <a href=\\\"%1$s\\\" target=\\\"_blank\\\">En savoir plus &raquo;</a>"
+
+#: inc/class-popup-base.php:807 views/meta-submitdiv.php:25
+msgid "In the free version you can activate 1 PopUp. When you activate this PopUp then all other PopUps will be deactivated "
+msgstr "Dans la version gratuite, vous pouvez activer 1 fenêtre surgissante. Quand vous activez cette fenêtre surgissante, alors tous les autres fenêtres surgissantes seront désactivées."
+
+#: inc/class-popup-base.php:806
+msgid "<strong>WordPress PopUp</strong><br />Your installation was successfully updated to use the latest version of the plugin!<br /><em>Note: Some PopUp options changed or were replaced. You should have a look at your <a href=\"%s\">PopUps</a> to see if they still look as intended.</em>"
+msgstr "<strong>WordPress PopUp</strong><br />L’installation a bien mis à jour à la dernière version de l’extension&nbsp;!<br /><em>Note&nbsp;: certaines options de fenêtre contextuelle ont été changées ou remplacées. Vous devriez vérifier vos <a href=\"%s\">fenêtres contextuelles</a> pour voir si elles ressemblent à ce qui était conçu.</em>"
+
+#: inc/class-popup-base.php:805 views/meta-behavior.php:105
+#: views/meta-behavior.php:164
+msgid "Pro feature. <a href=\"%1$s\" target=\"_blank\">Find out more &raquo;</a>"
+msgstr "Fonctionnalité de la version Pro. <a href=\"%1$s\" target=\"_blank\">En savoir plus &raquo;</a>"
+
+#: inc/class-popup-base.php:547
+msgid "Zoom Out Up"
+msgstr "Zoom arrière par le haut"
+
+#: inc/class-popup-base.php:546
+msgid "Zoom Out Right"
+msgstr "Zoom arrière par la droite"
+
+#: inc/class-popup-base.php:545
+msgid "Zoom Out Left"
+msgstr "Zoom arrière par la gauche"
+
+#: inc/class-popup-base.php:544
+msgid "Zoom Out Down"
+msgstr "Zoom arrière par le bas"
+
+#: inc/class-popup-base.php:543
+msgid "Zoom Out"
+msgstr "Zoom arrière"
+
+#: inc/class-popup-base.php:542
+msgid "Zoom Exits"
+msgstr "Sorties de zoom"
+
+#: inc/class-popup-base.php:540
+msgid "Roll Out"
+msgstr "Roulement arrière"
+
+#: inc/class-popup-base.php:539
+msgid "Hinge"
+msgstr "Charnière"
+
+#: inc/class-popup-base.php:536
+msgid "Rotate Out Up Right"
+msgstr "Rotation arrière par le haut droite"
+
+#: inc/class-popup-base.php:535
+msgid "Rotate Out Up Left"
+msgstr "Rotation arrière par le haut gauche"
+
+#: inc/class-popup-base.php:534
+msgid "Rotate Out Down Right"
+msgstr "Rotation arrière par le bas droite"
+
+#: inc/class-popup-base.php:533
+msgid "Rotate Out Down Left"
+msgstr "Rotation arrière par le bas gauche"
+
+#: inc/class-popup-base.php:532
+msgid "Rotate Out"
+msgstr "Rotation arrière"
+
+#: inc/class-popup-base.php:531
+msgid "Rotating Exits"
+msgstr "Sorties en rotation"
+
+#: inc/class-popup-base.php:529
+msgid "Light Speed Out"
+msgstr "Animation « Lightspeed » arrière"
+
+#: inc/class-popup-base.php:526
+msgid "Flip Out Y"
+msgstr "Retourner verticalement"
+
+#: inc/class-popup-base.php:525
+msgid "Flip Out X"
+msgstr "\tRetourner horizontalement"
+
+#: inc/class-popup-base.php:522
+msgid "Fade Out Up Big"
+msgstr "Disparition en fondu vers le haut, en grand"
+
+#: inc/class-popup-base.php:521
+msgid "Fade Out Up"
+msgstr "Disparition en fondu vers le bas"
+
+#: inc/class-popup-base.php:520
+msgid "Fade Out Right Big"
+msgstr "Disparition en fondu vers la droite"
+
+#: inc/class-popup-base.php:519
+msgid "Fade Out Right"
+msgstr "Disparition en fondu par la droite"
+
+#: inc/class-popup-base.php:518
+msgid "Fade Out Left Big"
+msgstr "Disparition en fondu par la gauche (grand)"
+
+#: inc/class-popup-base.php:517
+msgid "Fade Out Left"
+msgstr "Disparition en fondu par la gauche"
+
+#: inc/class-popup-base.php:516
+msgid "Fade Out Down Big"
+msgstr "Disparition en fondu par le bas (grand)"
+
+#: inc/class-popup-base.php:515
+msgid "Fade Out Down"
+msgstr "Disparition en fondu par le bas"
+
+#: inc/class-popup-base.php:514
+msgid "Fade Out"
+msgstr "Disparition en fondu"
+
+#: inc/class-popup-base.php:513
+msgid "Fading Exits"
+msgstr "Sorties avec disparition en fondu"
+
+#: inc/class-popup-base.php:511
+msgid "Bounce Out Up"
+msgstr "Rebond sortant vers le haut"
+
+#: inc/class-popup-base.php:510
+msgid "Bounce Out Right"
+msgstr "Rebond sortant vers la droite"
+
+#: inc/class-popup-base.php:509
+msgid "Bounce Out Left"
+msgstr "Rebond sortant vers la gauche"
+
+#: inc/class-popup-base.php:508
+msgid "Bounce Out Down"
+msgstr "Rebond sortant vers le bas"
+
+#: inc/class-popup-base.php:507
+msgid "Bounce Out"
+msgstr "Rebond sortant"
+
+#: inc/class-popup-base.php:506
+msgid "Bouncing Exits"
+msgstr "Sorties avec rebond"
+
+#: inc/class-popup-base.php:498
+msgid "Zoom In Up"
+msgstr "Zoom avant par le haut"
+
+#: inc/class-popup-base.php:497
+msgid "Zoom In Right"
+msgstr "Zoom avant par la droite"
+
+#: inc/class-popup-base.php:496
+msgid "Zoom In Left"
+msgstr "Zoom avant par la gauche"
+
+#: inc/class-popup-base.php:495
+msgid "Zoom In Down"
+msgstr "Zoom avant par le bas"
+
+#: inc/class-popup-base.php:494
+msgid "Zoom In"
+msgstr "Zoom avant"
+
+#: inc/class-popup-base.php:493
+msgid "Zoom Entrances"
+msgstr "Entrées de zoom"
+
+#: inc/class-popup-base.php:491
+msgid "Roll In"
+msgstr "Roulement avant"
+
+#: inc/class-popup-base.php:490 inc/class-popup-base.php:538
+msgid "Specials"
+msgstr "Spéciaux"
+
+#: inc/class-popup-base.php:488
+msgid "Rotate In Up Right"
+msgstr "Rotation avant par le haut droite"
+
+#: inc/class-popup-base.php:487
+msgid "Rotate In Up Left"
+msgstr "Rotation avant par le haut gauche"
+
+#: inc/class-popup-base.php:486
+msgid "Rotate In Down Right"
+msgstr "Rotation avant par le bas droite"
+
+#: inc/class-popup-base.php:485
+msgid "Rotate In Down Left"
+msgstr "Rotation avant par le bas gauche"
+
+#: inc/class-popup-base.php:484
+msgid "Rotate In"
+msgstr "Rotation avant"
+
+#: inc/class-popup-base.php:483
+msgid "Rotating Entrances"
+msgstr "Entrée avec rotation"
+
+#: inc/class-popup-base.php:481
+msgid "Light Speed In"
+msgstr "Animation « Lightspeed » avant"
+
+#: inc/class-popup-base.php:480 inc/class-popup-base.php:528
+msgid "Lightspeed"
+msgstr "Animation « Lightspeed »"
+
+#: inc/class-popup-base.php:478
+msgid "Flip In Y"
+msgstr "Retourner verticalement"
+
+#: inc/class-popup-base.php:477
+msgid "Flip In X"
+msgstr "Retourner horizontalement"
+
+#: inc/class-popup-base.php:476
+msgid "Flip"
+msgstr "Retourner"
+
+#: inc/class-popup-base.php:475 inc/class-popup-base.php:524
+msgid "Flippers"
+msgstr "Actions de retournement"
+
+#: inc/class-popup-base.php:473
+msgid "Fade In Up Big"
+msgstr "Apparition en fondu par le haut (grand)"
+
+#: inc/class-popup-base.php:472
+msgid "Fade In Up"
+msgstr "Apparition en fondu par le haut"
+
+#: inc/class-popup-base.php:471
+msgid "Fade In Right Big"
+msgstr "Apparition en fondu par la droite (grand)"
+
+#: inc/class-popup-base.php:470
+msgid "Fade In Right"
+msgstr "Apparition en fondu vers la droite"
+
+#: inc/class-popup-base.php:469
+msgid "Fade In Left Big"
+msgstr "Apparition en fondu vers la gauche, en grand"
+
+#: inc/class-popup-base.php:468
+msgid "Fade In Left"
+msgstr "Apparition en fondu vers la gauche"
+
+#: inc/class-popup-base.php:467
+msgid "Fade In Down Big"
+msgstr "Apparition en fondu vers le bas, en grand"
+
+#: inc/class-popup-base.php:466
+msgid "Fade In Down"
+msgstr "Apparition en fondu vers le bas"
+
+#: inc/class-popup-base.php:465
+msgid "Fade In"
+msgstr "Apparition en fondu"
+
+#: inc/class-popup-base.php:464
+msgid "Fading Entrances"
+msgstr "Apparition en fondu"
+
+#: inc/class-popup-base.php:462
+msgid "Bounce In Up"
+msgstr "Rebond entrant vers le haut"
+
+#: inc/class-popup-base.php:461
+msgid "Bounce In Right"
+msgstr "Rebond entrant vers la droite"
+
+#: inc/class-popup-base.php:460
+msgid "Bounce In Left"
+msgstr "Rebond entrant vers la gauche"
+
+#: inc/class-popup-base.php:459
+msgid "Bounce In Down"
+msgstr "Rebond entrant vers le bas"
+
+#: inc/class-popup-base.php:458
+msgid "Bounce In"
+msgstr "Rebond entrant"
+
+#: inc/class-popup-base.php:457
+msgid "Bouncing Entrances"
+msgstr "Entrées de rebond"
+
+#: inc/class-popup-base.php:455
+msgid "Wobble"
+msgstr "Trembler"
+
+#: inc/class-popup-base.php:454
+msgid "Tada"
+msgstr "Tada"
+
+#: inc/class-popup-base.php:453
+msgid "Swing"
+msgstr "Balancer"
+
+#: inc/class-popup-base.php:452
+msgid "Shake"
+msgstr "Secouer"
+
+#: inc/class-popup-base.php:451
+msgid "Rubber Band"
+msgstr "Bande élastique"
+
+#: inc/class-popup-base.php:450
+msgid "Pulse"
+msgstr "Pulsation"
+
+#: inc/class-popup-base.php:449
+msgid "Flash"
+msgstr "Flash"
+
+#: inc/class-popup-base.php:448
+msgid "Bounce"
+msgstr "Rebond"
+
+#: inc/class-popup-base.php:447
+msgid "Attention Seekers"
+msgstr "Besoin d’attention"
+
+#: inc/class-popup-base.php:445 inc/class-popup-base.php:504
+msgid "(No Animation)"
+msgstr "(Aucune animation)"
+
+#: inc/class-popup-base.php:441 inc/class-popup-base.php:804
+#: views/meta-appearance.php:181
+msgid "PRO Version"
+msgstr "Version Pro"
+
+#: inc/class-popup-admin.php:1069
+msgid "Name this PopUp"
+msgstr "Nommer cette fenêtre surgissante"
+
+#: inc/class-popup-admin.php:1066
+msgid "PopUp Name (not displayed on the PopUp)"
+msgstr "\tNom de la fenêtre surgissante (non affichée dans la fenêtre)"
+
+#: inc/class-popup-admin.php:1044
+msgid "Save PopUp"
+msgstr "Enregistrer la fenêtre surgissante"
+
+#: inc/class-popup-admin.php:1035
+msgid "Custom CSS (optional)"
+msgstr "CSS personnalisé (facultatif)"
+
+#: inc/class-popup-admin.php:1026
+msgid "Displaying Conditions (optional)"
+msgstr "Conditions d’affichage (facultatif)"
+
+#: inc/class-popup-admin.php:1017
+msgid "Behavior"
+msgstr "Comportement"
+
+#: inc/class-popup-admin.php:1008
+msgid "Appearance"
+msgstr "Apparence"
+
+#: inc/class-popup-admin.php:999
+msgid "PopUp Contents"
+msgstr "Contenu de fenêtre surgissante"
+
+#: inc/class-popup-admin.php:779
+msgid "%1$s PopUps toggled"
+msgstr "%1$s fenêtres surgissantes permutées"
+
+#: inc/class-popup-admin.php:778
+msgid "One PopUp toggled"
+msgstr "Une fenêtre surgissante permutée"
+
+#: inc/class-popup-admin.php:773
+msgid "%1$s PopUps deactivated"
+msgstr "%1$s fenêtres contextuelles désactivées"
+
+#: inc/class-popup-admin.php:772
+msgid "One PopUp deactivated"
+msgstr "Une fenêtre surgissante désactivée"
+
+#: inc/class-popup-admin.php:767
+msgid "%1$s PopUps activated"
+msgstr "%1$s fenêtres contextuelles activées"
+
+#: inc/class-popup-admin.php:766
+msgid "One PopUp activated"
+msgstr "Une fenêtre surgissante activée"
+
+#: inc/class-popup-admin.php:709
+msgid "One PopUp restored from the Trash."
+msgid_plural "%s PopUps restored from the Trash."
+msgstr[0] "Une fenêtre surgissante restorée de la corbeille."
+msgstr[1] "%s fenêtres surgissantes restorées de la corbeille."
+
+#: inc/class-popup-admin.php:708
+msgid "One PopUp moved to the Trash."
+msgid_plural "%s PopUps moved to the Trash."
+msgstr[0] "Une fenêtre surgissante déplacée dans la corbeille."
+msgstr[1] "%s fenêtres surgissantes déplacées dans la corbeille."
+
+#: inc/class-popup-admin.php:707
+msgid "One PopUp permanently deleted."
+msgid_plural "%s PopUps permanently deleted."
+msgstr[0] "Une fenêtre surgissante supprimée définitivement."
+msgstr[1] "%s fenêtres surgissantes supprimées définitivement."
+
+#: inc/class-popup-admin.php:706
+msgid "One PopUp not updated, somebody is editing it."
+msgid_plural "%s PopUps not updated, somebody is editing them."
+msgstr[0] "Une fenêtre surgissante non mise à jour, un utilisateur est en train de la modifier."
+msgstr[1] "%s fenêtres surgissantes non mises à jour, un utilisateur est en train de les modifier."
+
+#: inc/class-popup-admin.php:705
+msgid "One PopUp updated."
+msgid_plural "%s PopUps updated."
+msgstr[0] "Une fenêtre surgissante modifiée."
+msgstr[1] "%s fenêtres surgissantes modifiées."
+
+#: inc/class-popup-admin.php:636
+msgid "Trash <span class=\"count\">(%1$s)</span>"
+msgstr "Supprimer <span class=\"count\">(%1$s)</span>"
+
+#: inc/class-popup-admin.php:635
+msgid "Inactive <span class=\"count\">(%1$s)</span>"
+msgstr "Inactifs <span class=\"count\">(%1$s)</span>"
+
+#: inc/class-popup-admin.php:634
+msgid "Active <span class=\"count\">(%1$s)</span>"
+msgstr "Actifs <span class=\"count\">(%1$s)</span>"
+
+#: inc/class-popup-admin.php:633
+msgid "All <span class=\"count\">(%1$s)</span>"
+msgstr "Tous <span class=\"count\">(%1$s)</span>"
+
+#: inc/class-popup-admin.php:594
+msgid "Always Show PopUp"
+msgstr "Toujours afficher la fenêtre surgissante"
+
+#: inc/class-popup-admin.php:549
+msgid "Delete Permanently"
+msgstr "Supprimer Définitivement"
+
+#: inc/class-popup-admin.php:547
+msgid "Delete this PopUp permanently"
+msgstr "Supprimer cette fenêtre contextuelle définitivement"
+
+#: inc/class-popup-admin.php:541
+msgid "Trash"
+msgstr "Supprimer"
+
+#: inc/class-popup-admin.php:539
+msgid "Move this PopUp to the Trash"
+msgstr "Déplacer cette fenêtre surgissante à la corbeille"
+
+#: inc/class-popup-admin.php:534
+msgid "Restore"
+msgstr "Restaurer"
+
+#: inc/class-popup-admin.php:532
+msgid "Restore this PopUp from the Trash"
+msgstr "Restaurer cette fenêtre surgissante de la corbeille"
+
+#: inc/class-popup-admin.php:522 views/info-shortcodes.php:104
+msgid "Preview"
+msgstr "Aperçu"
+
+#: inc/class-popup-admin.php:520
+msgid "Preview this PopUp"
+msgstr "Prévisualiser cette fenêtre surgissante"
+
+#: inc/class-popup-admin.php:512
+msgid "Activate this PopUp"
+msgstr "Activer cette fenêtre surgissante"
+
+#: inc/class-popup-admin.php:500
+msgid "Deactivate this PopUp"
+msgstr "Désactiver cette fenêtre contextuelle"
+
+#: inc/class-popup-admin.php:490
+msgid "Edit"
+msgstr "Modifier"
+
+#: inc/class-popup-admin.php:488 inc/class-popup-admin.php:556
+msgid "Edit this PopUp"
+msgstr "Modifier cette fenêtre contextuelle"
+
+#: inc/class-popup-admin.php:439 inc/class-popup-item.php:1141
+msgid "Active"
+msgstr "Actif"
+
+#: inc/class-popup-admin.php:438
+msgid "Order"
+msgstr "Trier"
+
+#: inc/class-popup-admin.php:435
+msgid "Conditions"
+msgstr "Conditions"
+
+#: inc/class-popup-admin.php:434
+msgid "PopUp Name"
+msgstr "Nom de la fenêtre surgissante"
+
+#: inc/class-popup-admin.php:397
+msgid "Your settings have been updated."
+msgstr "Vos réglages ont été mis à jour."
+
+#: inc/class-popup-admin.php:299 inc/class-popup-posttype.php:91
+msgctxt "Post Type General Name"
+msgid "Global PopUps"
+msgstr "\tFenêtres surgissantes globales"
+
+#: inc/class-popup-admin.php:292 inc/class-popup-admin.php:293
+#: inc/class-popup-admin.php:303 inc/class-popup-admin.php:304
+msgid "Settings"
+msgstr "Réglages"
+
+#: inc/class-popup-admin.php:283 inc/class-popup-admin.php:284
+#: inc/class-popup-posttype.php:82
+msgid "Add New"
+msgstr "Ajouter"
+
+#: inc/class-popup-admin.php:272 inc/class-popup-admin.php:273
+#: inc/class-popup-posttype.php:77 inc/class-popup-posttype.php:97
+msgid "PopUp"
+msgstr "Fenêtre surgissante"
+
+#: inc/class-popup-admin.php:111
+msgid "Toggle activation"
+msgstr "Permuter l’activation"
+
+#: inc/class-popup-admin.php:110 inc/class-popup-admin.php:502
+msgid "Deactivate"
+msgstr "Désactiver"
+
+#: inc/class-popup-admin.php:109 inc/class-popup-admin.php:514
+msgid "Activate"
+msgstr "Activer"
+
+#: inc/addons/class-popup-addon-anonymous.php:44
+msgid "Anonymous Script"
+msgstr "Script anonyme"
+
+#: inc/addons/class-popup-addon-anonymous.php:40
+msgid "PRO Verson"
+msgstr "Version Pro"
+
+#: css/tpl/simple/style.php:2
+msgid "Simple"
+msgstr "Simple"
+
+#: css/tpl/old-fullbackground/style.php:2
+msgid "Dark Background Fixed"
+msgstr "Arrière-plan sombre et fixe"
+
+#: css/tpl/old-fixed/style.php:2
+msgid "Default Fixed"
+msgstr "Valeur par défaut fixe"
+
+#: css/tpl/old-default/template.php:33 css/tpl/old-fixed/template.php:33
+#: css/tpl/old-fullbackground/template.php:33 inc/class-popup-item.php:788
+msgid "Never see this message again."
+msgstr "Ne plus voir ce message."
+
+#: css/tpl/old-default/template.php:24 css/tpl/old-fixed/template.php:24
+#: css/tpl/old-fullbackground/template.php:24 css/tpl/simple/template.php:34
+msgid "Close this box"
+msgstr "Fermer cette boîte"
+
+#: css/tpl/old-default/style.php:2
+msgid "Default"
+msgstr "Valeur par défaut"
+
+#: css/tpl/minimal/style.php:2
+msgid "Minimal"
+msgstr "Minimal"
+
+#: css/tpl/cabriolet/style.php:2
+msgid "Cabriolet"
+msgstr "Cabriolet"
