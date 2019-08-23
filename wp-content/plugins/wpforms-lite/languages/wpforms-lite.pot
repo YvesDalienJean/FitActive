@@ -1662,11 +1662,7 @@ msgstr ""
 #: includes/admin/class-settings.php:480
 msgid "Please enter a valid URL."
 msgstr ""
-
 #: includes/class-frontend.php:1293
-#: includes/admin/class-settings.php:486
-msgid "Please enter a valid email address."
-msgstr ""
 
 #: includes/class-frontend.php:1294
 #: includes/admin/class-settings.php:492
@@ -4224,7 +4220,6 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
-#: includes/admin/class-settings.php:178
 #: includes/admin/class-settings.php:409
 msgid "reCAPTCHA"
 msgstr ""
@@ -4266,29 +4261,6 @@ msgstr ""
 
 #: includes/admin/class-settings.php:265
 msgid "Sites already using one type of reCAPTCHA will need to create new site keys before switching to a different option."
-msgstr ""
-
-#. translators: %s - WPForms.com Setup Captcha URL.
-#: includes/admin/class-settings.php:271
-msgid "<a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">Read our walk through</a> to learn more and for step-by-step directions."
-msgstr ""
-
-#: includes/admin/class-settings.php:289
-msgid "License"
-msgstr ""
-
-#: includes/admin/class-settings.php:289
-msgid "Your license key provides access to updates and addons."
-msgstr ""
-
-#: includes/admin/class-settings.php:296
-msgid "License Key"
-msgstr ""
-
-#: includes/admin/class-settings.php:308
-msgid "Include Form Styling"
-msgstr ""
-
 #. translators: %s - WPForms.com documentation URL.
 #: includes/admin/class-settings.php:312
 msgid "Determines which CSS files to load for the site (<a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">please see our tutorial for full details</a>). Unless experienced with CSS or instructed by support, \"Base and Form Theme Styling\" is recommended."

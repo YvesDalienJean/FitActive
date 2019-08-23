@@ -569,7 +569,11 @@
 				var $entriesList = $( '#wpforms-entries-list' );
 
 				// Works on entry list page only.
+<<<<<<< HEAD
 				if ( ! $entriesList.length || $entriesList.find( '.wpforms-dash-widget' ).length ) {
+=======
+				if ( ! $entriesList.length ) {
+>>>>>>> 84374bc... Configuration et Importation du demo fichier XML
 					return;
 				}
 
@@ -1026,7 +1030,11 @@
 			});
 
 			// Integration individual display toggling.
+<<<<<<< HEAD
 			$( document ).on( 'click', '.wpforms-settings-provider:not(.focus-out) .wpforms-settings-provider-header', function( event ) {
+=======
+			$( document ).on( 'click', '.wpforms-settings-provider-header', function( event ) {
+>>>>>>> 84374bc... Configuration et Importation du demo fichier XML
 
 				event.preventDefault();
 

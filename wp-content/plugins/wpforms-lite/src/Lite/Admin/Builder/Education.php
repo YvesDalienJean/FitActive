@@ -1,4 +1,4 @@
-<?php
+s<?php
 
 namespace WPForms\Lite\Admin\Builder;
 

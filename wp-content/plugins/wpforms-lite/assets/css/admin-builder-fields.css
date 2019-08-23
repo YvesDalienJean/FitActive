@@ -334,10 +334,13 @@
 	outline: 0;
 }
 
+<<<<<<< HEAD
 #wpforms-panel-fields .wpforms-field-option-group-toggle.upgrade-modal {
 	opacity: 0.6;
 }
 
+=======
+>>>>>>> 84374bc... Configuration et Importation du demo fichier XML
 #wpforms-panel-fields .wpforms-field-option-group-toggle span {
 	color: #888;
 	font-weight: 300;
