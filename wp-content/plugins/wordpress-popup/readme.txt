@@ -1,101 +1,128 @@
-=== Hustle - Pop-Ups, Slide-ins and Email Opt-ins ===
+=== Hustle Marketing, Social Share, Email Opt-in Form, and Popup Plugin ===
+Plugin Name: Hustle Marketing Social Share, Email Opt-in Form, and Popup Plugin
+Author: WPMU DEV
+Author URI: https://premium.wpmudev.org/
 Contributors: WPMUDEV
-Tags: marketing, floating social, pop-up, slide-in, opt-in, email, advertise, signup, mailing list
+Tags: marketing, floating social, pop-up, popups slide-in, opt-in, email, advertise, signup, mailing list, wordpress pop up plugin, pop up maker
 Requires at least: 4.6
 Tested up to: 5.2
-Stable tag: 7.0.0.1
+Stable tag: 7.0.2
 
-The complete marketing plugin for email opt-ins, pop-up advertising, social sharing, and building your user base.
+Setup email opt-in forms, popups, social share bars, and generate leads with the world-class marketing pop-up builder plugin by WPMU DEV.
 
 == Description ==
 
-<strong>Hustle is the ultimate marketing plugin for building a mailing list, targeted marketing, lead generation, building a social following, improving conversions, and growing your business.</strong>
+*Hustle is the ultimate marketing plugin for building a mailing list with opt-in forms, targeted marketing popups, lead generation, building a social following with share bars, improving conversions, and growing your business by the award-winning developers of [Smush](https://wordpress.org/plugins/wp-smushit/) image optimization and [Forminator](https://wordpress.org/plugins/forminator/) form builder at WPMU DEV.*
 
-Hustle let’s you easily grow your mailing list or display targeted ads across your site with pop-ups, slide-ins, widgets, and shortcodes.
+Hustle lets you easily grow your mailing list or display targeted ads across your site with pop-ups, slide-ins, widgets, and shortcodes.
 
 [youtube  https://www.youtube.com/watch?v=jyxkhFA5J8w]
 
-= Get Busy With Social Sharing =
+★★★★★
+> “This is hands down the best popup plugin for WordPress there is. It’s so easy to use, configure and customize and the interface is also super cool...” - [AmidaC](https://wordpress.org/support/users/amidac/)
+
+★★★★★
+> “Recovering 15%+ of sales due to this. Insanely good. Thanks!” - [lmbpack](https://wordpress.org/support/users/lmbpack/)
+
+★★★★★
+> “Amazing plugin really. Everything you need to create professional ads without spending a dime...amazing integration with MailChimp.” - [Marco Floriano](https://wordpress.org/support/users/marcofloriano/)
+
+### Get Busy With Social Sharing
 Plus, Hustle now includes top social icons for easily building your following on your favorite social networks. Quickly enable the most popular social networks and use floating social, widgets, and shortcodes to add followers. 
 
-* Facebook
-* Twitter
-* Pinterest
-* Reddit
-* LinkedIn
-* VKontakte
+- Facebook
+- Twitter
+- Pinterest
+- Reddit
+- LinkedIn
+- VKontakte
+- 500px
+- Houzz
+- Instagram
+- Twitch
+- YouTube
+- Telegram
+- WhatsApp
 
-= Hustle Makes Styling Easy =
-Hustle let’s you quickly style your marketing to really pop. Choose colors, animations, layouts, drop shadows, and display conditions from the easy-to-use design settings for pop-ups, slide-ins, email opt-ins, and social share bars.
+### Hustle Makes Styling Easy
+Hustle lets you quickly style your marketing to pop. Choose colors, animations, layouts, drop shadows, and display conditions from the easy-to-use design settings for pop-ups, slide-ins, email opt-ins, and social share bars.
 
-= Highly Targeted Display Settings =
+### Highly Targeted Display Settings
 Hustle has all the behaviors and conditions you’ll need to target visitors with email opt-ins or ads. Use time, on-click, scroll, location, position, page, post, login, category, tag, referral link, and device type to reach more users.
 
-= Grow Your Mailing List =
+### Form Builder Integrations
+Hustle integrates with popular free form builders like [Forminator](https://wordpress.org/plugins/forminator/), so you can embed your forms, polls, and quizzes into popups and slide-ins for interactive lead generation. Grow your following and capture more leads with Hustle.
+
+### Grow Your Mailing List
 Hustle integrates with all the popular email services. Just connect your account and start collecting new subscribers.
 
-* AWeber
-* ActiveCampaign
-* Campaign Monitor
-* e-Newsletter plugin
-* Mailchimp & Mailchimp groups
-* Constant Contact
-* ConvertKit
-* GetResponse
-* Hubspot
-* Sendy
-* Mad Mimi
-* Mautic
-* Infusionsoft
-* SendinBlue
-* MailerLite
-* iContact
-* Zapier
-* SendGrid
+- AWeber
+- ActiveCampaign
+- Campaign Monitor
+- MailChimp & MailChimp groups
+- Constant Contact
+- ConvertKit
+- GetResponse
+- Hubspot
+- Sendy
+- Mad Mimi
+- Mautic
+- Infusionsoft
+- SendinBlue
+- MailerLite
+- iContact
+- Zapier
+- SendGrid
 
-= Gutenberg WordPress Editor Block =
+### Gutenberg WordPress Editor Block
 Hustle supports both the Classic Editor plugin and Gutenberg. When you're ready to say goodbye to shortcodes, the Hustle block pulls your opt-ins and embedded content in for you. 
 
-= Smart Exit-Intent =
+### Smart Exit-Intent
 Hustle has exit-intent, a favorite of professional marketers, that detects when visitors are about to leave your site and – BOOM! A pop-up or slide-in to grab their attention.
 
-= ReCAPTCHA Spam Warrior =
+### ReCAPTCHA Spam Warrior
 Keep bot subscribers from taking over your mailing lists. Hustle connects to Googles ReCAPTCHA to protect your signup forms from spam.
 
-= Adblock is no Match for Hustle =
+### Adblock is no Match for Hustle
 Hustle has the moves and displays pop-ups and slide-ins even when Adblockers try to block your content.
 
-= Measure Performance and Results =
+### Measure Performance and Results
 Hustle includes three handy metrics to help you make better marketing decisions including stats on how many times forms are displayed and submitted and conversion rates.
 
-<strong>Features available in Hustle include:</strong>
+*Features available in Hustle include:*
 
-* Pop-ups, slide-ins, widgets, embeds and after post opt-ins
-* 1 free email opt-in (<a href="https://premium.wpmudev.org/project/hustle/utm_source=wordpress.org&utm_medium=readme&utm_campaign=hustle-readme&utm_content=upgrade_to_hustle_pro_for_unlimited_1#trial">upgrade to Hustle Pro for unlimited</a>)
-* 1 free custom content ad (<a href="https://premium.wpmudev.org/project/hustle/utm_source=wordpress.org&utm_medium=readme&utm_campaign=hustle-readme&utm_content=upgrade_to_hustle_pro_for_unlimited_2#trial">upgrade to Hustle Pro for unlimited</a>)
-* 1 free social share bar (<a href="https://premium.wpmudev.org/project/hustle/utm_source=wordpress.org&utm_medium=readme&utm_campaign=hustle-readme&utm_content=upgrade_to_hustle_pro_for_unlimited_3#trial">upgrade to Hustle Pro for unlimited</a>)
-* Built-in designs editor for simple customization
-* Color match your brand, like magic
-* Smooth display animations
-* Aweber, Mailchimp, Mailchimp groups, Constant Contact, Sendy, Infusionsoft, Mad Mimi, Mauntic. GetResponse & Campaign Monitor Ready
-* Super powerful conditions for targeting your audience
-* Track how many times pop-ups, slide-ins and opt-ins are displayed
-* See submissions straight through WordPress
-* Conversion rates overview
-* 4 default layouts
-* Easy management dashboard
-* New features, layouts and sass coming every month
+- Pop-ups, slide-ins, widgets, embeds and after post opt-ins
+- 3 free popups ([upgrade to Hustle Pro for unlimited](https://premium.wpmudev.org/project/hustle/utm_source=wordpress.org&utm_medium=readme&utm_campaign=hustle-readme&utm_content=upgrade_to_hustle_pro_for_unlimited_1#trial))
+- 3 free slide-ins ([upgrade to Hustle Pro for unlimited](https://premium.wpmudev.org/project/hustle/utm_source=wordpress.org&utm_medium=readme&utm_campaign=hustle-readme&utm_content=upgrade_to_hustle_pro_for_unlimited_2#trial))
+- 3 free social share bars ([upgrade to Hustle Pro for unlimited](https://premium.wpmudev.org/project/hustle/utm_source=wordpress.org&utm_medium=readme&utm_campaign=hustle-readme&utm_content=upgrade_to_hustle_pro_for_unlimited_3#trial))
+- 3 free embeds ([upgrade to Hustle Pro for unlimited](https://premium.wpmudev.org/project/hustle/utm_source=wordpress.org&utm_medium=readme&utm_campaign=hustle-readme&utm_content=upgrade_to_hustle_pro_for_unlimited_3#trial))
+- Built-in designs editor for simple customization
+- Color match your brand, like magic
+- Smooth display animations
+- Aweber, MailChimp, MailChimp groups, Constant Contact, Sendy, Infusionsoft, Mad Mimi, Mautic. GetResponse & Campaign Monitor Ready
+- Super powerful conditions for targeting your audience
+- Track how many times pop-ups, slide-ins and opt-ins are displayed
+- See submissions straight through WordPress
+- Conversion rates overview
+- 4 default layouts
+- Easy management dashboard
+- New features, layouts and sass coming every month
 
-Do marketing like a pro with the smooth styles, sass and charm of Hustle pop-ups, slide-ins and email opt-ins for WordPress.
+### A Note From Hummingbird
+Hey! This is Hustle, your trusted popup, email opt-in, and marketing plugin for WordPress. I’m part of the WPMU DEV team, a superhero-suite of WordPress plugins, services, and support. Here are some of our other free plugins:
 
-== Installation ==
+- [Smush](https://wordpress.org/plugins/wp-smushit/) - Image Compression and Optimization
+- [Forminator](https://wordpress.org/plugins/forminator/) - Form, Quiz, Poll and Survey Builder
+- [Hummingbird](https://wordpress.org/plugins/hummingbird-performance/) - Speed up, Cache, Optimize Your CSS and JS
 
-WordPress Installation Instructions:
+And if you need ALL our Pro plugins AND 24/7 WordPress support, get a WPMU DEV membership! You can try it free for 30 days: [premium.wpmudev.org](https://premium.wpmudev.org/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=hustle-readme&utm_content=link_wpmudev#trial)
 
-1. Upload the Hustle plugin to your /wp-content/plugins/ directory.
-2. Activate the plugin through the 'Plugins' menu in WordPress.
-3. Configure your desired settings via the Huste settings page.
-4. Done!
+My superhero friends run the WPMU DEV Blog, your source for the very best WordPress tutorials. If you need to be in the know about WordPress, check it out.
+
+Thanks for looking at Hustle, and I look forward to helping you market and grow your business with popups and more.
+
+ *Enjoy, The Hustle*
+ 
 
 == Frequently Asked Questions ==
 
@@ -117,6 +144,43 @@ No! Hustle gives you all the same settings and options as Hustle Pro. The only d
 
 == Changelog ==
 
+= 7.0.2 =
+* Add a "time" fields in forms
+* Add language options for reCAPTCHA fields
+* Update Facebook's native counter endpoint
+* Fix iframes and forms being removed from the main content
+* Improve accessibility in wizard's custom colors
+* Fix stats at the top of the page not updating in Embeds and Social sharing listings
+* Improve compatibility with Forminator and Gravity Forms on preview
+* Improve compatibility with HubSpot Marketing plugin
+* Fix Automated emails not being sent
+* Make the "embed" shortcode work in the main content
+* Fix forminator scripts being enqueued in the wrong pages
+* Load the stylesheets related to the displayed module types only in frontend
+* Update the existing subscription when an email is added again
+* Improve compatibility between the Aweber library and PHP 7
+* Improve UI/UX details in backend and frontend
+* Improve date formats for the datepicker field
+* Fix Aweber not updating already subscribed users
+* Fix Sendy error when selecting a list with no subscribers
+* Fix Infusionsoft not assigning the selected tag to the added subscriber.
+* Fix shortcodes not displaying when adding multiple in certain order
+* Improve compatibility with Firefox in form fields in frontend
+* Fix unsubscribe functionality not displaying the lists
+* Fix custom styling not being applied for informational modules
+* Update user capabilities when updating the plugin via FTP
+* Fix emails list exporting the displayed entries only
+* Improve compatibility with other plugins requiring wp-color-picker script
+* Fix social sharing modules ignoring the default number when using "Native" counters
+* Fix whitelabel not working for the footer in wizard pages
+* Improve compatibility with GeoDirectory plugin
+* Make embeds follow the settings from "Custom size"
+* Fix embed staying hidden if added via AJAX right after load.
+* Improve custom fields integration for Aweber and ActiveCampaign
+* Fix PHP message when an Embed is removed while being selected in widgets
+* Make the "closing behavior" work on the homepage
+* Fix border color for errors not being applied to inputs
+
 = 7.0.0.1 =
 * All new SUI
 * Support having multiple integrations per module
@@ -134,7 +198,7 @@ No! Hustle gives you all the same settings and options as Hustle Pro. The only d
 * Increase the amount of customizable elements for colors palettes
 * Add option to give form fields custom classes
 * Fix double opt-in for MailerLite not working
-* Support wildcards and regex in "URL" visibility conditions
+* Support wildcards and regex in "URL" visibility conditions 
 * Fix custom Javascript running twice on page load
 * Preview modules via AJAX
 * Adjust outdated countries in the countries list

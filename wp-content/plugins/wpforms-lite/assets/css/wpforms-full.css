@@ -1209,6 +1209,14 @@ div.wpforms-container-full .wpforms-form .wpforms-screen-reader-element {
 /* Small devices */
 @media only screen and (max-width: 600px) {
 
+	/* Аvoid horizontal scroll on mobiles */
+	div.wpforms-container-full .wpforms-form .wpforms-field {
+		overflow-x: hidden;
+	}
+	div.wpforms-container-full .wpforms-form .wpforms-field > * {
+		max-width: 100%;
+	}
+
 	/* Mobile width override */
 	div.wpforms-container-full .wpforms-form .wpforms-mobile-full {
 		width: 100%;

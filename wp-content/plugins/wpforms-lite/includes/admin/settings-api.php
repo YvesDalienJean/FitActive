@@ -101,15 +101,12 @@ function wpforms_settings_content_callback( $args ) {
  */
 function wpforms_settings_license_callback( $args ) {
 
-	$key  = wpforms_setting( 'key', '', 'wpforms_license' );
-	$type = wpforms_setting( 'type', '', 'wpforms_license' );
-
 	// Lite users don't need to worry about license keys.
 	if ( ! wpforms()->pro || ! class_exists( 'WPForms_License', false ) ) {
 
 		$output  = '<p>' . esc_html__( 'You\'re using WPForms Lite - no license needed. Enjoy!', 'wpforms-lite' ) . ' 🙂</p>';
 		$output .=
-			'<div id="wpforms-settings-upgrade-license-key-cont" class="wpforms-hide"><p>' .
+			'<p>' .
 			sprintf(
 				wp_kses(
 					/* translators: %s - WPForms.com upgrade URL. */
@@ -138,12 +135,17 @@ function wpforms_settings_license_callback( $args ) {
 				) .
 			'</p>';
 
-		$output .= '<hr><p>' . esc_html__( 'Already purchased? Simply enter your license key below to automatically unlock WPForms PRO!', 'wpforms-lite' ) . '</p>';
-		$output .= '<p><input type="password" id="wpforms-settings-upgrade-license-key" placeholder="' . esc_attr__( 'Paste license key here', 'wpforms-lite' ) . '" value="' . esc_attr( $key ) . '" /><i class="wpforms-spinner wpforms-hide fa fa-circle-o-notch fa-spin fa-lg fa-fw"></i></p></div>';
-		$output .= '<p><button type="button" class="wpforms-btn wpforms-btn-md wpforms-btn-orange wpforms-hide " id="wpforms-settings-upgrade-btn">' . esc_attr__( 'Unlock PRO Features Now', 'wpforms-lite' ) . '</button></p>';
+		$output .= '<hr><p>' . esc_html__( 'Already purchased?  Simply enter your license key below to connect with WPForms PRO!', 'wpforms-lite' ) . '</p>';
+		$output .= '<p>';
+		$output .= '<input type="password" id="wpforms-settings-upgrade-license-key" placeholder="' . esc_attr__( 'Paste license key here', 'wpforms-lite' ) . '" value="" />';
+		$output .= '<button type="button" class="wpforms-btn wpforms-btn-md wpforms-btn-orange" id="wpforms-settings-connect-btn">' . esc_attr__( 'Connect', 'wpforms-lite' ) . '</button>';
+		$output .= '</p>';
 
 		return $output;
 	}
+
+	$key  = wpforms_setting( 'key', '', 'wpforms_license' );
+	$type = wpforms_setting( 'type', '', 'wpforms_license' );
 
 	$output  = '<input type="password" id="wpforms-setting-license-key" value="' . esc_attr( $key ) . '" />';
 	$output .= '<button id="wpforms-setting-license-key-verify" class="wpforms-btn wpforms-btn-md wpforms-btn-orange">' . esc_html__( 'Verify Key', 'wpforms-lite' ) . '</button>';

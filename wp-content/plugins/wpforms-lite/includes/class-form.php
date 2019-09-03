@@ -485,10 +485,10 @@ class WPForms_Form_Handler {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string $form_id
-	 * @param string $field
+	 * @param string $form_id Form ID.
+	 * @param string $field   Field.
 	 *
-	 * @return bool
+	 * @return false|array
 	 */
 	public function get_meta( $form_id, $field = '' ) {
 
@@ -496,9 +496,12 @@ class WPForms_Form_Handler {
 			return false;
 		}
 
-		$data = $this->get( $form_id, array(
-			'content_only' => true,
-		) );
+		$data = $this->get(
+			$form_id,
+			array(
+				'content_only' => true,
+			)
+		);
 
 		if ( isset( $data['meta'] ) ) {
 			if ( empty( $field ) ) {

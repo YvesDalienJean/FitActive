@@ -569,7 +569,7 @@
 				var $entriesList = $( '#wpforms-entries-list' );
 
 				// Works on entry list page only.
-				if ( ! $entriesList.length ) {
+				if ( ! $entriesList.length || $entriesList.find( '.wpforms-dash-widget' ).length ) {
 					return;
 				}
 
@@ -1026,7 +1026,7 @@
 			});
 
 			// Integration individual display toggling.
-			$( document ).on( 'click', '.wpforms-settings-provider-header', function( event ) {
+			$( document ).on( 'click', '.wpforms-settings-provider:not(.focus-out) .wpforms-settings-provider-header', function( event ) {
 
 				event.preventDefault();
 

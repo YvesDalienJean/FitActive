@@ -21,7 +21,7 @@ class Summaries {
 
 		$this->hooks();
 
-		$summaries_disabled = $this->is_summaries_disabled();
+		$summaries_disabled = $this->is_disabled();
 
 		if ( $summaries_disabled && \wp_next_scheduled( 'wpforms_email_summaries_cron' ) ) {
 			\wp_clear_scheduled_hook( 'wpforms_email_summaries_cron' );
@@ -57,7 +57,7 @@ class Summaries {
 
 		\add_filter( 'wpforms_settings_defaults', array( $this, 'disable_summaries_setting' ) );
 
-		if ( ! $this->is_summaries_disabled() ) {
+		if ( ! $this->is_disabled() ) {
 			\add_action( 'init', array( $this, 'preview' ) );
 			\add_filter( 'cron_schedules', array( $this, 'add_weekly_cron_schedule' ) );
 			\add_action( 'wpforms_email_summaries_cron', array( $this, 'cron' ) );
@@ -71,9 +71,9 @@ class Summaries {
 	 *
 	 * @return bool
 	 */
-	protected function is_summaries_disabled() {
+	protected function is_disabled() {
 
-		return (bool) \wpforms_setting( 'email-summaries-disable' );
+		return (bool) apply_filters( 'wpforms_emails_summaries_is_disabled', (bool) \wpforms_setting( 'email-summaries-disable' ) );
 	}
 
 	/**
@@ -87,6 +87,10 @@ class Summaries {
 	 */
 	public function disable_summaries_setting( $settings ) {
 
+		if ( (bool) apply_filters( 'wpforms_emails_summaries_is_disabled', false ) ) {
+			return $settings;
+		}
+
 		$url = \add_query_arg(
 			array(
 				'wpforms_email_template' => 'summary',
@@ -97,7 +101,7 @@ class Summaries {
 
 		$desc = \esc_html__( 'Disable Email Summaries weekly delivery.', 'wpforms-lite' );
 
-		if ( ! $this->is_summaries_disabled() ) {
+		if ( ! $this->is_disabled() ) {
 			$desc .= '<br><a href="' . $url . '" target="_blank">' . \esc_html__( 'View Email Summary Example', 'wpforms-lite' ) . '</a>';
 		}
 

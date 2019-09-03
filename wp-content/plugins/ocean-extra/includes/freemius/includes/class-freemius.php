@@ -493,7 +493,7 @@
             );
 
             if ( 'true' === fs_request_get( 'fs_clear_api_cache' ) ||
-                 'true' === fs_request_is_action( 'restart_freemius' )
+                 fs_request_is_action( 'restart_freemius' )
             ) {
                 FS_Api::clear_cache();
                 $this->_cache->clear();
@@ -12334,6 +12334,8 @@
             $is_marketing_allowed = null,
             $plugin_id = null
         ) {
+            $this->_logger->entrance();
+
             $result = $this->activate_license(
                 $license_key,
                 $this->is_network_active() ?

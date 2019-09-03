@@ -146,6 +146,8 @@ function wpforms_admin_scripts() {
 		'importer_forms_required'         => esc_html__( 'Please select at least one form to import.', 'wpforms-lite' ),
 		'isPro'                           => wpforms()->pro,
 		'nonce'                           => wp_create_nonce( 'wpforms-admin' ),
+		'almost_done'                     => esc_html__( 'Almost Done', 'wpforms-lite' ),
+		'oops'                            => esc_html__( 'Oops!', 'wpforms-lite' ),
 		'ok'                              => esc_html__( 'OK', 'wpforms-lite' ),
 		'plugin_install_activate_btn'     => esc_html__( 'Install and Activate', 'wpforms-lite' ),
 		'plugin_install_activate_confirm' => esc_html__( 'needs to be installed and activated to import its forms. Would you like us to install and activate it for you?', 'wpforms-lite' ),
@@ -154,6 +156,7 @@ function wpforms_admin_scripts() {
 		'provider_delete_confirm'         => esc_html__( 'Are you sure you want to disconnect this account?', 'wpforms-lite' ),
 		'provider_auth_error'             => esc_html__( 'Could not authenticate with the provider.', 'wpforms-lite' ),
 		'save_refresh'                    => esc_html__( 'Save and Refresh', 'wpforms-lite' ),
+		'server_error'                    => esc_html__( 'Unfortunately, there was an server connection error.', 'wpforms-lite' ),
 		'settings_form_style_base'        => sprintf(
 			wp_kses(
 				/* translators: %s - WPForms.com docs page URL. */

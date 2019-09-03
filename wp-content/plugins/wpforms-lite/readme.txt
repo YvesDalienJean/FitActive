@@ -3,7 +3,7 @@ Contributors: wpforms, jaredatch, smub, slaFFik
 Tags: contact form, contact form plugin, forms, form builder, custom form, contact button, contact me, custom contact form, form manager, form, forms builder, forms creator, captcha, recaptcha, Akismet, email form, web form, feedback form, payment form, survey form, donation form, email submit form, message form, mailchimp, mailchimp form, aweber, aweber form, paypal, paypal form, stripe, stripe form, getresponse, getresponse form, email subscription, contact form widget, user registration form, wordpress registration, wordpress login form, feedback
 Requires at least: 4.8
 Tested up to: 5.2
-Stable tag: 1.5.4.2
+Stable tag: 1.5.5
 Requires PHP: 5.3.3
 License: GNU General Public License v2.0 or later
 
@@ -74,32 +74,60 @@ See what one business owner has to say about WPForms' contact form:
 
 Along with contact form, you can also use WPForms to create surveys and polls.
 
-Our <a href="https://wpforms.com/addons/surveys-and-polls-addon/?utm_source=wprepo&utm_medium=link&utm_campaign=liteversion" rel="friend">WordPress Survey plugin addon</a> comes with smart survey fields including likert scale, star ratings, multiple choice, Net Promoter Score (NPS), and more.
+Our <a href="https://wpforms.com/addons/surveys-and-polls-addon/?utm_source=wprepo&utm_medium=link&utm_campaign=liteversion" rel="friend">WordPress Survey plugin addon</a> comes with smart survey fields including likert scale, star ratings, multiple choice, Net Promoter Score (NPS), and more, so you can create custom survey forms like Survey Monkey (without the high costs).
 
 WPForms offer the best-in class survey reporting. You can use our interactive reports to customize the graphs, export them for your presentations, and even display the aggregate results to your users.
 
-The best part about WPForms survey reports is that it can retroactively work on any old contact form created with WPForms.
+The best part about WPForms survey reports is that it can retroactively work on any old contact form or feedback survey contact form created with WPForms.
 
-You can also use the surveys & polls addon to easily create a poll on your site. Our poll feature offers real-time reports, so you can share poll results with the user immediately after they submit their vote.
+Thousands of businesses love WPForms surveys for creating employee feedback form, customer feedback form, online petition form, and more.
+
+You can also use the surveys & polls addon to easily create a poll on your site. To save you time when creating a user poll, we have added a built-in poll forms template. Our poll feature offers real-time reports, so you can share poll results with the user immediately after they submit their vote.
 
 Just like the contact form, you can embed your surveys and polls inside any post, page, or widget area in WordPress.
+
+= Membership and Default WordPress Forms =
+
+Aside from building simple contact forms which every WordPress site needs, WPForms also helps you create better default WordPress forms.
+
+For example, you can use WPForms to create custom WordPress login forms and custom WordPress user registration forms which are great for <a href="https://www.wpbeginner.com/wp-tutorials/ultimate-guide-to-creating-a-wordpress-membership-site/">membership sites</a>.
+
+For membership sites, you can also use WPForms to create a password-protected contact form or even a members only contact form which is restricited to logged-in users only.
+
+Even if you're not using a WordPress membership plugin, you can use WPForms to create membership registration forms, online RSVP forms, and other address book contact forms.
+
+Bloggers and publishers can use our WordPress post submission forms to accept guest posts, testimonials contact form to collect testiomnials, and partnership agreement forms to grow their business.
 
 = Payment Form, Donation Form, Booking Form, and More =
 
 While WPForms started out as a contact form plugin, it has evolved into a powerful forms solution that you can use to create a payment form, donation form, registration form, online booking form, and more.
 
-WPForms integrates with both PayPal and Stripe to make it easy for you to accept credit card payments online. It even comes with a signature field to collect user signature on your WordPress forms.
+WPForms integrates with both PayPal and Stripe, so you can easily create a credit card payment form to accept payments on your website. If you're using SSL, then you can use our Stripe Payment form to accept credit card payments. Alternatively you can use our PayPal payment form to make a donation form and accept payments online.
 
-You can do all of this while still using the same easy-to-use contact form builder that's loved by over 1 million users.
+Aside from simple order forms, business owners also use WPForms to create custom product purchase forms, t-shit order forms, online booking forms, and more.
+
+We understand that sometimes you may need to create a contact form that require a signature. WPForms comes with a signature field to collect user signature on your WordPress forms or even create custom signature forms.
+
+You can do all of this while still using the same easy-to-use contact form builder that's loved by over 2 million users.
 
 >I am so impressed with this plugin. I decided to give it a shot over some of the other form plugins, and I am so glad I did. It works well, is so easy to use and customize. The support is amazing on top of it all. I got the pro version because I was so pleased. Highly recommend.<br>
 > Micky73 - WordPress user
 
+= Forms that are Optimized for Conversion and Results =
+
+With our Form Pages addon, you can create distraction-free custom form landing pages like Google Forms and Wufoo right inside WordPress, so you can increase conversions without the high costs (<a href="https://wpforms.com/addons/form-pages-addon/?utm_source=wprepo&utm_medium=link&utm_campaign=liteversion" rel="friend">See Form Pages Demo</a>).
+
+To improve form completion rate, we created Conversational Forms&reg; which helps you make your generic feedback form and other custom contact forms feel more human by adding an interactive form layout. Our conversational forms are similar to Typeform without the high subscription costs (<a href="https://wpforms.com/addons/conversational-forms-addon/?utm_source=wprepo&utm_medium=link&utm_campaign=liteversion" rel="friend">See Conversaional Forms Demo</a>).
+
+WPForms also has other conversion optimization features such as our smart form logic that lets you create dynamic contact forms where fields change based on user's answer, multi-page contact forms with progress bar, and other advanced contact forms.
+
+WPForms form analytics integration with MonsterInsights allow you to easily track your lead capture forms, newsletter signup forms, request a quote contact form, and other important forms on your site.
+
 = Easy to Customize and Extend =
 
-You can easily customize your contact forms with our section dividers, HTML blocks, an custom CSS.
+You can easily customize your contact forms with our section dividers, HTML blocks, and custom CSS.
 
-We also knew that our developer friends may want to extend contact forms further. That's why WPForms come with tons of hooks and filters to create custom functionality.
+We also knew that our developer friends may want to extend simple contact forms further. That's why WPForms come with tons of hooks and filters to create custom functionality.
 
 Since contact forms are essential for marketing, WPForms is a must have plugin for every website!
 
@@ -165,7 +193,8 @@ If you like this plugin, then consider checking out our other projects:
 * <a href="https://optinmonster.com/" rel="friend" title="OptinMonster">OptinMonster</a> - Get More Email Subscribers with the most popular conversion optimization plugin for WordPress.
 * <a href="https://www.monsterinsights.com/" rel="friend" title="MonsterInsights">MonsterInsights</a> - See the Stats that Matter and Grow Your Business with Confidence. Best Google Analytics Plugin for WordPress.
 * <a href="https://www.seedprod.com/" rel="friend" title="SeedProd">SeedProd</a> - Jumpstart your website with the #1 Coming Soon & Maintenance Mode Plugin for WordPress.
-* <a href="https://wordpress.org/plugins/wp-mail-smtp/">WP Mail SMTP</a> - Improve email deliverability for your contact form with the most popular SMTP plugin for WordPress.
+* <a href="https://wpmailsmtp.com">WP Mail SMTP</a> - Improve email deliverability for your contact form with the most popular SMTP plugin for WordPress.
+* <a href="https://rafflepress.com/">RafflePress</a> - Best WordPress giveaway and contest plugin.
 
 Visit <a href="http://www.wpbeginner.com/" rel="friend" title="WPBeginner">WPBeginner</a> to learn from our <a href="http://www.wpbeginner.com/category/wp-tutorials/" rel="friend" title="WordPress Tutorials">WordPress Tutorials</a> and find out about other <a href="http://www.wpbeginner.com/category/plugins/" rel="friend" title="Best WordPress Plugins">best WordPress plugins</a>.
 
@@ -201,60 +230,23 @@ Absolutely not. You can create and manage forms without any coding knowledge (10
 WPForms drag & drop form builder combined with our addons is the most powerful WordPress contact form plugin in the market. Here are some types of WordPress forms you can create:
 
 * Simple Contact Forms
-* Advanced Contact Forms
-* Custom Contact Forms
-* Multi-Page Contact Forms with Progress Bar
-* Dynamic Contact Forms (where fields change based on user's answers)
-* Request a Quote Contact Form
 * Job Application Contact Form
 * Feedback Survey Contact Form
 * Make a Suggestion Contact Form
-* Testimonials Contact Form
 * Change Request Forms
 * Online Booking Forms
 * Event Booking Form
-* Online RSVP Forms
-* Custom WordPress User Registration Forms (Great for membership sites)
-* Custom WordPress Login Forms
-* WordPress Post Submission Forms (Great for Guest Posts)
-* Credit Card Payment Forms
-* PayPal Payment Form
-* Stripe Payment Form
-* Make a Donation Forms
-* T-Shirt Order Forms
-* Product Purchase Forms
-* Lead Capture Forms
-* Newsletter Signup Forms
-* MailChimp Forms
-* AWeber Forms
-* Constant Contact Forms
-* GetResponse Signup Forms
-* Campaign Monitor Forms
-* Drip Forms
 * Video Release Forms
-* Partnership Agreement Forms
 * PTO Request Contact Form
-* Online Petition Form
-* Contact Forms that Require a Signature
-* Custom Signature Forms
 * Maintenance Request Contact Form
 * Scholarship Application Forms
 * File Download Forms
 * Employment Verification Forms
-* Employee Feedback Form
-* Customer Feedback Form
-* Generic Feedback Form
 * Make a Referral Contact Form
 * Volunteer Registration Contact Form
-* Membership Registration Forms
-* Address Book Contact Forms
-* Custom Survey Forms like Survey Monkey
-* Poll Forms
 * Offline Contact Form
-* Password-Protected Contact Form
-* Members Only Contact Form
-* Conversational Forms like Typeform
-* Custom Form Landing Page like Google Forms and Wufoo
+
+To see a full list, visit our <a href="https://wpforms.com/demo/?utm_source=wprepo&utm_medium=link&utm_campaign=liteversion" rel="friend">Form Template Gallery</a> which has over 150+ pre-made contact form templates.
 
 = Which Form Fields Does WPForms offer? =
 
@@ -303,7 +295,7 @@ Here is a list of our Payment Fields that will help you create a order form, don
 
 = Can I integrate WPForms with my CRM or Email Marketing Service? =
 
-Yes, WPForms offers seamless integration with over 1,000+ popular marketing and CRM software.
+Yes, WPForms offers seamless integration with over 1,000+ popular <a href="https://www.wpbeginner.com/showcase/best-email-marketing-services/">email marketing</a> and <a href="https://www.wpbeginner.com/showcase/best-crm-software-for-small-businesses-compared/">CRM software</a>.
 
 You can easily send data from your contact form and other WordPress forms to your favorite CRM, email newsletter, and other marketing platforms.
 
@@ -347,7 +339,9 @@ Using our Zapier integration, you can easily connect WPForms with over 1000+ mar
 * Acuity Scheduling
 * Quickbooks Online
 
-WPForms was voted Zapier's 8th fastest growing app in the world.
+See all <a href="https://zapier.com/apps/wpforms/integrations">WPForms Zapier Integrations</a>.
+
+Note: WPForms was voted Zapier's 8th fastest growing app in the world.
 
 = Can I create a Payment Form with WPForms =
 
@@ -406,6 +400,16 @@ Thank you
 Syed Balkhi
 
 == Changelog ==
+
+= 1.5.5 =
+- Added: WPForms details inside Site Health Info reports (Tools > Site Health > Info).
+- Added: Filter `wpforms_emails_summaries_is_disabled` to easily disable Email Summaries functionality.
+- Added: New smart tag: `{field_html_id="42"}` - that will postprocess field value and display its HTML representation.
+- Changed: Improve `wpforms_get_ip()` IP detection and related `{user_ip}` smart-tag value.
+- Fixed: Giving access to WPForms for Editors (and other roles) should give access to dashboard widget as well.
+- Fixed: Add 'attr' property to 'input_container' for radio/checkbox-based fields.
+- Fixed: Various typos.
+- Fixed: WP Mail SMTP plugin description on About us page.
 
 = 1.5.4.2 =
 - Changed: Renamed certain actions with typos in their names, backwards-compatible. Added a deprecation text using `do_action_deprecated()`.

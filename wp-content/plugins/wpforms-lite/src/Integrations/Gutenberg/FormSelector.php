@@ -104,7 +104,7 @@ class FormSelector implements IntegrationInterface {
 			'show_title'        => \esc_html__( 'Show Title', 'wpforms-lite' ),
 			'show_description'  => \esc_html__( 'Show Description', 'wpforms-lite' ),
 			'panel_notice_head' => \esc_html__( 'Heads up!', 'wpforms-lite' ),
-			'panel_notice_text' => \esc_html__( 'Dont forget to test your form.', 'wpforms-lite' ),
+			'panel_notice_text' => \esc_html__( 'Do not forget to test your form.', 'wpforms-lite' ),
 			'panel_notice_link' => \esc_html__( 'Check out our complete guide!', 'wpforms-lite' ),
 		);
 

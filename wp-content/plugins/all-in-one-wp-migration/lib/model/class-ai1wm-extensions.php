@@ -89,6 +89,19 @@ class Ai1wm_Extensions {
 			);
 		}
 
+		// Add Direct Extension
+		if ( defined( 'AI1WMXE_PLUGIN_NAME' ) ) {
+			$extensions[ AI1WMXE_PLUGIN_NAME ] = array(
+				'key'      => AI1WMXE_PLUGIN_KEY,
+				'title'    => AI1WMXE_PLUGIN_TITLE,
+				'about'    => AI1WMXE_PLUGIN_ABOUT,
+				'basename' => AI1WMXE_PLUGIN_BASENAME,
+				'version'  => AI1WMXE_VERSION,
+				'requires' => '1.0',
+				'short'    => AI1WMXE_PLUGIN_SHORT,
+			);
+		}
+
 		// Add Dropbox Extension
 		if ( defined( 'AI1WMDE_PLUGIN_NAME' ) ) {
 			$extensions[ AI1WMDE_PLUGIN_NAME ] = array(

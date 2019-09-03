@@ -1,5 +1,15 @@
 == Changelog ==
 
+= 1.5.5 =
+- Added: WPForms details inside Site Health Info reports (Tools > Site Health > Info).
+- Added: Filter `wpforms_emails_summaries_is_disabled` to easily disable Email Summaries functionality.
+- Added: New smart tag: `{field_html_id="42"}` - that will postprocess field value and display its HTML representation.
+- Changed: Improve `wpforms_get_ip()` IP detection and related `{user_ip}` smart-tag value.
+- Fixed: Giving access to WPForms for Editors (and other roles) should give access to dashboard widget as well.
+- Fixed: Add 'attr' property to 'input_container' for radio/checkbox-based fields.
+- Fixed: Various typos.
+- Fixed: WP Mail SMTP plugin description on About us page.
+
 = 1.5.4.2 =
 - Changed: Renamed certain actions with typos in their names, backwards-compatible. Added a deprecation text using `do_action_deprecated()`.
 - Fixed: About Us page behaviour when WP Mail SMTP Pro is installed.

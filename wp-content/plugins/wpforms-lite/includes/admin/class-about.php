@@ -774,13 +774,13 @@ class WPForms_About {
 			'wp-mail-smtp/wp_mail_smtp.php'         => array(
 				'icon' => WPFORMS_PLUGIN_URL . 'assets/images/about/plugin-smtp.png',
 				'name' => esc_html__( 'WP Mail SMTP', 'wpforms-lite' ),
-				'desc' => esc_html__( 'SMTP (Simple Mail Transfer Protocol) is an industry standard for sending emails. SMTP helps increase email deliverability by using proper authentication.', 'wpforms-lite' ),
+				'desc' => esc_html__( 'Make sure your website\'s emails reach the inbox. Our goal is to make email deliverability easy and reliable. Trusted by over 1 million websites.', 'wpforms-lite' ),
 				'url'  => 'https://downloads.wordpress.org/plugin/wp-mail-smtp.zip',
 				'pro'  => array(
 					'plug' => 'wp-mail-smtp-pro/wp_mail_smtp.php',
 					'icon' => WPFORMS_PLUGIN_URL . 'assets/images/about/plugin-smtp.png',
 					'name' => esc_html__( 'WP Mail SMTP Pro', 'wpforms-lite' ),
-					'desc' => esc_html__( 'SMTP (Simple Mail Transfer Protocol) is an industry standard for sending emails. SMTP helps increase email deliverability by using proper authentication.', 'wpforms-lite' ),
+					'desc' => esc_html__( 'Make sure your website\'s emails reach the inbox. Our goal is to make email deliverability easy and reliable. Trusted by over 1 million websites.', 'wpforms-lite' ),
 					'url'  => 'https://wpmailsmtp.com/pricing/',
 					'act'  => 'go-to-url',
 				),
