@@ -3,7 +3,7 @@
  * Plugin Name:			Ocean Extra
  * Plugin URI:			https://oceanwp.org/extension/ocean-extra/
  * Description:			Add extra features like widgets, metaboxes, import/export and a panel to activate the premium extensions.
- * Version:				1.5.13
+ * Version:				1.5.15
  * Author:				OceanWP
  * Author URI:			https://oceanwp.org/
  * Requires at least:	4.5.0
@@ -590,8 +590,59 @@ function owp_include_client_migration() {
 	require_once dirname( __FILE__ ) . '/includes/client-migration/edd.php';
 
 	owp_fs()->add_filter( 'has_paid_plan_account', '__return_false' );
+	owp_fs()->add_filter( 'is_submenu_visible', 'owp_fs_is_submenu_visible', 10, 2 );
 }
 
 add_action( 'owp_fs_loaded', 'owp_include_client_migration' );
+
+function owp_fs_is_submenu_visible( $is_visible, $submenu_id ) {
+	if ( 'pricing' === $submenu_id ) {
+		$show_pricing_transient = get_transient( 'oceanwp_show_pricing' );
+
+		if ( is_string( $show_pricing_transient ) ) {
+			$show_pricing = ( 'yes' === $show_pricing_transient );
+		} else {
+			$show_pricing = true;
+
+			foreach ( OceanWP_EDD_License_Key::$paid_addons as $class_name => $data ) {
+				if ( ! class_exists( $class_name ) ) {
+					continue;
+				}
+
+				if ( ! function_exists( $data['fs_shortcode'] ) ) {
+					continue;
+				}
+
+				/**
+				 * Initiate the Freemius instance before migrating.
+				 *
+				 * @var Freemius $addon_fs
+				 */
+				$addon_fs = call_user_func( $data['fs_shortcode'] );
+
+				if ( $addon_fs->has_active_valid_license() ) {
+					$licenses = $addon_fs->_get_license();
+
+					if ( is_object( $licenses ) &&
+					     FS_Plugin_License::is_valid_id( $licenses->parent_license_id )
+					) {
+						$show_pricing = false;
+						break;
+					}
+				}
+			}
+
+			set_transient(
+				'oceanwp_show_pricing',
+				$show_pricing ? 'yes' : 'no',
+				WP_FS__TIME_24_HOURS_IN_SEC
+			);
+		}
+
+		return $show_pricing;
+	}
+
+	return $is_visible;
+}
 
 #endregion

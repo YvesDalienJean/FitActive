@@ -152,34 +152,6 @@ class WPForms_Settings {
 	 */
 	public function enqueues() {
 
-		$min = \wpforms_get_min_suffix();
-
-		// Enqueue Lite's assets.
-		if ( ! wpforms()->pro ) {
-			\wp_enqueue_script(
-				'wpforms-upgrade',
-				\WPFORMS_PLUGIN_URL . "lite/assets/js/admin/upgrade{$min}.js",
-				array( 'jquery' ),
-				\WPFORMS_VERSION,
-				true
-			);
-
-			\wp_localize_script(
-				'wpforms-upgrade',
-				'wpforms_upgrade',
-				array(
-					'error'                         => esc_html__( 'Oops!', 'wpforms-lite' ),
-					'error_intro'                   => esc_html__( 'Unfortunately, there was an server connection error:', 'wpforms-lite' ),
-					'upgrd_to_pro_license_ok_title' => esc_html__( 'Almost Done', 'wpforms-lite' ),
-					'upgrd_to_pro_license_ok_msg'   => esc_html__( 'We can automatically upgrade the installed version to WPForms PRO.', 'wpforms-lite' ),
-					'upgrd_to_pro_btn_ok'           => esc_html__( 'Ok', 'wpforms-lite' ),
-					'upgrd_to_pro_btn_upgrade'      => esc_html__( 'Upgrade now', 'wpforms-lite' ),
-					'upgrd_to_pro_btn_activate'     => esc_html__( 'Activate now', 'wpforms-lite' ),
-					'upgrd_to_pro_btn_cancel'       => esc_html__( 'Do upgrade later', 'wpforms-lite' ),
-				)
-			);
-		}
-
 		do_action( 'wpforms_settings_enqueue' );
 	}
 

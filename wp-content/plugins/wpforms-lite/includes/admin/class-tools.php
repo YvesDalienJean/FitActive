@@ -512,6 +512,8 @@ class WPForms_Tools {
 	 */
 	public function export_tab() {
 
+		do_action( 'wpforms_admin_tools_export_top' );
+
 		?>
 
 		<div class="wpforms-setting-row tools">
@@ -593,6 +595,8 @@ class WPForms_Tools {
 		</div>
 
 		<?php
+
+		do_action( 'wpforms_admin_tools_export_bottom' );
 	}
 
 	/**

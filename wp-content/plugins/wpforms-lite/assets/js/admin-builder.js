@@ -622,11 +622,11 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 			});
 
 			// Field Options group toggle
-			$builder.on('click', '.wpforms-field-option-group-toggle', function(e) {
+			$builder.on('click', '.wpforms-field-option-group-toggle:not(.upgrade-modal)', function( e ) {
 				e.preventDefault();
-				var $this = $(this);
-				$this.parent().toggleClass('wpforms-hide').find('.wpforms-field-option-group-inner').slideToggle();
-				$this.find('i').toggleClass('fa-angle-down fa-angle-right');
+				var $this = $( this );
+				$this.parent().toggleClass( 'wpforms-hide' ).find( '.wpforms-field-option-group-inner' ).slideToggle();
+				$this.find( 'i' ).toggleClass( 'fa-angle-down fa-angle-right' );
 			});
 
 			// Display toggle for Address field hide address line 2 option

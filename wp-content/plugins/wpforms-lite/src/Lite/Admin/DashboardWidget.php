@@ -5,7 +5,7 @@ namespace WPForms\Lite\Admin;
 /**
  * Dashboard Widget shows a chart and the form entries stats in WP Dashboard.
  *
- * @package    WPForms\Admin
+ * @package    WPForms\Lite\Admin
  * @author     WPForms
  * @since      1.5.0
  * @license    GPL-2.0+
@@ -15,6 +15,8 @@ class DashboardWidget {
 
 	/**
 	 * Widget settings.
+	 *
+	 * @since 1.5.0
 	 *
 	 * @var array
 	 */
@@ -26,6 +28,15 @@ class DashboardWidget {
 	 * @since 1.5.0
 	 */
 	public function __construct() {
+
+		add_action( 'admin_init', array( $this, 'init' ) );
+	}
+	/**
+	 * Init class.
+	 *
+	 * @since 1.5.5
+	 */
+	public function init() {
 
 		// This widget should be displayed for certain high-level users only.
 		if ( ! wpforms_current_user_can() ) {

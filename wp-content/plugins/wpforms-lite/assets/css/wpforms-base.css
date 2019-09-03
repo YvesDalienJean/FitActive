@@ -880,6 +880,14 @@ div.wpforms-container-full .wpforms-notice.wpforms-error .wpforms-notice-action:
 /* Small devices */
 @media only screen and (max-width: 600px) {
 
+	/* Аvoid horizontal scroll on mobiles */
+	.wpforms-container .wpforms-field {
+		overflow-x: hidden;
+	}
+	.wpforms-container .wpforms-field > * {
+		max-width: 100%;
+	}
+
 	/* Mobile width override */
 	.wpforms-container .wpforms-mobile-full {
 		width: 100%;

@@ -1096,18 +1096,29 @@ function wpforms_days() {
  */
 function wpforms_get_ip() {
 
-	$ip = '127.0.0.1';
+	$ip = false;
 
-	if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
-		$ip = $_SERVER['HTTP_CLIENT_IP']; //phpcs:ignore
+	if ( ! empty( $_SERVER['HTTP_X_REAL_IP'] ) ) {
+		$ip = filter_var( wp_unslash( $_SERVER['HTTP_X_REAL_IP'] ), FILTER_VALIDATE_IP );
+	} elseif ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+		// Check ip from share internet.
+		$ip = filter_var( wp_unslash( $_SERVER['HTTP_CLIENT_IP'] ), FILTER_VALIDATE_IP );
 	} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
-		$ip = explode( ',', $_SERVER['HTTP_X_FORWARDED_FOR'] ); //phpcs:ignore
-		$ip = trim( $ip[0] );
+		// To check ip is pass from proxy.
+		// Can include more than 1 ip, first is the public one.
+		// WPCS: sanitization ok.
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$ips = explode( ',', wp_unslash( $_SERVER['HTTP_X_FORWARDED_FOR'] ) );
+		if ( is_array( $ips ) ) {
+			$ip = filter_var( $ips[0], FILTER_VALIDATE_IP );
+		}
 	} elseif ( ! empty( $_SERVER['REMOTE_ADDR'] ) ) {
-		$ip = $_SERVER['REMOTE_ADDR']; //phpcs:ignore
+		$ip = filter_var( wp_unslash( $_SERVER['REMOTE_ADDR'] ), FILTER_VALIDATE_IP );
 	}
 
-	$ip_array = array_map( 'trim', explode( ',', $ip ) );
+	$ip       = false !== $ip ? $ip : '127.0.0.1';
+	$ip_array = explode( ',', $ip );
+	$ip_array = array_map( 'trim', $ip_array );
 
 	return sanitize_text_field( apply_filters( 'wpforms_get_ip', $ip_array[0] ) );
 }
@@ -1766,11 +1777,69 @@ function wpforms_get_day_period_date( $period, $timestamp = '', $format = 'Y-m-d
 		case 'end_of_day':
 			$date = date( $format, strtotime( 'tomorrow', $timestamp ) - 1 );
 			break;
-
 	}
 
 	return $date;
 }
+
+/**
+ * Get an array of all possible provider addons.
+ *
+ * @since 1.5.5
+ *
+ * @return array
+ */
+function wpforms_get_providers_all() {
+
+	$providers = array(
+		array(
+			'name'        => 'AWeber',
+			'slug'        => 'aweber',
+			'img'         => 'addon-icon-aweber.png',
+			'plugin'      => 'wpforms-aweber/wpforms-aweber.php',
+			'plugin_slug' => 'wpforms-aweber',
+		),
+		array(
+			'name'        => 'Campaign Monitor',
+			'slug'        => 'campaign-monitor',
+			'img'         => 'addon-icon-campaign-monitor.png',
+			'plugin'      => 'wpforms-campaign-monitor/wpforms-campaign-monitor.php',
+			'plugin_slug' => 'wpforms-campaign-monitor',
+		),
+		array(
+			'name'        => 'Drip',
+			'slug'        => 'drip',
+			'img'         => 'addon-icon-drip.png',
+			'plugin'      => 'wpforms-drip/wpforms-drip.php',
+			'plugin_slug' => 'wpforms-drip',
+		),
+		array(
+			'name'        => 'GetResponse',
+			'slug'        => 'getresponse',
+			'img'         => 'addon-icon-getresponse.png',
+			'plugin'      => 'wpforms-getresponse/wpforms-getresponse.php',
+			'plugin_slug' => 'wpforms-getresponse',
+		),
+		array(
+			'name'        => 'MailChimp',
+			'slug'        => 'mailchimp',
+			'img'         => 'addon-icon-mailchimp.png',
+			'plugin'      => 'wpforms-mailchimp/wpforms-mailchimp.php',
+			'plugin_slug' => 'wpforms-mailchimp',
+		),
+		array(
+			'name'        => 'Zapier',
+			'slug'        => 'zapier',
+			'img'         => 'addon-icon-zapier.png',
+			'plugin'      => 'wpforms-zapier/wpforms-zapier.php',
+			'plugin_slug' => 'wpforms-zapier',
+		),
+	);
+
+	return $providers;
+}
+
+
 
 /**
  * Get an array of all the active provider addons.

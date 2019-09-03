@@ -334,6 +334,10 @@
 	outline: 0;
 }
 
+#wpforms-panel-fields .wpforms-field-option-group-toggle.upgrade-modal {
+	opacity: 0.6;
+}
+
 #wpforms-panel-fields .wpforms-field-option-group-toggle span {
 	color: #888;
 	font-weight: 300;
