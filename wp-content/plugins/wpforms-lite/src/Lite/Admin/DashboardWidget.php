@@ -5,11 +5,7 @@ namespace WPForms\Lite\Admin;
 /**
  * Dashboard Widget shows a chart and the form entries stats in WP Dashboard.
  *
-<<<<<<< HEAD
  * @package    WPForms\Lite\Admin
-=======
- * @package    WPForms\Admin
->>>>>>> 84374bc... Configuration et Importation du demo fichier XML
  * @author     WPForms
  * @since      1.5.0
  * @license    GPL-2.0+
@@ -20,11 +16,8 @@ class DashboardWidget {
 	/**
 	 * Widget settings.
 	 *
-<<<<<<< HEAD
 	 * @since 1.5.0
 	 *
-=======
->>>>>>> 84374bc... Configuration et Importation du demo fichier XML
 	 * @var array
 	 */
 	public $settings;
@@ -36,7 +29,6 @@ class DashboardWidget {
 	 */
 	public function __construct() {
 
-<<<<<<< HEAD
 		add_action( 'admin_init', array( $this, 'init' ) );
 	}
 	/**
@@ -46,8 +38,6 @@ class DashboardWidget {
 	 */
 	public function init() {
 
-=======
->>>>>>> 84374bc... Configuration et Importation du demo fichier XML
 		// This widget should be displayed for certain high-level users only.
 		if ( ! wpforms_current_user_can() ) {
 			return;

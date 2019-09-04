@@ -570,10 +570,14 @@
 
 				// Works on entry list page only.
 <<<<<<< HEAD
+<<<<<<< HEAD
 				if ( ! $entriesList.length || $entriesList.find( '.wpforms-dash-widget' ).length ) {
 =======
 				if ( ! $entriesList.length ) {
 >>>>>>> 84374bc... Configuration et Importation du demo fichier XML
+=======
+				if ( ! $entriesList.length || $entriesList.find( '.wpforms-dash-widget' ).length ) {
+>>>>>>> 3235c6f2acb220e31db6b7f037cc741c01e2da2f
 					return;
 				}
 
@@ -1031,10 +1035,14 @@
 
 			// Integration individual display toggling.
 <<<<<<< HEAD
+<<<<<<< HEAD
 			$( document ).on( 'click', '.wpforms-settings-provider:not(.focus-out) .wpforms-settings-provider-header', function( event ) {
 =======
 			$( document ).on( 'click', '.wpforms-settings-provider-header', function( event ) {
 >>>>>>> 84374bc... Configuration et Importation du demo fichier XML
+=======
+			$( document ).on( 'click', '.wpforms-settings-provider:not(.focus-out) .wpforms-settings-provider-header', function( event ) {
+>>>>>>> 3235c6f2acb220e31db6b7f037cc741c01e2da2f
 
 				event.preventDefault();
 

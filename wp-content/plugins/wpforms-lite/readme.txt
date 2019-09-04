@@ -516,4 +516,8 @@ Syed Balkhi
 - Fixed: reCAPTCHA compatibility when form is inside OptinMonster popup.
 - Fixed: Gutenberg block returning error if no forms have been created.
 
+<<<<<<< HEAD
 [See changelog for all versions](https://plugins.svn.wordpress.org/wpforms-lite/trunk/changelog.txt).
+=======
+[See changelog for all versions](https://plugins.svn.wordpress.org/wpforms-lite/trunk/changelog.txt).
+>>>>>>> 3235c6f2acb220e31db6b7f037cc741c01e2da2f
