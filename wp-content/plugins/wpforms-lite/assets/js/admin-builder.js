@@ -622,25 +622,11 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 			});
 
 			// Field Options group toggle
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3235c6f2acb220e31db6b7f037cc741c01e2da2f
 			$builder.on('click', '.wpforms-field-option-group-toggle:not(.upgrade-modal)', function( e ) {
 				e.preventDefault();
 				var $this = $( this );
 				$this.parent().toggleClass( 'wpforms-hide' ).find( '.wpforms-field-option-group-inner' ).slideToggle();
 				$this.find( 'i' ).toggleClass( 'fa-angle-down fa-angle-right' );
-<<<<<<< HEAD
-=======
-			$builder.on('click', '.wpforms-field-option-group-toggle', function(e) {
-				e.preventDefault();
-				var $this = $(this);
-				$this.parent().toggleClass('wpforms-hide').find('.wpforms-field-option-group-inner').slideToggle();
-				$this.find('i').toggleClass('fa-angle-down fa-angle-right');
->>>>>>> 84374bc... Configuration et Importation du demo fichier XML
-=======
->>>>>>> 3235c6f2acb220e31db6b7f037cc741c01e2da2f
 			});
 
 			// Display toggle for Address field hide address line 2 option

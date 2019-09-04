@@ -667,15 +667,7 @@ class WPForms_Lite {
 						<div class="form-details-actions">
 							<a href="#" class="form-details-actions-edit"><span class="dashicons dashicons-edit"></span> Edit This Form</a>
 							<a href="#" class="form-details-actions-preview" target="_blank" rel="noopener noreferrer"><span class="dashicons dashicons-visibility"></span> Preview Form</a>
-<<<<<<< HEAD
-<<<<<<< HEAD
 							<a href="#" class="form-details-actions-export"><span class="dashicons dashicons-migrate"></span> Export All (CSV)</a>
-=======
-							<a href="#" class="form-details-actions-export"><span class="dashicons dashicons-migrate"></span> Download Export (CSV)</a>
->>>>>>> 84374bc... Configuration et Importation du demo fichier XML
-=======
-							<a href="#" class="form-details-actions-export"><span class="dashicons dashicons-migrate"></span> Export All (CSV)</a>
->>>>>>> 3235c6f2acb220e31db6b7f037cc741c01e2da2f
 							<a href="#" class="form-details-actions-read"><span class="dashicons dashicons-marker"></span> Mark All Read</a>
 						</div>
 					</div>
