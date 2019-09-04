@@ -880,10 +880,6 @@ div.wpforms-container-full .wpforms-notice.wpforms-error .wpforms-notice-action:
 /* Small devices */
 @media only screen and (max-width: 600px) {
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3235c6f2acb220e31db6b7f037cc741c01e2da2f
 	/* Аvoid horizontal scroll on mobiles */
 	.wpforms-container .wpforms-field {
 		overflow-x: hidden;
@@ -892,11 +888,6 @@ div.wpforms-container-full .wpforms-notice.wpforms-error .wpforms-notice-action:
 		max-width: 100%;
 	}
 
-<<<<<<< HEAD
-=======
->>>>>>> 84374bc... Configuration et Importation du demo fichier XML
-=======
->>>>>>> 3235c6f2acb220e31db6b7f037cc741c01e2da2f
 	/* Mobile width override */
 	.wpforms-container .wpforms-mobile-full {
 		width: 100%;

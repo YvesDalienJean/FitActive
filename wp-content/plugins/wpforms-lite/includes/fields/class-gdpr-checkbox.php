@@ -83,14 +83,7 @@ class WPForms_Field_GDPR_Checkbox extends WPForms_Field {
 		$properties['input_container'] = array(
 			'class' => array(),
 			'data'  => array(),
-<<<<<<< HEAD
-<<<<<<< HEAD
 			'attr'  => array(),
-=======
->>>>>>> 84374bc... Configuration et Importation du demo fichier XML
-=======
-			'attr'  => array(),
->>>>>>> 3235c6f2acb220e31db6b7f037cc741c01e2da2f
 			'id'    => "wpforms-{$form_id}-field_{$field_id}",
 		);
 
@@ -264,15 +257,7 @@ class WPForms_Field_GDPR_Checkbox extends WPForms_Field {
 
 		printf(
 			'<ul %s>',
-<<<<<<< HEAD
-<<<<<<< HEAD
 			wpforms_html_attributes( $container['id'], $container['class'], $container['data'], $container['attr'] )
-=======
-			wpforms_html_attributes( $container['id'], $container['class'], $container['data'] )
->>>>>>> 84374bc... Configuration et Importation du demo fichier XML
-=======
-			wpforms_html_attributes( $container['id'], $container['class'], $container['data'], $container['attr'] )
->>>>>>> 3235c6f2acb220e31db6b7f037cc741c01e2da2f
 		);
 
 			foreach ( $choices as $key => $choice ) {
