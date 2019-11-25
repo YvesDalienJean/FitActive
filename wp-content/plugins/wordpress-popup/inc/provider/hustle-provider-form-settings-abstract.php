@@ -7,7 +7,7 @@
  *
  * This class should be extended by your integration in order to display a settings section for it within Hustle.
  * For more information, more examples, and even sample integrations, visit this page at WPMUDev's site:
- * @see https://linktodocumentation.com
+ * @see https://premium.wpmudev.org/docs/wpmu-dev-plugins/hustle-providers-api-doc/
  *
  * @since 3.0.5
  */
@@ -109,6 +109,50 @@ abstract class Hustle_Provider_Form_Settings_Abstract {
 	}
 
 	/**
+	 * Get lists
+	 *
+	 * @since 4.0.2
+	 *
+	 * @param boolean $refresh
+	 * @param int $module_id
+	 * @return array
+	 */
+	final public function get_global_multi_lists( $refresh = false, $module_id = false, $key = 'lists' ) {
+		if ( $module_id ) {
+			$this->module_id = $module_id;
+		}
+
+		$key = 'forms' === $key ? 'forms' : 'lists';
+
+		$provider = $this->provider;
+		$settings = $this->get_form_settings_values( false );
+
+		$global_multi_id = isset( $settings['selected_global_multi_id'] ) ? $settings['selected_global_multi_id'] : '';
+
+		// try to get cached lists
+		$lists = $provider->get_setting( $key, null, $global_multi_id );
+
+		if ( is_null( $lists ) || $refresh ) {
+			if ( 'lists' !== $key && isset( $this->list_type ) ) {
+				$this->list_type = $key;
+			}
+			$lists = $this->refresh_global_multi_lists( $provider, $global_multi_id );
+			// cache lists
+			$settings_to_save = $provider->get_multi_settings_values( $global_multi_id );
+			$settings_to_save[ $key ] = $lists;
+			$provider->save_multi_settings_values( $global_multi_id, $settings_to_save );
+		}
+
+		if ( empty( $lists ) ) {
+			$lists = array(
+				'0' => __( 'No options to select from.', 'wordpress-popup' ),
+			);
+		}
+
+		return $lists;
+	}
+
+	/**
 	 * Save form settings value
 	 * Hooked with
 	 *
@@ -152,6 +196,14 @@ abstract class Hustle_Provider_Form_Settings_Abstract {
 		return $module->set_provider_settings( $provider_slug, $values );
 	}
 
+	/**
+	 * Saves the form settings with the format for multi-form providers.
+	 * @see Hustle_Zapier_Form_Settings
+	 *
+	 * @since 4.0
+	 *
+	 * @param array $values
+	 */
 	final public function save_form_multi_id_settings_values( $values ) {
 
 		if ( isset( $values['multi_id'] ) ) {
@@ -271,7 +323,7 @@ abstract class Hustle_Provider_Form_Settings_Abstract {
 	 * ]
 	 *
 	 * @since   3.0.5
-	 * @param array $submitted_data Array of the submitted data POST-ed by the user or by Hustle. Already sanitized by @see Hustle_Api_Utils::validate_and_sanitize_fields()
+	 * @param array $submitted_data Array of the submitted data POST-ed by the user or by Hustle. Already sanitized by @see Opt_In_Utils::validate_and_sanitize_fields()
 	 * @return array
 	 */
 	private function sample_first_step_callback( $submitted_data ) {
@@ -305,6 +357,18 @@ abstract class Hustle_Provider_Form_Settings_Abstract {
 	 */
 	public function disconnect_form( $submitted_data ) {
 		$this->save_form_settings_values( array(), true );
+	}
+
+	protected function get_selected_list( $submitted_data, $key = 'list_id' ) {
+		$lists = $this->lists;
+
+		if ( isset( $submitted_data[ $key ] ) && array_key_exists( $submitted_data[ $key ], $lists ) ) {
+			$selected_list = $submitted_data[ $key ];
+		} else {
+			$selected_list = array_key_first( $lists );
+		}
+
+		return $selected_list;
 	}
 
 	/**
@@ -375,25 +439,6 @@ abstract class Hustle_Provider_Form_Settings_Abstract {
 	}
 
 	/**
-	 * Saves the property 'desc' getting it's value from the property 'api_key'.
-	 * Intended to be used on the 1st step when assigning the value of 'api_key' to 'desc' on the returned array.
-	 * The value of 'desc' is what will be shown below the Provider’s title and above the text saying
-	 * “Click here to edit or change your email provider”, under “Email collection module” section on “Content” tab.
-	 * -Helper.
-	 *
-	 * @since 3.0.5
-	 *
-	 * @param array $data
-	 * @return array
-	 */
-	protected function before_save_first_step( $data ) {
-		if ( isset( $data['api_key'] ) ) {
-			$data['desc'] = $data['api_key'];
-		}
-		return $data;
-	}
-
-	/**
 	 * Get current data
 	 *
 	 * @since 4.0
@@ -403,7 +448,7 @@ abstract class Hustle_Provider_Form_Settings_Abstract {
 	 * @return array
 	 */
 	protected function get_current_data( $current_data, $submitted_data ) {
-		$is_submit = ! empty( $submitted_data['hustle_is_submit'] ) && empty( $submitted_data['page'] );
+		$is_submit = ! empty( $submitted_data['hustle_is_submit'] );
 
 		$saved_data = $this->get_form_settings_values( false );
 		$multi_id = ! isset( $submitted_data['multi_id'] ) ? false : $submitted_data['multi_id'];
@@ -458,13 +503,10 @@ abstract class Hustle_Provider_Form_Settings_Abstract {
 		$select_options = array();
 
 		foreach ( $global_accounts as $account ) {
-			$select_options[] = array(
-				'label' => $this->provider->get_title() . ' - ' . $account['label'],
-				'value' => $account['id'],
-			);
+			$select_options[ $account['id'] ] = $this->provider->get_title() . ' - ' . $account['label'];
 		}
 
-		$selected = reset( $select_options );
+		$selected = array_key_first( $select_options );
 
 		$options = array(
 			'group_id_setup' => array(
@@ -480,17 +522,17 @@ abstract class Hustle_Provider_Form_Settings_Abstract {
 						'type'     => 'select',
 						'name'     => 'selected_global_multi_id',
 						'options'  => $select_options,
-						'selected' => $selected['value'],
+						'selected' => $selected,
 						'id'       => 'select-email-list',
 					),
 				),
 			),
 		);
-		$step_html = hustle_get_integration_modal_title_markup(
+		$step_html = Hustle_Provider_Utils::get_integration_modal_title_markup(
 			__( 'Connect Account', 'wordpress-popup' ),
 			__( 'Select the integration account you want to connect your module to.', 'wordpress-popup' )
 		);
-		$step_html .= hustle_get_html_for_options( $options );
+		$step_html .= Hustle_Provider_Utils::get_html_for_options( $options );
 
 		if ( $is_submit ) {
 			$is_completed = $this->is_multi_global_select_step_completed( $submitted_data );
@@ -512,7 +554,12 @@ abstract class Hustle_Provider_Form_Settings_Abstract {
 			'html'       => $step_html,
 			'buttons'    => array(
 				'save' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Continue', 'wordpress-popup' ), '', 'next', true ),
+					'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+						__( 'Continue', 'wordpress-popup' ),
+						'sui-button-right',
+						'next',
+						true
+					),
 				),
 			),
 			'has_errors' => $has_errors,
@@ -548,46 +595,5 @@ abstract class Hustle_Provider_Form_Settings_Abstract {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Get options for Load previous lists
-	 *
-	 * @param string $current_page
-	 * @return array
-	 */
-	protected function get_previous_button( $current_page ) {
-
-		$options = array(
-			'type'  => 'link',
-			'href'  => '#',
-			'text' => __( 'Previous', 'wordpress-popup' ),
-			'class' => 'hustle-provider-load-more',
-			'attributes' => array(
-				'data-page' => $current_page - 1,
-			),
-		);
-
-		return $options;
-	}
-
-	/**
-	 * Get options for Load next lists
-	 *
-	 * @param string $current_page
-	 * @return array
-	 */
-	protected function get_next_button( $current_page ) {
-		$options = array(
-			'type'  => 'link',
-			'href'  => '#',
-			'text' => __( 'Next', 'wordpress-popup' ),
-			'class' => 'hustle-provider-load-more pull-right',
-			'attributes' => array(
-				'data-page' => $current_page + 1,
-			),
-		);
-
-		return $options;
 	}
 }

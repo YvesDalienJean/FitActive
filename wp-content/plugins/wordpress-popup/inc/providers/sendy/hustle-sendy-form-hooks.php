@@ -53,17 +53,28 @@ class Hustle_Sendy_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 				'name'      => $name,
 				'email'     => $email,
 			);
+
 			// Add extra fields
-			$extra_fields = array_diff_key( $submitted_data, array(
-				'email' => '',
-				'first_name' => '',
-				'last_name' => '',
-			) );
+			$extra_fields = array_diff_key(
+				$submitted_data,
+				array(
+					'email' => '',
+					'first_name' => '',
+					'last_name' => '',
+					'gdpr' => '',
+				)
+			);
+
 			$extra_fields = array_filter( $extra_fields );
 
 			if ( ! empty( $extra_fields ) ) {
 				$_data = array_merge( $_data, $extra_fields );
 			}
+
+			$_data['gdpr'] = ( isset( $submitted_data['gdpr'] ) && 'on' === $submitted_data['gdpr'] ? "true" : '' );
+
+			$_data = apply_filters( 'hustly_sendy_subscribe_api_data', $_data );
+
 			$api_response = $api->subscribe( $_data );
 			if ( is_wp_error( $api_response ) ) {
 				$entry_fields = $this->get_status( false, $api_response->get_error_message() );
@@ -87,17 +98,12 @@ class Hustle_Sendy_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 	}
 
 	private function get_status( $status, $message ) {
-		$utils = Hustle_Provider_Utils::get_instance();
-
 		return array(
 			array(
 				'name'  => 'status',
 				'value' => array(
 					'is_sent'       => $status,
 					'description'   => $message,
-					'data_sent'     => $utils->get_last_data_sent(),
-					'data_received' => $utils->get_last_data_received(),
-					'url_request'   => $utils->get_last_url_request(),
 				),
 			),
 		);

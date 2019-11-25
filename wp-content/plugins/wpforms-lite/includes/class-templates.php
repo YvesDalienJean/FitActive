@@ -58,7 +58,7 @@ class WPForms_Templates {
 
 			if ( file_exists( WPFORMS_PLUGIN_DIR . 'includes/templates/class-' . $template . '.php' ) ) {
 				require_once WPFORMS_PLUGIN_DIR . 'includes/templates/class-' . $template . '.php';
-			} elseif ( file_exists( WPFORMS_PLUGIN_DIR . 'pro/includes/templates/class-' . $template . '.php' ) ) {
+			} elseif ( file_exists( WPFORMS_PLUGIN_DIR . 'pro/includes/templates/class-' . $template . '.php' ) && wpforms()->pro ) {
 				require_once WPFORMS_PLUGIN_DIR . 'pro/includes/templates/class-' . $template . '.php';
 			}
 		}

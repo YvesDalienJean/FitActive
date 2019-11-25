@@ -1,4 +1,5 @@
-<main class="<?php echo implode( ' ', apply_filters( 'hustle_sui_wrap_class', null ) ); ?>">
+<main class="<?php echo implode( ' ', apply_filters( 'hustle_sui_wrap_class', null ) );// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>">
+
 	<div class="sui-header">
 		<h1 class="sui-header-title"><?php esc_html_e( 'Dashboard', 'wordpress-popup' ); ?></h1>
 		<?php self::static_render( 'admin/commons/view-documentation' ); ?>

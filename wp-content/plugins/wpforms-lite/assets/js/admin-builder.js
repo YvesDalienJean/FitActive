@@ -172,6 +172,93 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				boxWidth: '400px',
 				animateFromElement: false
 			};
+
+			$builder.on(
+				'change',
+				'.wpforms-field-option-row-limit_enabled input',
+				function( event ) {
+					app.updateTextFieldsLimitControls( $( event.target ).parents( '.wpforms-field-option-row-limit_enabled' ).data().fieldId, event.target.checked );
+				}
+			);
+
+			// File uploader - change style.
+			$builder
+				.on(
+					'change',
+					'.wpforms-field-option-file-upload .wpforms-field-option-row-style select, .wpforms-field-option-file-upload .wpforms-field-option-row-max_file_number input',
+					function( event ) {
+						app.fieldFileUploadPreviewUpdate( event.target );
+					}
+				);
+		},
+
+		/**
+		 * Update upload selector.
+		 *
+		 * @since 1.5.6
+		 *
+		 * @param {object} target Changed :input.
+		 */
+		fieldFileUploadPreviewUpdate: function( target ) {
+
+			var $options = $( target ).parents( '.wpforms-field-option-file-upload' );
+			var fieldId = $options.data( 'field-id' );
+
+			var styleOption = $options.find( '#wpforms-field-option-' + fieldId + '-style' ).val();
+			var $maxFileNumberRow = $options.find( '#wpforms-field-option-row-' + fieldId + '-max_file_number' );
+			var maxFileNumber = parseInt( $maxFileNumberRow.find( 'input' ).val(), 10 );
+
+			var $preview = $( '#wpforms-field-' + fieldId );
+			var classicPreview = '.wpforms-file-upload-builder-classic';
+			var modernPreview = '.wpforms-file-upload-builder-modern';
+
+			if ( styleOption === 'classic' ) {
+				$( classicPreview, $preview ).removeClass( 'wpforms-hide' );
+				$( modernPreview, $preview ).addClass( 'wpforms-hide' );
+				$maxFileNumberRow.addClass( 'wpforms-row-hide' );
+			} else {
+
+				// Change hint and title.
+				if ( maxFileNumber > 1 ) {
+					$preview
+						.find( '.modern-title' )
+						.text( wpforms_builder.file_upload.preview_title_plural );
+					$preview
+						.find( '.modern-hint' )
+						.text( wpforms_builder.file_upload.preview_hint.replace( '{maxFileNumber}', maxFileNumber ) )
+						.removeClass( 'wpforms-hide' );
+				} else {
+					$preview
+						.find( '.modern-title' )
+						.text( wpforms_builder.file_upload.preview_title_single );
+					$preview
+						.find( '.modern-hint' )
+						.text( wpforms_builder.file_upload.preview_hint.replace( '{maxFileNumber}', 1 ) )
+						.addClass( 'wpforms-hide' );
+				}
+
+				// Display the preview.
+				$( classicPreview, $preview ).addClass( 'wpforms-hide' );
+				$( modernPreview, $preview ).removeClass( 'wpforms-hide' );
+				$maxFileNumberRow.removeClass( 'wpforms-row-hide' );
+			}
+		},
+
+		/**
+		 * Update limit controls by changing checkbox.
+		 *
+		 * @since 1.5.6
+		 *
+		 * @param {number} id Field id.
+		 * @param {bool} checked Whether an option is checked or not.
+		 */
+		updateTextFieldsLimitControls: function( id, checked ) {
+
+			if ( ! checked ) {
+				$( '#wpforms-field-option-row-' + id + '-limit_controls' ).addClass( 'wpforms-hide' );
+			} else {
+				$( '#wpforms-field-option-row-' + id + '-limit_controls' ).removeClass( 'wpforms-hide' );
+			}
 		},
 
 		/**
@@ -1262,7 +1349,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 			var $btn = $( '#wpforms-add-fields-' + type );
 
-			if ( $btn.hasClass( 'upgrade-modal' ) || $btn.hasClass( 'education-modal' ) ) {
+			if ( $btn.hasClass( 'upgrade-modal' ) || $btn.hasClass( 'education-modal' ) || $btn.hasClass( 'warning-modal' ) ) {
 				return;
 			}
 
@@ -1438,7 +1525,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				   }
 			});
 
-			$('.wpforms-add-fields-button').not('.upgrade-modal').draggable({
+			$('.wpforms-add-fields-button').not('.upgrade-modal').not('.warning-modal').draggable({
 				connectToSortable: '.wpforms-field-wrap',
 				delay: 200,
 				helper: function(event) {
@@ -1670,40 +1757,48 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		 * Field choice bulk insert the new choices.
 		 *
 		 * @since 1.3.7
+		 *
+		 * @param {object} el DOM element.
 		 */
-		fieldChoiceBulkAddInsert: function(el) {
+		fieldChoiceBulkAddInsert: function( el ) {
 
-			var $this          = $(el),
-				$container     = $this.closest('.wpforms-field-option-row'),
-				$textarea      = $container.find('textarea'),
-				$list          = $container.find('.choices-list'),
-				$choice        = $list.find('li:first-of-type').clone().wrap('<div>').parent(),
-				choice         = '',
-				fieldID        = $container.data('field-id'),
-				type           = $list.data('field-type'),
-				nextID         = Number( $list.attr('data-next-id') ),
-				newValues      = $textarea.val().split("\n"),
-				newChoices     = '';
+			var $this = $( el ),
+				$container = $this.closest( '.wpforms-field-option-row' ),
+				$textarea = $container.find( 'textarea' ),
+				$list = $container.find( '.choices-list' ),
+				$choice = $list.find( 'li:first-of-type' ).clone().wrap( '<div>' ).parent(),
+				choice = '',
+				fieldID = $container.data( 'field-id' ),
+				type = $list.data( 'field-type' ),
+				nextID = Number( $list.attr( 'data-next-id' ) ),
+				newValues = $textarea.val().split( '\n' ),
+				newChoices = '';
 
-			$this.prop('disabled', true).html($this.html()+' '+s.spinner);
-			$choice.find('input.value,input.label').attr('value','');
+			$this.prop( 'disabled', true ).html( $this.html() + ' ' + s.spinner );
+			$choice.find( 'input.value,input.label' ).attr( 'value', '' );
 			choice = $choice.html();
 
-			for(var key in newValues) {
-				var value     = newValues[key],
+			for ( var key in newValues ) {
+				if ( ! newValues.hasOwnProperty( key ) ) {
+					continue;
+				}
+				var value     = newValues[ key ],
 					newChoice = choice;
 				value = value.trim();
-				newChoice = newChoice.replace( /\[choices\]\[(\d+)\]/g ,'[choices]['+nextID+']' );
-				newChoice = newChoice.replace( /data-key="(\d+)"/g ,'data-key="'+nextID+'"' );
-				newChoice = newChoice.replace( /value="" class="label"/g ,'value="'+value+'" class="label"' );
+				newChoice = newChoice.replace( /\[choices\]\[(\d+)\]/g, '[choices][' + nextID + ']' );
+				newChoice = newChoice.replace( /data-key="(\d+)"/g, 'data-key="' + nextID + '"' );
+				newChoice = newChoice.replace( /value="" class="label"/g, 'value="' + value + '" class="label"' );
+
+				// For some reasons IE has its own atrribute order.
+				newChoice = newChoice.replace( /class="label" type="text" value=""/g, 'class="label" type="text" value="' + value + '"' );
 				newChoices += newChoice;
 				nextID++;
 			}
-			$list.attr('data-next-id', nextID).append(newChoices)
+			$list.attr( 'data-next-id', nextID ).append( newChoices );
 
-			app.fieldChoiceUpdate(type, fieldID);
-			$builder.trigger('wpformsFieldChoiceAdd');
-			app.fieldChoiceBulkAddToggle( $container.find('.toggle-bulk-add-display') );
+			app.fieldChoiceUpdate( type, fieldID );
+			$builder.trigger( 'wpformsFieldChoiceAdd' );
+			app.fieldChoiceBulkAddToggle( $container.find( '.toggle-bulk-add-display' ) );
 		},
 
 		/**
@@ -2983,7 +3078,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		 *
 		 * @since 1.0.1
 		 */
-		smartTagToggle: function(el) {
+		smartTagToggle: function( el ) {
 
 			var $this = $( el ),
 				$label = $this.closest( 'label' );
@@ -2992,7 +3087,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 				// Smart tags are showing, so hide/remove them
 				var $list = $label.next( '.smart-tags-list-display' );
-				$list.slideUp( 400, function () {
+				$list.slideUp( 400, function() {
 					$list.remove();
 				} );
 				$this.find( 'span' ).text( wpforms_builder.smart_tags_show );
@@ -3041,9 +3136,14 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 					}
 				}
 
+				var isFieldOption = $label.attr( 'for' ).indexOf( 'wpforms-field-option-' ) !== -1;
+
 				if ( type === 'other' || type === 'all' ) {
 					smartTagList += '<li class="heading">' + wpforms_builder.other + '</li>';
 					for ( var smarttag_key in wpforms_builder.smart_tags ) {
+						if ( isFieldOption && wpforms_builder.smart_tags_disabled_for_fields.indexOf( smarttag_key ) > -1 ) {
+							continue;
+						}
 						smartTagList += '<li><a href="#" data-type="other" data-meta=\'' + smarttag_key + '\'>' + wpforms_builder.smart_tags[ smarttag_key ] + '</a></li>';
 					}
 				}

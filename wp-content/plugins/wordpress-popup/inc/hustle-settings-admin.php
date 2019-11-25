@@ -51,7 +51,6 @@ class Hustle_Settings_Admin extends Hustle_Admin_Page_Abstract {
 			'unsubscription_email' => self::get_unsubscribe_email_settings(),
 			'hustle_settings' => self::get_hustle_settings(),
 			'section' => Hustle_Module_Admin::get_current_section( 'emails' ),
-			'accessibility' => $accessibility,
 			'migrate' => apply_filters( 'hustle_settings_migrate_data', array() ),
 		);
 	}
@@ -217,6 +216,74 @@ class Hustle_Settings_Admin extends Hustle_Admin_Page_Abstract {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Get the settings of the top metrics.
+	 *
+	 * @since 4.0.2
+	 * @return array
+	 */
+	public static function get_top_metrics_settings() {
+
+		$defaults = [ 'average_conversion_rate', 'total_conversions', 'most_conversions' ];
+		$stored_settings = self::get_hustle_settings( 'top_metrics' );
+
+		// Use defaults if empty
+		if ( empty( $stored_settings ) ) {
+			$stored_settings = $defaults;
+		}
+
+		return $stored_settings;
+	}
+
+	/**
+	 * Get privacy settings.
+	 * 
+	 * @since 4.0.2
+	 * @return array
+	 */
+	public static function get_privacy_settings() {
+		$defaults = array(
+			'ip_tracking'						=> 'on',
+			'retain_sub_on_erasure'				=> '1',
+
+			'retain_submission_forever'			=> '1',
+			'submissions_retention_number'		=> 30,
+			'submissions_retention_number_unit'	=> 'days',
+
+			'retain_ip_forever'					=> '1',
+			'ip_retention_number'				=> 30,
+			'ip_retention_number_unit'			=> 'days',
+
+			'retain_tracking_forever'			=> '1',
+			'tracking_retention_number'			=> 30,
+			'tracking_retention_number_unit'	=> 'days',
+		);
+
+		$stored = self::get_hustle_settings( 'privacy' );
+
+		$settings = array_merge( $defaults, $stored );
+
+		return apply_filters( 'hustle_get_privacy_settings', $settings );
+	}
+
+	/**
+	 * Get the values of the Data settings.
+	 * 
+	 * @since 4.0.2
+	 * @return array
+	 */
+	public static function get_data_settings() {
+		$default = array(
+			'reset_settings_uninstall' => '0',
+		);
+
+		$stored = self::get_hustle_settings( 'data' );
+
+		$settings = array_merge( $default, $stored );
+
+		return apply_filters( 'hustle_get_data_settings', $settings );
 	}
 
 	/**

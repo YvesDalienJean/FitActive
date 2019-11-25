@@ -314,10 +314,10 @@
 		</div>
 
 		<?php
-		// SETTING: GDPR checkbox style ?>
+		// SETTING: Checkbox style ?>
 		<div class="sui-form-field">
 
-			<label class="sui-label"><?php esc_html_e( 'GDPR checkbox style', 'wordpress-popup' ); ?></label>
+			<label class="sui-label"><?php esc_html_e( 'Checkbox style', 'wordpress-popup' ); ?></label>
 
 			<div class="sui-side-tabs">
 

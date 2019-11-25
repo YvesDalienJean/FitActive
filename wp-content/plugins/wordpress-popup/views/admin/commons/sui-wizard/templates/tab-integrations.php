@@ -98,7 +98,7 @@ $integrations_url = add_query_arg( 'page', Hustle_Module_Admin::INTEGRATIONS_PAG
 					id="hustle-integrations-active-count"
 					data-attribute="active_integrations_count"
 					name="active_integrations_count"
-					value=""
+					value="<?php echo esc_html( $settings['active_integrations_count'] ); ?>"
 				/>
 			</div>
 

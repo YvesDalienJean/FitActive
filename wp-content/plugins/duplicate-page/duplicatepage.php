@@ -4,7 +4,7 @@ Plugin Name: Duplicate Page
 Plugin URI: https://wordpress.org/plugins/duplicate-page/
 Description: Duplicate Posts, Pages and Custom Posts using single click.
 Author: mndpsingh287
-Version: 3.9
+Version: 4.0
 Author URI: https://profiles.wordpress.org/mndpsingh287/
 License: GPLv2
 Text Domain: duplicate-page
@@ -143,7 +143,7 @@ if (!class_exists('duplicate_page')):
                      'post_author' => $new_post_author,
                      'post_content' => (isset($opt['duplicate_post_editor']) && $opt['duplicate_post_editor'] == 'gutenberg') ? wp_slash($post->post_content) : $post->post_content,
                      'post_excerpt' => $post->post_excerpt,
-                     'post_name' => $post->post_name,
+                     //'post_name' => $post->post_name,
                      'post_parent' => $post->post_parent,
                      'post_password' => $post->post_password,
                      'post_status' => $post_status,

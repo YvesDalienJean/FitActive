@@ -3,7 +3,7 @@
  * Plugin Name:			Ocean Extra
  * Plugin URI:			https://oceanwp.org/extension/ocean-extra/
  * Description:			Add extra features like widgets, metaboxes, import/export and a panel to activate the premium extensions.
- * Version:				1.5.15
+ * Version:				1.5.19
  * Author:				OceanWP
  * Author URI:			https://oceanwp.org/
  * Requires at least:	4.5.0
@@ -86,7 +86,7 @@ final class Ocean_Extra {
 		$this->token 			= 'ocean-extra';
 		$this->plugin_url 		= plugin_dir_url( __FILE__ );
 		$this->plugin_path 		= plugin_dir_path( __FILE__ );
-		$this->version 			= '1.5.13';
+		$this->version 			= '1.5.19';
 
 		define( 'OE_URL', $this->plugin_url );
 		define( 'OE_PATH', $this->plugin_path );
@@ -123,7 +123,7 @@ final class Ocean_Extra {
 			require_once( OE_PATH .'/includes/panel/updater.php' );
 			require_once( OE_PATH .'/includes/menu-icons/menu-icons.php' );
 			require_once( OE_PATH .'/includes/wizard/wizard.php' );
-	        
+
 			// Outputs custom JS to the footer
 			add_action( 'wp_footer', array( $this, 'custom_js' ), 9999 );
 
@@ -597,7 +597,7 @@ add_action( 'owp_fs_loaded', 'owp_include_client_migration' );
 
 function owp_fs_is_submenu_visible( $is_visible, $submenu_id ) {
 	if ( 'pricing' === $submenu_id ) {
-		$show_pricing_transient = get_transient( 'oceanwp_show_pricing' );
+		$show_pricing_transient = false; //get_transient( 'oceanwp_show_pricing' );
 
 		if ( is_string( $show_pricing_transient ) ) {
 			$show_pricing = ( 'yes' === $show_pricing_transient );
@@ -632,11 +632,11 @@ function owp_fs_is_submenu_visible( $is_visible, $submenu_id ) {
 				}
 			}
 
-			set_transient(
-				'oceanwp_show_pricing',
-				$show_pricing ? 'yes' : 'no',
-				WP_FS__TIME_24_HOURS_IN_SEC
-			);
+//			set_transient(
+//				'oceanwp_show_pricing',
+//				$show_pricing ? 'yes' : 'no',
+//				WP_FS__TIME_5_MIN_IN_SEC
+//			);
 		}
 
 		return $show_pricing;
@@ -644,5 +644,15 @@ function owp_fs_is_submenu_visible( $is_visible, $submenu_id ) {
 
 	return $is_visible;
 }
+
+//function owp_fs_after_client_migration( $license_accessor ) {
+//	if ('OceanWP_EDD_License_Key' !== get_class($license_accessor)) {
+//		return;
+//	}
+//
+//	delete_transient( 'oceanwp_show_pricing' );
+//}
+//
+//add_action( 'fs_after_client_migration', 'owp_fs_after_client_migration' );
 
 #endregion

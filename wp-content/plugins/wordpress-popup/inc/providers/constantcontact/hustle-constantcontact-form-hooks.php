@@ -22,13 +22,23 @@ class Hustle_ConstantContact_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstr
 		$addon 					= $this->addon;
 		$module_id 				= $this->module_id;
 		$form_settings_instance = $this->form_settings_instance;
+		$addon_setting_values 	= $form_settings_instance->get_form_settings_values();
 
 		/**
+		 * Filter Campaign Monitor submitted form data to be processed
+		 *
 		 * @since 4.0
+		 *
+		 * @param array                                          $submitted_data
+		 * @param int                                            $module_id                current Form ID
+		 * @param Hustle_ConstantContact_Form_Settings 			 $form_settings_instance
 		 */
-		$submitted_data = apply_filters( 'hustle_provider_' . $addon->get_slug() . '_form_submitted_data', $submitted_data, $module_id, $form_settings_instance );
-
-		$addon_setting_values = $form_settings_instance->get_form_settings_values();
+		$submitted_data = apply_filters(
+			'hustle_provider_constantcontact_form_submitted_data',
+			$submitted_data,
+			$module_id,
+			$form_settings_instance
+		);
 
 		try {
 			$api = $addon->api();
@@ -47,19 +57,47 @@ class Hustle_ConstantContact_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstr
 				throw new Exception( __( 'Wrong API credentials', 'wordpress-popup' ) );
 			}
 
-			$existing_contact = $api->get_contact( $submitted_data['email'] );
-			$exists = $api->contact_exist( $existing_contact, $list_id );
+			//check exists
+			$exists = $this->get_subscriber(
+				$api,
+				array(
+					'email' 	=> $submitted_data['email'],
+					'list_id' 	=> $addon_setting_values['list_id']
+				)
+			);
+
 			$is_sent = false;
 			$details = __( 'Something went wrong.', 'wordpress-popup' );
+
 			$first_name = isset( $submitted_data['first_name'] ) ? $submitted_data['first_name'] : '';
 			$last_name = isset( $submitted_data['last_name'] ) ? $submitted_data['last_name'] : '';
+
 			$custom_fields = array_diff_key( $submitted_data, array(
 				'email' => '',
 				'first_name' => '',
 				'last_name' => '',
 			) );
+
 			$custom_fields = array_filter( $custom_fields );
+			$data_to_send  = $submitted_data;
+
+			/**
+			 * Fires before adding subscriber to Constant Contact
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param int                                            $form_id                current Form ID
+			 * @param array                                          $submitted_data
+			 * @param Hustle_ConstantContact_Form_Settings 			 $form_settings_instance
+			 */
+			do_action( 'hustle_provider_constantcontact_before_add_subscriber',
+				$module_id,
+				$data_to_send,
+				$form_settings_instance
+			);
+
 			if ( $exists ) {
+				$existing_contact = $api->get_contact( $submitted_data['email'] );
 				$response = $api->updateSubscription( $existing_contact, $first_name, $last_name, $list_id, $custom_fields );
 			} else {
 				$response = $api->subscribe( $submitted_data['email'], $first_name, $last_name, $list_id, $custom_fields );
@@ -70,7 +108,23 @@ class Hustle_ConstantContact_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstr
 				$details = __( 'Successfully added or updated member on Constant Contact list', 'wordpress-popup' );
 			}
 
-			$utils = Hustle_Provider_Utils::get_instance();
+			/**
+			 * Fires after adding subscriber to Constant Contact
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param int                                            $form_id                current Form ID
+			 * @param array                                          $submitted_data
+			 * @param Hustle_ConstantContact_Form_Settings 			 $form_settings_instance
+			 * @param mixed 			 							 $response
+			 */
+			do_action( 'hustle_provider_constantcontact_after_add_subscriber',
+				$module_id,
+				$data_to_send,
+				$form_settings_instance,
+				$response
+			);
+
 			$contact = $api->get_contact( $submitted_data['email'] );
 			$member_status = $contact->status;
 
@@ -81,8 +135,6 @@ class Hustle_ConstantContact_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstr
 						'is_sent'       => $is_sent,
 						'description'   => $details,
 						'member_status' => $member_status,
-						'data_sent'     => $submitted_data,
-						'data_received' => $utils->get_last_data_received(),
 						'data_member'	=> $contact,
 					),
 				),
@@ -95,7 +147,7 @@ class Hustle_ConstantContact_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstr
 			$entry_fields[0]['value']['list_name'] = $addon_setting_values['list_name'];
 		}
 
-		$entry_fields = apply_filters( 'hustle_provider_' . $addon->get_slug() . '_entry_fields',
+		$entry_fields = apply_filters( 'hustle_provider_constantcontact_entry_fields',
 			$entry_fields,
 			$module_id,
 			$submitted_data,
@@ -144,9 +196,15 @@ class Hustle_ConstantContact_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstr
 			);
 
 			//triggers exception if not found.
-			$api 				= $addon->api();
-			$existing_contact 	= $api->get_contact( $submitted_data['email'] );
-			$exists 			= $api->contact_exist( $existing_contact, $addon_setting_values['list_id'] );
+			$api 	= $addon->api();
+			$exists = $this->get_subscriber(
+				$api,
+				array(
+					'email' 	=> $submitted_data['email'],
+					'list_id' 	=> $addon_setting_values['list_id']
+				)
+			);
+
 			if ( $exists )
 				$is_success = self::ALREADY_SUBSCRIBED_ERROR;
 		}
@@ -179,6 +237,29 @@ class Hustle_ConstantContact_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstr
 		}
 
 		return true;
+	}
+
+	/**
+	 * Get subscriber for providers
+	 *
+	 * This method is to be inherited
+	 * And extended by child classes.
+	 *
+	 * Make use of the property `$_subscriber`
+	 * Method to omit double api calls
+	 *
+	 * @since 4.0.2
+	 *
+	 * @param 	object 	$api
+	 * @param 	mixed  	$data
+	 * @return  mixed 	array/object API response on queried subscriber
+	 */
+	protected function get_subscriber( $api, $data ) {
+		if( empty ( $this->_subscriber ) && ! isset( $this->_subscriber[ md5( $data['email'] ) ] ) ){
+			$existing_contact 	= $api->get_contact( $data['email'] );
+			$this->_subscriber[ md5( $data['email'] ) ] = $api->contact_exist( $existing_contact, $data['list_id'] );
+		}
+		return $this->_subscriber[ md5( $data['email'] ) ];
 	}
 
 }

@@ -56,6 +56,7 @@ class Hustle_Activecampaign_Api {
 
 		curl_close($request);
 
+		//logging data
 		$utils = Hustle_Provider_Utils::get_instance();
 		$utils->_last_url_request = $url;
 		$utils->_last_data_received = $response;
@@ -244,11 +245,12 @@ class Hustle_Activecampaign_Api {
 					'title' => $label,
 					'type' => 1, // We only support text type for now,
 					'perstag' => $key,
-					'p[' . (int) $list . ']' => (int) $list,
+					'p[0]' => 0,
 					'req' => 0,
 				);
 				$res = $this->_post( 'list_field_add', $field_data );
 			}
 		}
 	}
+
 }

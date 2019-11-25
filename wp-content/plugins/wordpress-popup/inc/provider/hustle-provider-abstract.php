@@ -8,7 +8,7 @@
  *
  * This class must be extended by your integration in order to be integrated into Hustle.
  * For more information, more examples, and even sample integrations, visit this page at WPMUDev's site:
- * @see https://linktodocumentation.com
+ * @see https://premium.wpmudev.org/docs/wpmu-dev-plugins/hustle-providers-api-doc/
  *
  * @since 3.0.5
  */
@@ -85,16 +85,6 @@ abstract class Hustle_Provider_Abstract implements Hustle_Provider_Interface{
 	protected $_class;
 
 	/**
-	 * Whether the provider supports custom fields. Override it if your integration does accept custom fields.
-	 * Leaving it as false will disable adding fields to opt-in forms.
-	 * -Required. It's false by default.
-	 *
-	 * @since 3.0.5
-	 * @var bool
-	 */
-	protected $_supports_fields = false;
-
-	/**
 	 * Title of your integration.
 	 * It will be shown on the integration's list, and when your integration is selected.
 	 * -Required.
@@ -104,24 +94,6 @@ abstract class Hustle_Provider_Abstract implements Hustle_Provider_Interface{
 	 * @var string
 	 */
 	protected $_title;
-
-	/**
-	 * Url or path of the icon that will be displayed when the provider is selected.
-	 * If it's PNG or JPG, use the URL to the icon. It will be used within the "src" attribute of an "img" element.
-	 * @see Hustle_Mad_Mimi
-	 * @example plugin_dir_url( __FILE__ ) . 'assets/icon-madmimi.png'
-	 * If it's a SVG, use the path to the PHP template file containing the SVG code.
-	 * @see Hustle_Mailchimp
-	 * @example plugin_dir_path( __FILE__ ) . 'views/icon.php'
-	 * -Optional. Looks nice.
-	 *
-	 *
-	 * @todo to be removed. Unused in 4.0
-	 *
-	 * @since  3.0.5
-	 * @var string
-	 */
-	protected $_icon;
 
 	/**
 	 * Icon url that will be displayed in the providers list.
@@ -240,14 +212,6 @@ abstract class Hustle_Provider_Abstract implements Hustle_Provider_Interface{
 	 */
 	protected $_activation_error_message = '';
 
-	/**
-	 * Error Message on update general settings
-	 *
-	 * @since 4.0
-	 * @var string
-	 */
-	protected $_update_settings_error_message = '';
-
 	/*********************************** END Errors Messages ********************************/
 
 	/**
@@ -363,16 +327,6 @@ abstract class Hustle_Provider_Abstract implements Hustle_Provider_Interface{
 	}
 
 	/**
-	 * Gets if this integration supports custom fields.
-	 *
-	 * @since  3.0.5
-	 * @return bool
-	 */
-	final public function get_supports_fields() {
-		return $this->_supports_fields;
-	}
-
-	/**
 	 * Gets the title of this integration.
 	 *
 	 * @since  3.0.5
@@ -381,17 +335,6 @@ abstract class Hustle_Provider_Abstract implements Hustle_Provider_Interface{
 	final public function get_title() {
 		return $this->_title;
 	}
-
-	/**
-	 * Gets the icon path or URL.
-	 * @todo to be removed. Unused in 4.0
-	 *
-	 * @since  3.0.5
-	 * @return string
-	 */
-	//final public function get_icon() {
-	//	return $this->_icon;
-	//}
 
 	/**
 	 * Gets retina icon URL.
@@ -456,6 +399,7 @@ abstract class Hustle_Provider_Abstract implements Hustle_Provider_Interface{
 	/**
 	 * Get whether the provider allows having multiple instances on a form.
 	 *
+	 * @since 4.0
 	 * @return bool
 	 */
 	final public function is_allow_multi_on_form() {
@@ -465,6 +409,7 @@ abstract class Hustle_Provider_Abstract implements Hustle_Provider_Interface{
 	/**
 	 * Get whether the provider allows having multiple instances on the global settings.
 	 *
+	 * @since 4.0
 	 * @return bool
 	 */
 	final public function is_allow_multi_on_global() {
@@ -540,7 +485,6 @@ abstract class Hustle_Provider_Abstract implements Hustle_Provider_Interface{
 			'short_description'		 => $this->get_short_description(),
 			'version'                => $this->get_version(),
 			'class'                  => $this->get_class(),
-			'supports_fields'		 => $this->get_supports_fields(), // To be removed.
 			'is_multi_on_global'	 => $this->is_allow_multi_on_global(),
 			'is_activable'           => $this->is_activable(),
 			'is_settings_available'  => $this->is_settings_available(),
@@ -691,16 +635,6 @@ abstract class Hustle_Provider_Abstract implements Hustle_Provider_Interface{
 	}
 
 	/**
-	 * Get error message on saving settings.
-	 *
-	 * @since 4.0
-	 * @return string
-	 */
-	public function get_update_settings_error_message() {
-		return $this->_update_settings_error_message;
-	}
-
-	/**
 	 * Get Global settings wizard
 	 * This function will process @see Hustle_Provider_Abstract::settings_wizards()
 	 * Keep in mind this function will only be called when @see Hustle_Provider_Abstract::is_settings_available() returns `true`
@@ -708,7 +642,7 @@ abstract class Hustle_Provider_Abstract implements Hustle_Provider_Interface{
 	 *
 	 * @since 4.0
 	 *
-	 * @param array $submitted_data Array with the submitted data. Softly sanitized by @see Hustle_Api_Utils::validate_and_sanitize_fields().
+	 * @param array $submitted_data Array with the submitted data. Softly sanitized by @see Opt_In_Utils::validate_and_sanitize_fields().
 	 * @param int   $module_id ID of the module to which the settings wizard belongs to if retrieved from within a module and not from global settings.
 	 * @param int   $current_step Step from which the call is made.
 	 * @param int   $step Step to which the user is going.
@@ -775,7 +709,7 @@ abstract class Hustle_Provider_Abstract implements Hustle_Provider_Interface{
 	 * @since 3.0.5
 	 * @since 4.0   Add global form settings steps at the beginning if the provider is not already connected. $module_id param added.
 	 *
-	 * @param array $submitted_data Array with the submitted data. Softly sanitized by @see Hustle_Api_Utils::validate_and_sanitize_fields().
+	 * @param array $submitted_data Array with the submitted data. Softly sanitized by @see Opt_In_Utils::validate_and_sanitize_fields().
 	 * @param int   $module_id ID of the module to which the setting wizard belongs to.
 	 * @param int   $current_step Step from which the call is made.
 	 * @param int   $step Step to which the user is going.
@@ -1066,7 +1000,7 @@ abstract class Hustle_Provider_Abstract implements Hustle_Provider_Interface{
 				}
 				$this->_provider_form_settings_instance[ $module_id ] = $form_settings_instance;
 			} catch ( Exception $e ) {
-				Hustle_Api_Utils::maybe_log( $this->get_slug(), 'Failed to instantiate its _form_settings_instance', $e->getMessage() );
+				Hustle_Provider_Utils::maybe_log( $this->get_slug(), 'Failed to instantiate its _form_settings_instance', $e->getMessage() );
 
 				return null;
 			}
@@ -1126,7 +1060,7 @@ abstract class Hustle_Provider_Abstract implements Hustle_Provider_Interface{
 	 * @return Hustle_Provider_Form_Hooks_Abstract|null
 	 */
 	final public function get_addon_form_hooks( $module_id ) {
-		if ( ! isset( $this->_addon_form_hooks_instances[ $module_id ] ) || ! $this->_addon_form_hooks_instances[ $module_id ] instanceof Hustle_Provider_Form_Hooks_Abstract ) {
+		if ( ! isset( $this->_provider_form_hooks_instances[ $module_id ] ) || ! $this->_provider_form_hooks_instances[ $module_id ] instanceof Hustle_Provider_Form_Hooks_Abstract ) {
 			if ( empty( $this->_form_hooks ) ) {
 				return null;
 			}
@@ -1138,15 +1072,15 @@ abstract class Hustle_Provider_Abstract implements Hustle_Provider_Interface{
 			try {
 
 				$classname = $this->_form_hooks;
-				$this->_addon_form_hooks_instances[ $module_id ] = new $classname( $this, $module_id );
+				$this->_provider_form_hooks_instances[ $module_id ] = new $classname( $this, $module_id );
 			} catch ( Exception $e ) {
-				Opt_In_Utils::maybe_log( $this->get_slug(), 'Failed to instantiate its _addon_form_hooks_instance', $e->getMessage() );
+				Hustle_Provider_Utils::maybe_log( $this->get_slug(), 'Failed to instantiate its _addon_form_hooks_instance', $e->getMessage() );
 
 				return null;
 			}
 		}
 
-		return $this->_addon_form_hooks_instances[ $module_id ];
+		return $this->_provider_form_hooks_instances[ $module_id ];
 	}
 
 	/**
@@ -1156,7 +1090,7 @@ abstract class Hustle_Provider_Abstract implements Hustle_Provider_Interface{
 	 * @since 4.0 $module_id param added. $is_close, $is_submit, $data_to_save params removed.
 	 *
 	 * @param array $steps Array with all the wizard's steps from the integration.
-	 * @param array $submitted_data Array with the submitted data. Softly sanitized by @see Hustle_Api_Utils::validate_and_sanitize_fields().
+	 * @param array $submitted_data Array with the submitted data. Softly sanitized by @see Opt_In_Utils::validate_and_sanitize_fields().
 	 * @param int   $step Step from which the call is made.
 	 *
 	 * @return array|mixed
@@ -1196,10 +1130,9 @@ abstract class Hustle_Provider_Abstract implements Hustle_Provider_Interface{
 		// Close the modal if...
 		$do_close = (
 			// It's a submission.
-			! empty( $submitted_data['is_submit'] ) &&
+			! empty( $submitted_data['hustle_is_submit'] ) &&
 			// We're in the last step.
 			! $wizard['opt_in_provider_has_next_step'] &&
-			empty( $submitted_data['page'] ) &&
 			// And there are no errors.
 			( ! isset( $wizard['has_errors'] ) || ! $wizard['has_errors'] )
 		);
@@ -1340,14 +1273,29 @@ abstract class Hustle_Provider_Abstract implements Hustle_Provider_Interface{
 	public function save_multi_settings_values( $global_multi_id, $values ) {
 
 		$saved_settings = $this->get_settings_values();
-		$settings_to_save = array_merge(
-			$saved_settings,
-			array(
-				$global_multi_id => $values,
-			)
-		);
+		if (  $this->is_allow_multi_on_global() ) {
+			$settings_to_save = array_merge(
+				$saved_settings,
+				array(
+					$global_multi_id => $values,
+				)
+			);
+		} else {
+			$settings_to_save = $values;
+		}
 
 		$this->save_settings_values( $settings_to_save );
+	}
+
+	public function get_multi_settings_values( $global_multi_id = false ) {
+
+		$settings = $this->get_settings_values();
+		
+		if ( $this->is_allow_multi_on_global() ) {
+			$settings = ( $global_multi_id && ! empty( $settings[ $global_multi_id ] ) ) ? $settings[ $global_multi_id ] : array();
+		}
+
+		return $settings;
 	}
 
 	/**
@@ -1449,6 +1397,19 @@ abstract class Hustle_Provider_Abstract implements Hustle_Provider_Interface{
 	}
 
 	/**
+	 * Process the return value of an external redirect.
+	 * Also, return the behavior to have in the global integrations page.
+	 * Useful for handling oAuth.
+	 * 
+	 * @since 4.0.2
+	 *
+	 * @return array
+	 */
+	public function process_external_redirect() {
+		return array();
+	}
+
+	/**
 	 * Updates provider's db option with the new value.
 	 *
 	 * @uses update_option
@@ -1476,6 +1437,7 @@ abstract class Hustle_Provider_Abstract implements Hustle_Provider_Interface{
 	 * Like form_settings_wizards(), but for global settings.
 	 * Should be overridden in order to show a wizard in the global settings.
 	 *
+	 * @since 4.0
 	 * @return array
 	 */
 	public function settings_wizards() {
@@ -1562,10 +1524,6 @@ abstract class Hustle_Provider_Abstract implements Hustle_Provider_Interface{
 
 		return $multi_ids;
 	}
-
-	//private function get_global_settings_multi_ids() {
-	//	return $this->get_global_multi_ids();
-	//}
 
 	/**
 	 * Get the globally connected accounts of this integration.
@@ -1673,7 +1631,7 @@ abstract class Hustle_Provider_Abstract implements Hustle_Provider_Interface{
 				'value'         => isset( $submitted_data['global_multi_id'] ) ? $submitted_data['global_multi_id'] : $this->generate_multi_id(),
 			);
 		}
-		$html = hustle_get_html_for_options( $options );
+		$html = Hustle_Provider_Utils::get_html_for_options( $options );
 		$html = apply_filters( 'hustle_providers_admin_add_common_hidden_fields', $html );
 		return $html;
 	}

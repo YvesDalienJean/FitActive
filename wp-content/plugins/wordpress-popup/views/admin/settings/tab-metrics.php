@@ -1,6 +1,3 @@
-<?php
-$stored_metrics = isset( $hustle_settings['selected_top_metrics'] ) && is_array( $hustle_settings['selected_top_metrics'] ) ? $hustle_settings['selected_top_metrics'] : array();
-?>
 <div id="top-metrics-box" class="sui-box" data-tab="metrics" <?php if ( 'metrics' !== $section ) echo 'style="display: none;"'; ?>>
 
 	<div class="sui-box-header">
@@ -16,8 +13,8 @@ $stored_metrics = isset( $hustle_settings['selected_top_metrics'] ) && is_array(
 			<div class="sui-form-field">
 				<label for="hustle-metrics-rate" class="sui-checkbox">
 					<input type="checkbox"
-						name="average_conversion_rate"
-						value="1"
+						name="metrics[]"
+						value="average_conversion_rate"
 						id="hustle-metrics-rate"
 						<?php checked( in_array( 'average_conversion_rate', $stored_metrics, true ) ); ?> />
 					<span aria-hidden="true"
@@ -30,8 +27,8 @@ $stored_metrics = isset( $hustle_settings['selected_top_metrics'] ) && is_array(
 			<div class="sui-form-field">
 				<label for="hustle-metrics-today" class="sui-checkbox">
 					<input type="checkbox"
-						name="today_conversions"
-						value="1"
+						name="metrics[]"
+						value="today_conversions"
 						id="hustle-metrics-today"
 						<?php checked( in_array( 'today_conversions', $stored_metrics, true ) ); ?> />
 					<span aria-hidden="true"
@@ -44,8 +41,8 @@ $stored_metrics = isset( $hustle_settings['selected_top_metrics'] ) && is_array(
 			<div class="sui-form-field">
 				<label for="hustle-metrics-week" class="sui-checkbox">
 					<input type="checkbox"
-						name="last_week_conversions"
-						value="1"
+						name="metrics[]"
+						value="last_week_conversions"
 						id="hustle-metrics-week"
 						<?php checked( in_array( 'last_week_conversions', $stored_metrics, true ) ); ?> />
 					<span aria-hidden="true"
@@ -58,8 +55,8 @@ $stored_metrics = isset( $hustle_settings['selected_top_metrics'] ) && is_array(
 			<div class="sui-form-field">
 				<label for="hustle-metrics-month" class="sui-checkbox">
 					<input type="checkbox"
-						name="last_month_conversions"
-						value="1"
+						name="metrics[]"
+						value="last_month_conversions"
 						id="hustle-metrics-month"
 						<?php checked( in_array( 'last_month_conversions', $stored_metrics, true ) ); ?> />
 					<span aria-hidden="true"
@@ -72,8 +69,8 @@ $stored_metrics = isset( $hustle_settings['selected_top_metrics'] ) && is_array(
 			<div class="sui-form-field">
 				<label for="hustle-metrics-total" class="sui-checkbox">
 					<input type="checkbox"
-						name="total_conversions"
-						value="1"
+						name="metrics[]"
+						value="total_conversions"
 						id="hustle-metrics-total"
 						<?php checked( in_array( 'total_conversions', $stored_metrics, true ) ); ?> />
 					<span aria-hidden="true"
@@ -86,8 +83,8 @@ $stored_metrics = isset( $hustle_settings['selected_top_metrics'] ) && is_array(
 			<div class="sui-form-field">
 				<label for="hustle-metrics-most" class="sui-checkbox">
 					<input type="checkbox"
-						name="most_conversions"
-						value="1"
+						name="metrics[]"
+						value="most_conversions"
 						id="hustle-metrics-most"
 						<?php checked( in_array( 'most_conversions', $stored_metrics, true ) ); ?> />
 					<span aria-hidden="true"
@@ -100,8 +97,8 @@ $stored_metrics = isset( $hustle_settings['selected_top_metrics'] ) && is_array(
 			<div class="sui-form-field">
 				<label for="hustle-metrics-inactive-modules" class="sui-checkbox">
 					<input type="checkbox"
-						name="inactive_modules_count"
-						value="1"
+						name="metrics[]"
+						value="inactive_modules_count"
 						id="hustle-metrics-inactive-modules"
 						<?php checked( in_array( 'inactive_modules_count', $stored_metrics, true ) ); ?> />
 					<span aria-hidden="true"
@@ -114,8 +111,8 @@ $stored_metrics = isset( $hustle_settings['selected_top_metrics'] ) && is_array(
 			<div class="sui-form-field">
 				<label for="hustle-metrics-total-modules" class="sui-checkbox">
 					<input type="checkbox"
-						name="total_modules_count"
-						value="1"
+						name="metrics[]"
+						value="total_modules_count"
 						id="hustle-metrics-total-modules"
 						<?php checked( in_array( 'total_modules_count', $stored_metrics, true ) ); ?> />
 					<span aria-hidden="true"
@@ -129,10 +126,12 @@ $stored_metrics = isset( $hustle_settings['selected_top_metrics'] ) && is_array(
 
 		<div class="sui-box-footer">
 			<div class="sui-actions-right">
-				<button type="submit" class="sui-button sui-button-blue">
-					<span class="sui-loading-text"><?php esc_html_e( 'Save Settings', 'wordpress-popup' ); ?></span>
-					<i class="sui-icon-loader sui-loading" aria-hidden="true"></i>
-				</button>
+				<div class="sui-tooltip-top-right" data-tooltip="<?php esc_html_e( 'Please select 3 metrics to save settings.', 'wordpress-popup' ); ?>">
+				  	<button type="submit" class="sui-button sui-button-blue" id="save_metrics">
+						<span class="sui-loading-text"><?php esc_html_e( 'Save Settings', 'wordpress-popup' ); ?></span>
+						<i class="sui-icon-loader sui-loading" aria-hidden="true"></i>
+					</button>
+				</div>
 			</div>
 		</div>
 

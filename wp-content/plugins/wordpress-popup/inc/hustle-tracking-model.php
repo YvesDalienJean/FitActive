@@ -62,7 +62,7 @@ class Hustle_Tracking_Model {
 		 * IP Tracking
 		 */
 		$ip_query = ' AND `ip` IS NULL';
-		$settings = Hustle_Settings_Admin::get_hustle_settings( 'privacy' );
+		$settings = Hustle_Settings_Admin::get_privacy_settings();
 		$ip_tracking = ! isset( $settings['ip_tracking'] ) || 'on' === $settings['ip_tracking'];
 		if ( $ip_tracking ) {
 			$ip = $ip ? $ip : Opt_In_Geo::get_user_ip();
@@ -536,7 +536,7 @@ class Hustle_Tracking_Model {
 	public function get_today_conversions() {
 		global $wpdb;
 		$sql = sprintf(
-			'SELECT COUNT(*) FROM `%s` WHERE `date_created` > DATE_SUB( NOW(), INTERVAL 24 hour )',
+			'SELECT COUNT(*) FROM `%s` WHERE `action` = "conversion" AND `date_created` > DATE_SUB( NOW(), INTERVAL 24 hour )',
 			$this->table_name
 		);
 		$value = intval( $wpdb->get_var( $sql ) );
@@ -553,7 +553,7 @@ class Hustle_Tracking_Model {
 	public function get_last_week_conversions() {
 		global $wpdb;
 		$sql = sprintf(
-			'SELECT COUNT(*) FROM `%s` WHERE `date_created` > DATE_SUB( NOW(), INTERVAL 7 DAY )',
+			'SELECT COUNT(*) FROM `%s` WHERE `action` = "conversion" AND `date_created` > DATE_SUB( NOW(), INTERVAL 7 DAY )',
 			$this->table_name
 		);
 		$value = intval( $wpdb->get_var( $sql ) );
@@ -570,7 +570,7 @@ class Hustle_Tracking_Model {
 	public function get_last_month_conversions() {
 		global $wpdb;
 		$sql = sprintf(
-			'SELECT COUNT(*) FROM `%s` WHERE `date_created` > DATE_SUB( NOW(), INTERVAL 1 MONTH )',
+			'SELECT COUNT(*) FROM `%s` WHERE `action` = "conversion" AND `date_created` > DATE_SUB( NOW(), INTERVAL 1 MONTH )',
 			$this->table_name
 		);
 		$value = intval( $wpdb->get_var( $sql ) );
@@ -636,5 +636,85 @@ class Hustle_Tracking_Model {
 	 */
 	private function wrap_ip( $a ) {
 		return sprintf( '\'%s\'', $a );
+	}
+
+	/**
+	 * Delete tracking data by tracking id
+	 *
+	 * @since 4.0.2
+	 */
+	public static function delete_data_by_tracking_id( $tracking_id ) {
+		global $wpdb;
+		$wpdb->delete(
+			Hustle_Db::tracking_table(),
+			array( 'tracking_id' => $tracking_id ),
+			array( '%d' )
+		);
+	}
+
+	/**
+	 * Get entries older than $date_created
+	 *
+	 * @since 4.0.2
+	 *
+	 * @param $date_created
+	 *
+	 * @return array
+	 */
+	public static function get_older_tracking_ids( $date_created ) {
+		global $wpdb;
+		$tracking_table = Hustle_Db::tracking_table();
+		$query = "SELECT e.tracking_id AS tracking_id
+					FROM {$tracking_table} e
+					WHERE e.date_created < %s";
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$query = $wpdb->prepare( $query, $date_created );
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		return $wpdb->get_col( $query ); 
+	}
+
+	/**
+	 * Get ip from tracking id
+	 *
+	 * @since 4.0.2
+	 *
+	 * @param $tracking_id
+	 *
+	 * @return array ip address
+	 */
+	public static function get_ip_from_tracking_id( $tracking_id ){
+		global $wpdb;
+		$tracking_table = Hustle_Db::tracking_table();
+		$query = "SELECT e.ip AS ip
+					FROM {$tracking_table} e
+					WHERE e.tracking_id < %s";
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$query = $wpdb->prepare( $query, $tracking_id );
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		return $wpdb->get_col( $query ); 
+	}
+
+	/**
+	 * Set ip of a tracking id
+	 *
+	 * @since 4.0.2
+	 *
+	 * @param $tracking_id
+	 * @param $ip
+	 *
+	 * @return array ip address
+	 */
+	public static function anonymise_tracked_id( $tracking_id, $ip ){
+		global $wpdb;
+		$tracking_table = Hustle_Db::tracking_table();
+		$wpdb->query( $wpdb->prepare(
+			"UPDATE {$tracking_table} SET `ip` = %s WHERE `tracking_id` = %d",
+			$ip,
+			$tracking_id
+		));
 	}
 }

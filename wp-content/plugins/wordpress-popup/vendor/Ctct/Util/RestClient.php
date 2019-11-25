@@ -70,7 +70,7 @@ class RestClient implements RestClientInterface
     {
         //adding the version header to the existing headers
         $headers[] = self::getVersionHeader();
-        
+
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_HEADER, 0);
@@ -88,6 +88,12 @@ class RestClient implements RestClientInterface
         $response = CurlResponse::create(curl_exec($curl), curl_getinfo($curl), curl_error($curl));
         curl_close($curl);
 
+		//logging data
+		$utils = \Hustle_Provider_Utils::get_instance();
+		$utils->_last_url_request 	= $url;
+		$utils->_last_data_sent 	= $data;
+		$utils->_last_data_received = $response;
+
         // check if any errors were returned
         $body = json_decode($response->body, true);
         if (isset($body[0]) && array_key_exists('error_key', $body[0])) {
@@ -99,7 +105,7 @@ class RestClient implements RestClientInterface
 
         return $response;
     }
-    
+
     /**
      * Returns the version header for the rest calls
      * @return string

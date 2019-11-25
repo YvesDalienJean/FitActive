@@ -145,7 +145,7 @@ class Hustle_E_Newsletter extends Hustle_Provider_Abstract {
 	public function configure( $submitted_data ) {
 		$has_errors = false;
 		$active = $this->active();
-		$is_submit = isset( $submitted_data['is_submit'] );
+		$is_submit = isset( $submitted_data['hustle_is_submit'] );
 
 		if ( $is_submit ) {
 
@@ -167,10 +167,10 @@ class Hustle_E_Newsletter extends Hustle_Provider_Abstract {
 			if ( ! $has_errors ) {
 
 				return array(
-					'html'         => Hustle_Api_Utils::get_modal_title_markup( __( 'e-Newsletter Added', 'wordpress-popup' ), __( 'You can now go to your forms and assign them to this integration', 'wordpress-popup' ) ),
+					'html'         => Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'e-Newsletter Added', 'wordpress-popup' ), __( 'You can now go to your pop-ups, slide-ins and embeds and assign them to this integration', 'wordpress-popup' ) ),
 					'buttons'      => array(
 						'close' => array(
-							'markup' => Hustle_Api_Utils::get_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
+							'markup' => Hustle_Provider_Utils::get_provider_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
 						),
 					),
 					'redirect'     => false,
@@ -201,16 +201,11 @@ class Hustle_E_Newsletter extends Hustle_Provider_Abstract {
 				'name'  => 'active',
 				'value' => 1,
 			),
-			array(
-				'type'  => 'hidden',
-				'name'  => 'is_submit',
-				'value' => 1,
-			),
 		);
 
 		if ( $has_errors ) {
 
-			$step_html = Hustle_Api_Utils::get_modal_title_markup(
+			$step_html = Hustle_Provider_Utils::get_integration_modal_title_markup(
 				__( 'Install e-Newsletter', 'wordpress-popup' )
 			);
 
@@ -220,13 +215,13 @@ class Hustle_E_Newsletter extends Hustle_Provider_Abstract {
 
 		} else {
 
-			$step_html = Hustle_Api_Utils::get_modal_title_markup(
+			$step_html = Hustle_Provider_Utils::get_integration_modal_title_markup(
 				__( 'Configure e-Newsletter', 'wordpress-popup' ),
 				__( 'Activate e-Newsletter to start using it on your forms.', 'wordpress-popup' )
 			);
 		}
 
-		$step_html .= Hustle_Api_Utils::get_html_for_options( $options );
+		$step_html .= Hustle_Provider_Utils::get_html_for_options( $options );
 
 		$is_edit = $this->is_connected() ? true : false;
 
@@ -235,16 +230,30 @@ class Hustle_E_Newsletter extends Hustle_Provider_Abstract {
 		} else if ( $is_edit ) {
 			$buttons = array(
 				'disconnect' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Disconnect', 'wordpress-popup' ), 'sui-button-ghost', 'disconnect', true ),
+					'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+						__( 'Disconnect', 'wordpress-popup' ),
+						'sui-button-ghost',
+						'disconnect',
+						true
+					),
 				),
 				'close' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Save', 'wordpress-popup' ), '', 'close' ),
+					'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+						__( 'Save', 'wordpress-popup' ),
+						'',
+						'close'
+					),
 				),
 			);
 		} else {
 			$buttons = array(
 				'connect' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Activate', 'wordpress-popup' ), '', 'connect', true ),
+					'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+						__( 'Activate', 'wordpress-popup' ),
+						'sui-button-center',
+						'connect',
+						true
+					),
 				),
 			);
 
@@ -307,7 +316,7 @@ class Hustle_E_Newsletter extends Hustle_Provider_Abstract {
 
 		/*
 		 * Our regular migration would've saved the provider settings in a format that's incorrect for e-newsletter
-		 * 
+		 *
 		 * Let's fix that now.
 		 */
 		$module_provider_settings = $module->get_provider_settings( $this->get_slug() );

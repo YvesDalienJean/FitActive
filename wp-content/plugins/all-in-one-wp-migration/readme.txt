@@ -2,9 +2,9 @@
 Contributors: yani.iliev, bangelov, pimjitsawang
 Tags: move, transfer, copy, migrate, backup, clone, restore, db migration, wordpress migration, website migration, database export, database import, apoyo, sauvegarde, di riserva, バックアップ
 Requires at least: 3.3
-Tested up to: 5.2
+Tested up to: 5.3
 Requires PHP: 5.2.17
-Stable tag: 7.6
+Stable tag: 7.10
 License: GPLv2 or later
 
 Move, transfer, copy, migrate, and backup a site with 1-click. Quick, easy, and reliable.
@@ -72,7 +72,6 @@ Mobile device compatible: All in One WP Plugin is the first plugin to offer true
 * Bluehost
 * InMotion
 * Web Hosting Hub
-* Siteground
 * Pagely
 * Dreamhost
 * Justhost
@@ -109,6 +108,34 @@ Alternatively you can download the plugin using the download button on this page
 All-in-One WP Migration **asks for your consent** to collect **requester's email address** when filling plugin's contact form. [GDPR Compliant Privacy Policy](https://www.iubenda.com/privacy-policy/946881)
 
 == Changelog ==
+= 7.10 =
+**Added**
+
+* Better support for WP Engine platform
+
+= 7.9 =
+**Added**
+
+* Uploads, plugins, and themes path to the backup
+
+**Removed**
+
+* Sorting of active plugins on import
+
+= 7.8 =
+**Added**
+
+* Better support for Elementor plugin
+
+**Fixed**
+
+* Skip files from wp-content when exporting only database
+
+= 7.7 =
+**Changed**
+
+* Enhanced support for old versions of revslider plugin
+
 = 7.6 =
 **Added**
 

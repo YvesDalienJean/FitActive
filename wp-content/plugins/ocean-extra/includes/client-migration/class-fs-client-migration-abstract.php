@@ -550,6 +550,8 @@
                 // Upon successful migration, store the no-migration flag for 5 years.
                 set_transient( $should_migrate_transient, 'no', WP_FS__TIME_24_HOURS_IN_SEC * 365 * 5 );
 
+                do_action( 'fs_after_client_migration', $this->_license_accessor );
+
                 $this->_logger->info( 'Migration completed successfully.' );
 
                 return true;

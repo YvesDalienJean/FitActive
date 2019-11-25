@@ -15,6 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Utils {
 
+	const DEPRECATION_RANGE = 0.4;
+
 	/**
 	 * Is ajax.
 	 *
@@ -615,5 +617,27 @@ class Utils {
 		$script_data = 'var ' . $js_var . ' = ' . $config . ';';
 
 		wp_add_inline_script( $handle, $script_data, 'before' );
+	}
+
+	public static function handle_deprecation( $item, $version, $replacement = null ) {
+		preg_match( '/^[0-9]+\.[0-9]+/', ELEMENTOR_VERSION, $current_version );
+
+		$current_version_as_float = (float) $current_version[0];
+
+		preg_match( '/^[0-9]+\.[0-9]+/', $version, $alias_version );
+
+		$alias_version_as_float = (float) $alias_version[0];
+
+		if ( round( $current_version_as_float - $alias_version_as_float, 1 ) >= self::DEPRECATION_RANGE ) {
+			_deprecated_file( $item, $version, $replacement );
+		}
+	}
+
+	/*
+	 * Checks a control value for being empty, including a string of '0' not covered by PHP's empty().
+	 * @param string $control_value
+	 */
+	public static function is_empty( $control_value ) {
+		return '0' !== $control_value && empty( $control_value );
 	}
 }

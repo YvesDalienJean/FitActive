@@ -54,12 +54,6 @@ if ( ! class_exists( 'Hustle_Aweber' ) ) :
 	protected $_title = 'Aweber';
 
 	/**
-	 * @since 3.0.5
-	 * @var bool
-	 */
-	protected $_supports_fields = true;
-
-	/**
 	 * Class name of form settings
 	 *
 	 * @var string
@@ -109,7 +103,7 @@ if ( ! class_exists( 'Hustle_Aweber' ) ) :
 		}
 
 		return null;
-	} 
+	}
 	/**
 	 * Get API Instance
 	 *
@@ -123,7 +117,7 @@ if ( ! class_exists( 'Hustle_Aweber' ) ) :
 	 * @throws Hustle_Addon_Aweber_Wp_Api_Exception
 	 */
 	public function get_api( $multi_global_id = null, $api_credentials = array() ) {
-		
+
 		if ( is_null( self::$api ) ) {
 
 			if ( empty( $api_credentials ) ) {
@@ -140,7 +134,7 @@ if ( ! class_exists( 'Hustle_Aweber' ) ) :
 			$_oauth_token_secret = $api_credentials[ self::ACCESS_SECRET ];
 
 			$api = new Hustle_Addon_Aweber_Wp_Api( $_application_key, $_application_secret, $_oauth_token, $_oauth_token_secret );
-			
+
 			self::$api = $api;
 		}
 
@@ -151,7 +145,7 @@ if ( ! class_exists( 'Hustle_Aweber' ) ) :
 	 * Retrieve the stored credentials key.
 	 * Checks the global-multi settings first. If empty, checks
 	 * the old wp_options keys where it was stored before 4.0.1.
-	 * 
+	 *
 	 * @since 4.0.1
 	 *
 	 * @param string $multi_global_id
@@ -172,7 +166,7 @@ if ( ! class_exists( 'Hustle_Aweber' ) ) :
 		$instance_settings = $setting_values[ $multi_global_id ];
 
 		foreach ( $api_credentials as $api_credentials_key => $value ) {
-		
+
 			/**
 			 * If there's any key missing in the saved multi settings,
 			 * try retrieving them from the wp_options instead.
@@ -191,10 +185,10 @@ if ( ! class_exists( 'Hustle_Aweber' ) ) :
 		 * This is were they were stored before 4.0.1.
 		 */
 		if ( $get_keys_from_options ) {
-			
+
 			foreach ( $api_credentials as $api_credentials_key => $value ) {
-			
-				$saved_key = $this->get_provider_option( $api_credentials_key, '' ); 
+
+				$saved_key = $this->get_provider_option( $api_credentials_key, '' );
 				if ( empty( $saved_key ) ) {
 					break;
 				}
@@ -208,14 +202,14 @@ if ( ! class_exists( 'Hustle_Aweber' ) ) :
 
 	/**
 	 * Get the account ID
-	 * 
+	 *
 	 * @since 4.0.1
 	 *
 	 * @param string $global_multi_id
-	 * @return string|false 
+	 * @return string|false
 	 */
 	public function get_account_id( $global_multi_id ) {
-		
+
 		$account_id = $this->get_setting( 'account_id', false, $global_multi_id );
 
 		if ( ! $account_id ) {
@@ -228,7 +222,7 @@ if ( ! class_exists( 'Hustle_Aweber' ) ) :
 				$this->save_multi_settings_values( $global_multi_id, $settings_to_save );
 
 			} catch ( Exception $e ) {
-				Hustle_Api_Utils::maybe_log( __METHOD__, $e->getMessage() );
+				Hustle_Provider_Utils::maybe_log( __METHOD__, $e->getMessage() );
 			}
 
 		}
@@ -348,7 +342,7 @@ if ( ! class_exists( 'Hustle_Aweber' ) ) :
 		if ( $is_submit ) {
 
 			$validated_credentials = $this->get_validated_credentials( $submitted_data['api_key'] );
-			
+
 			if ( empty( $validated_credentials ) || ! is_array( $validated_credentials ) ) {
 				$api_key_validated = false;
 				$error_message = $this->provider_connection_falied();
@@ -358,9 +352,9 @@ if ( ! class_exists( 'Hustle_Aweber' ) ) :
 			if ( ! $has_errors ) {
 
 				// If not active, activate it.
-				if ( 
-					$this->is_active() || 
-					Hustle_Providers::get_instance()->activate_addon( $this->_slug ) 
+				if (
+					$this->is_active() ||
+					Hustle_Providers::get_instance()->activate_addon( $this->_slug )
 				) {
 
 					$keys_names = array(
@@ -397,10 +391,10 @@ if ( ! class_exists( 'Hustle_Aweber' ) ) :
 			if ( ! $has_errors ) {
 
 				return array(
-					'html'         => Hustle_Api_Utils::get_modal_title_markup( __( 'Aweber Added', 'wordpress-popup' ), __( 'You can now go to your forms and assign them to this integration', 'wordpress-popup' ) ),
+					'html'         => Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'Aweber Added', 'wordpress-popup' ), __( 'You can now go to your pop-ups, slide-ins and embeds and assign them to this integration', 'wordpress-popup' ) ),
 					'buttons'      => array(
 						'close' => array(
-							'markup' => Hustle_Api_Utils::get_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
+							'markup' => Hustle_Provider_Utils::get_provider_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
 						),
 					),
 					'redirect'     => false,
@@ -464,26 +458,41 @@ if ( ! class_exists( 'Hustle_Aweber' ) ) :
 			),
 		);
 
-		$step_html = Hustle_Api_Utils::get_modal_title_markup( __( 'Configure Aweber', 'wordpress-popup' ), sprintf( __("Please %1\$sclick here%2\$s to connect to Aweber service to get your authorization code.", 'wordpress-popup'), '<a href="https://auth.aweber.com/1.0/oauth/authorize_app/' . self::APP_ID .'" target="_blank">', '</a>' ) );
+		$step_html = Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'Configure Aweber', 'wordpress-popup' ), sprintf( __("Please %1\$sclick here%2\$s to connect to Aweber service to get your authorization code.", 'wordpress-popup'), '<a href="https://auth.aweber.com/1.0/oauth/authorize_app/' . self::APP_ID .'" target="_blank">', '</a>' ) );
 		if ( $has_errors ) {
 			$step_html .= '<span class="sui-notice sui-notice-error"><p>' . esc_html( $error_message ) . '</p></span>';
 		}
-		$step_html .= Hustle_Api_Utils::get_html_for_options( $options );
+		$step_html .= Hustle_Provider_Utils::get_html_for_options( $options );
 
 		$is_edit = $this->settings_are_completed( $global_multi_id );
 		if ( $is_edit ) {
 			$buttons = array(
 				'disconnect' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Disconnect', 'wordpress-popup' ), 'sui-button-ghost', 'disconnect', true ),
+					'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+						__( 'Disconnect', 'wordpress-popup' ),
+						'sui-button-ghost',
+						'disconnect',
+						true
+					),
 				),
 				'save' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Save', 'wordpress-popup' ), '', 'connect', true ),
+					'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+						__( 'Save', 'wordpress-popup' ),
+						'',
+						'connect',
+						true
+					),
 				),
 			);
 		} else {
 			$buttons = array(
 				'connect' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Connect', 'wordpress-popup' ), '', 'connect', true ),
+					'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+						__( 'Connect', 'wordpress-popup' ),
+						'sui-button-right',
+						'connect',
+						true
+					),
 				),
 			);
 
@@ -530,7 +539,7 @@ if ( ! class_exists( 'Hustle_Aweber' ) ) :
 			$tokens = $this->get_validated_access_token( $application_key, $application_secret, $request_token, $token_secret, $oauth_verifier );
 
 		} catch ( Hustle_Addon_Aweber_Exception $e ) {
-			Hustle_Api_Utils::maybe_log( $e->getMessage() );
+			Hustle_Provider_Utils::maybe_log( $e->getMessage() );
 			return false;
 		}
 
@@ -547,12 +556,12 @@ if ( ! class_exists( 'Hustle_Aweber' ) ) :
 			$account_id = $this->get_validated_account_id( null, $api_key );
 
 			if ( ! $account_id ) {
-				Hustle_Api_Utils::maybe_log( __METHOD__, __( 'Invalid Aweber authorization code.', 'wordpress-popup' ) );
+				Hustle_Provider_Utils::maybe_log( __METHOD__, __( 'Invalid Aweber authorization code.', 'wordpress-popup' ) );
 				return false;
 			}
 
 		} catch ( Exception $e ) {
-			Hustle_Api_Utils::maybe_log( __METHOD__, $e->getMessage() );
+			Hustle_Provider_Utils::maybe_log( __METHOD__, $e->getMessage() );
 			return false;
 		}
 

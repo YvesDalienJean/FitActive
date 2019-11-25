@@ -30,7 +30,7 @@ if ( ! class_exists( 'Hustle_SendGrid_Api' ) ) :
 			$api_key = $this->api_key;
 
 			if ( empty( $api_key ) ) {
-				Hustle_Api_Utils::maybe_log( __METHOD__, 'No API key is set.' );
+				Hustle_Provider_Utils::maybe_log( __METHOD__, 'No API key is set.' );
 				return false;
 			}
 
@@ -60,7 +60,7 @@ if ( ! class_exists( 'Hustle_SendGrid_Api' ) ) :
 
 			$url = $this->sendgrid_url . '/lists';
 
-			$response = wp_remote_get( $url, $args );
+			$response = $this->request( $url, $args );
 
 			if ( ! is_array( $response ) || ! isset( $response['body'] ) ) {
 				return false;
@@ -95,27 +95,22 @@ if ( ! class_exists( 'Hustle_SendGrid_Api' ) ) :
 			$req_body = wp_json_encode( array( $data ) );
 			$args['body'] = $req_body;
 
-			$response = wp_remote_post( $url, $args );
-
-			$utils = Hustle_Provider_Utils::get_instance();
-			$utils->_last_data_received = $response;
-			$utils->_last_url_request = $url;
-			$utils->_last_data_sent = $data;
+			$response = $this->request( $url, $args, 'POST' );
 
 			if ( ! is_array( $response ) || ! isset( $response['body'] ) ) {
-				Hustle_Api_Utils::maybe_log( __METHOD__, 'Error adding the recipient.', 'The response is not an array or does not have a body.' );
+				Hustle_Provider_Utils::maybe_log( __METHOD__, 'Error adding the recipient.', 'The response is not an array or does not have a body.' );
 				return false;
 			}
 
 			$recipient_response = json_decode( $response['body'], true );
 
 			if ( isset( $recipient_response['error_count'] ) && 0 !== $recipient_response['error_count'] ) {
-				Hustle_Api_Utils::maybe_log( __METHOD__, 'Error adding the recipient.', $recipient_response['errors'][0]['message'] );
+				Hustle_Provider_Utils::maybe_log( __METHOD__, 'Error adding the recipient.', $recipient_response['errors'][0]['message'] );
 				return false;
 			}
 
 			if ( ! isset( $recipient_response['persisted_recipients'] ) || ! isset( $recipient_response['persisted_recipients'][0] ) ) {
-				Hustle_Api_Utils::maybe_log( __METHOD__, 'Error adding the recipient.', 'Persistent recipients is not set or does not contain values.' );
+				Hustle_Provider_Utils::maybe_log( __METHOD__, 'Error adding the recipient.', 'Persistent recipients is not set or does not contain values.' );
 				return false;
 			}
 
@@ -142,27 +137,22 @@ if ( ! class_exists( 'Hustle_SendGrid_Api' ) ) :
 			$args['body'] 	= $req_body;
 			$args['method'] = 'PATCH';
 
-			$response = wp_remote_request( $url, $args );
-
-			$utils = Hustle_Provider_Utils::get_instance();
-			$utils->_last_data_received = $response;
-			$utils->_last_url_request = $url;
-			$utils->_last_data_sent = $data;
+			$response = $this->request( $url, $args );
 
 			if ( ! is_array( $response ) || ! isset( $response['body'] ) ) {
-				Hustle_Api_Utils::maybe_log( __METHOD__, 'Error adding the recipient.', 'The response is not an array or does not have a body.' );
+				Hustle_Provider_Utils::maybe_log( __METHOD__, 'Error adding the recipient.', 'The response is not an array or does not have a body.' );
 				return false;
 			}
 
 			$recipient_response = json_decode( $response['body'], true );
 
 			if ( isset( $recipient_response['error_count'] ) && 0 !== $recipient_response['error_count'] ) {
-				Hustle_Api_Utils::maybe_log( __METHOD__, 'Error adding the recipient.', $recipient_response['errors'][0]['message'] );
+				Hustle_Provider_Utils::maybe_log( __METHOD__, 'Error adding the recipient.', $recipient_response['errors'][0]['message'] );
 				return false;
 			}
 
 			if ( ! isset( $recipient_response['persisted_recipients'] ) || ! isset( $recipient_response['persisted_recipients'][0] ) ) {
-				Hustle_Api_Utils::maybe_log( __METHOD__, 'Error adding the recipient.', 'Persistent recipients is not set or does not contain values.' );
+				Hustle_Provider_Utils::maybe_log( __METHOD__, 'Error adding the recipient.', 'Persistent recipients is not set or does not contain values.' );
 				return false;
 			}
 
@@ -186,15 +176,10 @@ if ( ! class_exists( 'Hustle_SendGrid_Api' ) ) :
 
 			$url = $this->sendgrid_url . '/lists/'. $list_id . '/recipients/' . $recipient_id;
 
-			$response = wp_remote_post( $url, $args );
-
-			$utils = Hustle_Provider_Utils::get_instance();
-			$utils->_last_data_received = $response;
-			$utils->_last_url_request = $url;
-			$utils->_last_data_sent = '';
+			$response = $this->request( $url, $args, 'POST' );
 
 			if ( ! is_array( $response ) || ! isset( $response['body'] ) ) {
-				Hustle_Api_Utils::maybe_log( __METHOD__, 'Error adding the recipient to a list.', 'The response is not an array or does not have a body.' );
+				Hustle_Provider_Utils::maybe_log( __METHOD__, 'Error adding the recipient to a list.', 'The response is not an array or does not have a body.' );
 				return false;
 			}
 
@@ -251,12 +236,7 @@ if ( ! class_exists( 'Hustle_SendGrid_Api' ) ) :
 
 			$url = $this->sendgrid_url . '/recipients/search?email=' . $email . '&list_id=' . $list_id;
 
-			$response = wp_remote_get( $url, $args );
-
-			$utils = Hustle_Provider_Utils::get_instance();
-			$utils->_last_data_received = $response;
-			$utils->_last_url_request = $url;
-			$utils->_last_data_sent = '';
+			$response = $this->request( $url, $args );
 
 			if ( ! is_array( $response ) || ! isset( $response['body'] ) ) {
 				return false;
@@ -265,7 +245,7 @@ if ( ! class_exists( 'Hustle_SendGrid_Api' ) ) :
 			$response_array = json_decode( $response['body'], true );
 
 			if ( isset( $response_array['errors'] ) ) {
-				Hustle_Api_Utils::maybe_log( __METHOD__, 'Error retrieving recipient.', $response_array['errors'][0]['message'] );
+				Hustle_Provider_Utils::maybe_log( __METHOD__, 'Error retrieving recipient.', $response_array['errors'][0]['message'] );
 				return false;
 			}
 
@@ -289,12 +269,12 @@ if ( ! class_exists( 'Hustle_SendGrid_Api' ) ) :
 
 			// Get reserved fields
 			$reserved_fields_url = $this->sendgrid_url . '/reserved_fields';
-			$reserved_fields_response = wp_remote_get( $reserved_fields_url, $args );
+			$reserved_fields_response = $this->request( $reserved_fields_url, $args );
 			$reserved_fields = json_decode( $reserved_fields_response['body'], true );
 
 			// Get custom fields
 			$custom_fields_url = $this->sendgrid_url . '/custom_fields';
-			$custom_fields_response = wp_remote_get( $custom_fields_url, $args );
+			$custom_fields_response = $this->request( $custom_fields_url, $args );
 			$custom_fields = json_decode( $custom_fields_response['body'], true );
 
 			$existing_reserved_fields = isset( $reserved_fields['reserved_fields'] ) ? $reserved_fields['reserved_fields'] : array();
@@ -335,15 +315,38 @@ if ( ! class_exists( 'Hustle_SendGrid_Api' ) ) :
 			$req_body = wp_json_encode( $field_data );
 			$args['body'] = $req_body;
 
-			$response = wp_remote_post( $url, $args );
+			$response = $this->request( $url, $args, 'POST' );
 
 			$response_array = json_decode( $response['body'], true );
 
 			if ( isset( $response_array['errors'] ) && isset( $response_array['errors'][0] ) ) {
-				Hustle_Api_Utils::maybe_log( __METHOD__, 'Error creating the custom field.', $response_array['errors'][0]['message'] );
+				Hustle_Provider_Utils::maybe_log( __METHOD__, 'Error creating the custom field.', $response_array['errors'][0]['message'] );
 			}
 
 			return true;
+		}
+
+		/**
+		 * Request
+		 *
+		 * @param string $url
+		 * @param array $args
+		 * @param string $method GET|POST
+		 * @return array|WP_Error
+		 */
+		private function request( $url, $args, $method = 'GET' ) {
+			if ( empty( $args['method'] ) && in_array( $method, [ 'GET', 'POST' ], true ) ) {
+				$args['method'] = $method;
+			}
+
+			$response = wp_remote_request( $url, $args );
+
+			$utils = Hustle_Provider_Utils::get_instance();
+			$utils->_last_url_request = $url;
+			$utils->_last_data_sent = $args;
+			$utils->_last_data_received = $response;
+
+			return $response;
 		}
 
 	}

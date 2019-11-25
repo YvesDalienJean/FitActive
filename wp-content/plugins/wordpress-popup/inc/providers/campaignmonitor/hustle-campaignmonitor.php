@@ -1,18 +1,6 @@
 <?php
 
-if( !class_exists("Hustle_Campaignmonitor") ):
-
-if( !class_exists( "CS_REST_General" ) )
-	require_once Opt_In::$vendor_path . 'campaignmonitor/createsend-php/csrest_general.php';
-
-if( !class_exists( "CS_REST_Subscribers" ) )
-	require_once Opt_In::$vendor_path . 'campaignmonitor/createsend-php/csrest_subscribers.php';
-
-if( !class_exists( "CS_REST_Clients" ) )
-	require_once Opt_In::$vendor_path . 'campaignmonitor/createsend-php/csrest_clients.php';
-
-if( !class_exists( "CS_REST_Lists" ) )
-	require_once Opt_In::$vendor_path . 'campaignmonitor/createsend-php/csrest_lists.php';
+if( ! class_exists("Hustle_Campaignmonitor") ):
 
 class Hustle_Campaignmonitor extends Hustle_Provider_Abstract {
 
@@ -59,12 +47,6 @@ class Hustle_Campaignmonitor extends Hustle_Provider_Abstract {
 	protected $_title = 'Campaign Monitor';
 
 	/**
-	 * @since 3.0.5
-	 * @var bool
-	 */
-	protected $_supports_fields = true;
-
-	/**
 	 * Class name of form settings
 	 *
 	 * @var string
@@ -107,10 +89,10 @@ class Hustle_Campaignmonitor extends Hustle_Provider_Abstract {
 	public static function api( $api_key ){
 		if( empty( self::$api ) ){
 			try {
-				self::$api = new CS_REST_General( array('api_key' => $api_key) );
+				self::$api = Hustle_Campaignmonitor_API::boot( $api_key );
 				self::$errors = array();
 			} catch (Exception $e) {
-				self::$errors = array("api_error" => $e) ;
+				self::$errors = array( "api_error" => $e ) ;
 			}
 
 		}
@@ -149,18 +131,25 @@ class Hustle_Campaignmonitor extends Hustle_Provider_Abstract {
 		$default_data = array(
 			'api_key' => '',
 			'name' => '',
+			'client_id' => '',
 		);
 		$current_data = $this->get_current_data( $default_data, $submitted_data );
 		$is_submit = isset( $submitted_data['api_key'] );
 		$global_multi_id = $this->get_global_multi_id( $submitted_data );
 
 		$api_key_validated = true;
+		$api_client_validated 	= true;
 		if ( $is_submit ) {
 
-			$api_key_validated = $this->validate_api_key( $submitted_data['api_key'] );
+			$api_key_validated 		= $this->validate_api_key( $submitted_data['api_key'] );
+			$client_id 				= isset( $current_data['client_id'] ) ? $current_data['client_id'] : '';
 			if ( ! $api_key_validated ) {
 				$error_message = $this->provider_connection_falied();
 				$has_errors = true;
+			}
+
+			if ( ! empty( $client_id ) ) {
+				$api_client_validated 	= $this->validate_client( $submitted_data['api_key'], $client_id );
 			}
 
 			if ( ! $has_errors ) {
@@ -169,6 +158,36 @@ class Hustle_Campaignmonitor extends Hustle_Provider_Abstract {
 					'name' => $current_data['name'],
 				);
 				$api_key = $submitted_data['api_key'];
+
+				$client_details = null;
+				if ( ! empty( $client_id ) && $api_client_validated ) {
+					$client_details = $this->get_client( $api_key, $client_id );
+				} else {
+					//find first client
+					$clients = self::api( $api_key )->get_clients();
+					if ( is_array( $clients ) ) {
+						if ( isset( $clients[0] ) ) {
+							$client = $clients[0];
+							if ( isset( $client->ClientID ) ) { //phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+								$client_id      = $client->ClientID; //phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+								$client_details = $this->get_client( $api_key, $client_id );
+							}
+						}
+					}
+				}
+
+				if ( ! isset( $client_details->BasicDetails ) //phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+				     || ! isset( $client_details->BasicDetails->ClientID ) //phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+				     || ! isset( $client_details->BasicDetails->CompanyName ) ) { //phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+					$error_message = __( 'Could not find client details, please try again.', 'wordpress-popup' );
+					$has_errors = true;
+				}
+
+				if( ! $has_errors ){
+					$settings_to_save['client_id'] = $client_id;
+					$settings_to_save['client_name'] = $client_details->BasicDetails->CompanyName; //phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+					$api_client_validated = true;
+				}
 				// If not active, activate it.
 				// TODO: Wrap this in a friendlier method
 				if ( Hustle_Provider_Utils::is_provider_active( $this->_slug )
@@ -183,10 +202,10 @@ class Hustle_Campaignmonitor extends Hustle_Provider_Abstract {
 			if ( ! $has_errors ) {
 
 				return array(
-					'html'         => Hustle_Api_Utils::get_modal_title_markup( __( 'Campaign Monitor Added', 'wordpress-popup' ), __( 'You can now go to your forms and assign them to this integration', 'wordpress-popup' ) ),
+					'html'         => Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'Campaign Monitor Added', 'wordpress-popup' ), __( 'You can now go to your pop-ups, slide-ins and embeds and assign them to this integration', 'wordpress-popup' ) ),
 					'buttons'      => array(
 						'close' => array(
-							'markup' => Hustle_Api_Utils::get_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
+							'markup' => Hustle_Provider_Utils::get_provider_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
 						),
 					),
 					'redirect'     => false,
@@ -228,6 +247,35 @@ class Hustle_Campaignmonitor extends Hustle_Provider_Abstract {
 			),
 			array(
 				'type'     => 'wrapper',
+				'class'    => $api_client_validated ? '' : 'sui-form-field-error',
+				'elements' => array(
+					'api_key_label' => array(
+						'type'  => 'label',
+						'for'   => 'client_id',
+						'value' => __( 'Client ID', 'wordpress-popup'),
+						'note'  => esc_html__( 'Required for Agency accounts only', 'wordpress-popup' ),
+					),
+					'client_id' => array(
+						'type'        => 'text',
+						'id'          => 'client_id',
+						'name'        => 'client_id',
+						'value'       => $current_data['client_id'],
+						'placeholder' => __( 'Enter Key', 'wordpress-popup' ),
+						'icon'        => 'key',
+					),
+					'client_message' => array(
+						'type'  => 'description',
+						'value' => sprintf( esc_html__( "If you have an agency account, enter the client id to connect to one of your clients' account. You can find client id on the %1\$sAccount Settings > API Keys%2\$s page.", 'wordpress-popup' ), '<strong>', '</strong>' ),
+					),
+					'client_error' => array(
+						'type'  => 'error',
+						'class' => $api_client_validated ? 'sui-hidden' : '',
+						'value' => __( 'Please, enter a valid Campaign Monitor client id.', 'wordpress-popup' ),
+					),
+				)
+			),
+			array(
+				'type'     => 'wrapper',
 				'style'    => 'margin-bottom: 0;',
 				'elements' => array(
 					'label' => array(
@@ -250,7 +298,7 @@ class Hustle_Campaignmonitor extends Hustle_Provider_Abstract {
 			),
 		);
 
-		$step_html = Hustle_Api_Utils::get_modal_title_markup( __( 'Configure Campaign Monitor', 'wordpress-popup' ),
+		$step_html = Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'Configure Campaign Monitor', 'wordpress-popup' ),
 			sprintf(
 				esc_html__( 'To get your API key, log in to your %1$s, then click on your profile picture at the top-right corner to open a menu, then select %2$s and finally click on %3$s.', 'wordpress-popup'),
 				sprintf( '<a href="%1$s" target="_blank">%2$s</a>',
@@ -264,22 +312,37 @@ class Hustle_Campaignmonitor extends Hustle_Provider_Abstract {
 		if ( $has_errors ) {
 			$step_html .= '<span class="sui-notice sui-notice-error"><p>' . esc_html( $error_message ) . '</p></span>';
 		}
-		$step_html .= Hustle_Api_Utils::get_html_for_options( $options );
+		$step_html .= Hustle_Provider_Utils::get_html_for_options( $options );
 
 		$is_edit = $this->settings_are_completed( $global_multi_id );
 		if ( $is_edit ) {
 			$buttons = array(
 				'disconnect' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Disconnect', 'wordpress-popup' ), 'sui-button-ghost', 'disconnect', true ),
+					'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+						__( 'Disconnect', 'wordpress-popup' ),
+						'sui-button-ghost',
+						'disconnect',
+						true
+					),
 				),
 				'save' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Save', 'wordpress-popup' ), '', 'connect', true ),
+					'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+						__( 'Save', 'wordpress-popup' ),
+						'',
+						'connect',
+						true
+					),
 				),
 			);
 		} else {
 			$buttons = array(
 				'connect' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Connect', 'wordpress-popup' ), '', 'connect', true ),
+					'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+						__( 'Connect', 'wordpress-popup' ),
+						'sui-button-right',
+						'connect',
+						true
+					),
 				),
 			);
 
@@ -310,15 +373,67 @@ class Hustle_Campaignmonitor extends Hustle_Provider_Abstract {
 		// Check API Key by validating it on get_info request
 		try {
 			// Check if API key is valid
-			$clients = self::api( $api_key )->get_clients();
+			$clients = self::api( $api_key )->get_system_date();
 
-			if ( ! $clients->was_successful() ) {
-				Hustle_Api_Utils::maybe_log( __METHOD__, __( 'Invalid Campaign Monitor API key.', 'wordpress-popup' ) );
+			if ( is_wp_error( $clients ) ) {
+				Hustle_Provider_Utils::maybe_log( __METHOD__, __( 'Invalid Campaignmonitor API key.', 'wordpress-popup' ) );
 				return false;
 			}
 
 		} catch ( Exception $e ) {
-			Hustle_Api_Utils::maybe_log( __METHOD__, $e->getMessage() );
+			Hustle_Provider_Utils::maybe_log( __METHOD__, $e->getMessage() );
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * get client
+	 *
+	 * @since 1.0 Campaign Monitor Addon
+	 *
+	 * @param $api_key
+	 * @param $client_id
+	 *
+	 * @return array|mixed|object
+	 *
+	 */
+	public function get_client( $api_key, $client_id ) {
+		self::$api = null;
+		$api       = self::api( $api_key );
+
+		$client_details = $api->get_client( $client_id );
+
+		return $client_details;
+	}
+
+	/**
+	 * Validate Client
+	 *
+	 * @since 1.0 Campaign Monitor Addon
+	 *
+	 * @param $api_key
+	 * @param $client_id
+	 *
+	 * @return array|mixed|object
+	 *
+	 */
+	public function validate_client( $api_key, $client_id ) {
+
+		// Check API Key by validating it on get_info request
+		try {
+			// Check if API key is valid
+			self::$api = null;
+			$api       	= self::api( $api_key );
+			$client_details = $api->get_client( $client_id );
+
+			if ( is_wp_error( $client_details ) ) {
+				Hustle_Provider_Utils::maybe_log( __METHOD__, __( 'Invalid Campaignmonitor Client ID key.', 'wordpress-popup' ) );
+				return false;
+			}
+		} catch ( Exception $e ) {
+			Hustle_Provider_Utils::maybe_log( __METHOD__, $e->getMessage() );
 			return false;
 		}
 

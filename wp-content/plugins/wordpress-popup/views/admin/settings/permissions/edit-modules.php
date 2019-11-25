@@ -85,7 +85,7 @@
 
 							<div class="sui-form-field">
 
-								<label for="forminator-filter-keyword" class="sui-label"><?php esc_html_e( 'Module name has keyword', 'wordpress-popup' ); ?></label>
+								<label for="hustle-filter-keyword" class="sui-label"><?php esc_html_e( 'Module name has keyword', 'wordpress-popup' ); ?></label>
 
 								<div class="sui-control-with-icon">
 
@@ -93,7 +93,7 @@
 										name="filter[q]"
 										placeholder="<?php esc_html_e( 'E.g. Discount', 'wordpress-popup' ); ?>"
 										value="<?php echo esc_attr( isset( $filter['q'] )? esc_attr( $filter['q'] ) : '' ); ?>"
-										id="forminator-filter-keyword"
+										id="hustle-filter-keyword"
 										class="sui-form-control" />
 
 									<i class="sui-icon-magnifying-glass-search" aria-hidden="true"></i>

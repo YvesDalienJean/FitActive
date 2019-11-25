@@ -9,6 +9,7 @@ if( !class_exists("Hustle_Activecampaign_Form_Settings") ):
 class Hustle_Activecampaign_Form_Settings extends Hustle_Provider_Form_Settings_Abstract {
 
 	private $is_empty_lists = false;
+	public $list_type = false;
 
 	/**
 	 * For settings Wizard steps
@@ -88,18 +89,28 @@ class Hustle_Activecampaign_Form_Settings extends Hustle_Provider_Form_Settings_
 		);
 		$current_data = $this->get_current_data( $current_data, $submitted_data );
 
-		$is_submit = ! empty( $submitted_data['is_submit'] );
+		$is_submit = ! empty( $submitted_data['hustle_is_submit'] );
 		$options = $this->get_first_step_options( $current_data );
 
-		$step_html = Hustle_Api_Utils::get_modal_title_markup( __( 'ActiveCampaign Forms or Lists', 'wordpress-popup' ), '' );
-		$step_html .= Hustle_Api_Utils::get_html_for_options( $options );
+		$step_html = Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'ActiveCampaign Forms or Lists', 'wordpress-popup' ), '' );
+		$step_html .= Hustle_Provider_Utils::get_html_for_options( $options );
 
 		$buttons = array(
 			'disconnect' => array(
-				'markup' => Hustle_Api_Utils::get_button_markup( __( 'Disconnect', 'wordpress-popup' ), 'sui-button-ghost', 'disconnect_form', true ),
+				'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+					__( 'Disconnect', 'wordpress-popup' ),
+					'sui-button-ghost',
+					'disconnect_form',
+					true
+				),
 			),
 			'save' => array(
-				'markup' => Hustle_Api_Utils::get_button_markup( __( 'Continue', 'wordpress-popup' ), '', 'next', true ),
+				'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+					__( 'Continue', 'wordpress-popup' ),
+					'',
+					'next',
+					true
+				),
 			),
 		);
 
@@ -157,11 +168,6 @@ class Hustle_Activecampaign_Form_Settings extends Hustle_Provider_Form_Settings_
 					),
 				),
 			),
-			array(
-				'type'  => 'hidden',
-				'name'  => 'is_submit',
-				'value' => '1',
-			),
 		);
 
 		return $options;
@@ -188,7 +194,7 @@ class Hustle_Activecampaign_Form_Settings extends Hustle_Provider_Form_Settings_
 		);
 
 		$current_data = $this->get_current_data( $current_data, $submitted_data );
-		$is_submit = ! empty( $submitted_data['is_submit'] );
+		$is_submit = ! empty( $submitted_data['hustle_is_submit'] );
 
 		if ( $is_submit && empty( $submitted_data[ $list_id ] ) ) {
 			$error_message = $form ? __( 'The form is required.', 'wordpress-popup' ) : __( 'The email list is required.', 'wordpress-popup' );
@@ -197,9 +203,9 @@ class Hustle_Activecampaign_Form_Settings extends Hustle_Provider_Form_Settings_
 		$options = $this->get_second_step_options( $current_data, $form );
 
 		$step_html = $form
-			? Hustle_Api_Utils::get_modal_title_markup( __( 'Choose your form', 'wordpress-popup' ), __( 'Choose the form you want to send form data to.', 'wordpress-popup' ) )
-			: Hustle_Api_Utils::get_modal_title_markup( __( 'Choose your list', 'wordpress-popup' ), __( 'Choose the list you want to send form data to.', 'wordpress-popup' ) );
-		$step_html .= Hustle_Api_Utils::get_html_for_options( $options );
+			? Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'Choose your form', 'wordpress-popup' ), __( 'Choose the form you want to send form data to.', 'wordpress-popup' ) )
+			: Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'Choose your list', 'wordpress-popup' ), __( 'Choose the list you want to send form data to.', 'wordpress-popup' ) );
+		$step_html .= Hustle_Provider_Utils::get_html_for_options( $options );
 
 		if( ! isset( $error_message ) ) {
 			$has_errors = false;
@@ -211,10 +217,21 @@ class Hustle_Activecampaign_Form_Settings extends Hustle_Provider_Form_Settings_
 
 		$buttons = array(
 			'cancel' => array(
-				'markup' => Hustle_Api_Utils::get_button_markup( __( 'Back', 'wordpress-popup' ), '', 'prev', true ),
+				'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+					__( 'Back', 'wordpress-popup' ),
+					'',
+					'prev',
+					true
+				),
 			),
 			'save' => array(
-				'markup' => Hustle_Api_Utils::get_button_markup( __( 'Save', 'wordpress-popup' ), '', 'next', true, $this->is_empty_lists ),
+				'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+					__( 'Save', 'wordpress-popup' ),
+					'',
+					'next',
+					true,
+					$this->is_empty_lists
+				),
 			),
 		);
 
@@ -238,6 +255,35 @@ class Hustle_Activecampaign_Form_Settings extends Hustle_Provider_Form_Settings_
 	}
 
 	/**
+	 * Refresh list array via API
+	 *
+	 * @param object $provider
+	 * @param string $global_multi_id
+	 * @return array
+	 */
+	public function refresh_global_multi_lists( $provider, $global_multi_id ) {
+		$api_url = $provider->get_setting( 'api_url', '', $global_multi_id );
+		$api_key = $provider->get_setting( 'api_key', '', $global_multi_id );
+		$api = $provider::api( $api_url, $api_key );
+
+		$lists = array();
+
+		// Retrieve lists if "sign_up_to" is not set to "forms".
+		if ( !$this->list_type || 'forms' !== $this->list_type ) {
+			$_lists = $api->get_lists();
+		} else {
+			// Retrieve forms otherwise
+			$_lists = $api->get_forms();
+		}
+
+		if ( ! is_wp_error( $_lists ) && ! empty( $_lists ) ) {
+			$lists = wp_list_pluck( $_lists, 'name', 'id' );
+		}
+
+		return $lists;
+	}
+
+	/**
 	 * Return an array of options used to display the settings of the 2st step.
 	 *
 	 * @since 4.0
@@ -247,169 +293,64 @@ class Hustle_Activecampaign_Form_Settings extends Hustle_Provider_Form_Settings_
 	 * @return array
 	 */
 	private function get_second_step_options( $submitted_data, $is_form ) {
-		$provider = $this->provider;
-		$settings = $this->get_form_settings_values( false );
-
-		$global_multi_id = $settings['selected_global_multi_id'];
-		$api_url = $provider->get_setting( 'api_url', '', $global_multi_id );
-		$api_key = $provider->get_setting( 'api_key', '', $global_multi_id );
-
-		$lists = array();
-
-		try {
-
-			$api = $provider::api( $api_url, $api_key );
-
-			// Retrieve lists if "sign_up_to" is not set to "forms".
-			if ( !$is_form ) {
-
-				$_lists = $api->get_lists();
-
-				if ( ! is_wp_error( $_lists ) && ! empty( $_lists ) ) {
-
-					foreach (  ( array) $_lists as $list ) {
-
-						$list = (object) (array) $list;
-
-						$lists[ $list->id ] = array(
-							'value' => $list->id,
-							'label' => $list->name,
-						);
-
-					}
-				}
-			} else {
-
-				// Retrieve forms otherwise
-				$_forms = $api->get_forms();
-
-				if ( ! is_wp_error( $_forms ) && !empty( $_forms ) ) {
-
-					foreach( $_forms as $form => $data ) {
-
-						$lists[ $data['id'] ] = array(
-							'value' => $data['id'],
-							'label' => $data['name'],
-						);
-					}
-
-				}
-			}
-		} catch ( Exception $e ) {
-			// TODO: handle this properly
-			return array();
-		}
-
+		$this->list_type = $is_form ? 'forms' : false;
+		$id = !$is_form ? 'list_id' : 'form_id';
+		$cache_key = !$is_form ? 'lists' : 'forms';
+		$lists = $this->get_global_multi_lists( false, false, $cache_key );
 		$this->lists = $lists;
-		$total_lists = count( $lists );
-
-		$first = $total_lists > 0 ? reset( $lists ) : "";
-
-		if ( !empty( $first ) )
-			$first = $first['value'];
-
-		if ( $is_form && isset( $submitted_data['form_id'] ) ) {
-			$selected = array_key_exists( $submitted_data['form_id'], $lists ) ? $submitted_data['form_id'] : $first;
-		} else if ( ! $is_form && isset( $submitted_data['list_id'] ) ) {
-			$selected = array_key_exists( $submitted_data['list_id'], $lists ) ? $submitted_data['list_id'] : $first;
-		} else {
-			$selected = $first;
-		}
+		$selected_list = $this->get_selected_list( $submitted_data, $id );
 
 		$this->is_empty_lists = empty( $lists );
 
-		if ( ! $is_form ) {
-
-			if ( empty( $lists ) ) {
-
-				$options =  array(
-					array(
-						'type'     => 'wrapper',
-						'style'    => 'margin-bottom: 0;',
-						'elements' => array(
-							'options' => array(
-								'type'  => 'notice',
-								'class' => 'sui-notice-error',
-								'value' => __( "You can't sync this provider because your account doesn't have any email list added. Please, go to your ActiveCampaign account to add one before retrying.", 'wordpress-popup' ),
-							),
+		if ( empty( $lists ) ) {
+			$options =  array(
+				array(
+					'type'     => 'wrapper',
+					'style'    => 'margin-bottom: 0;',
+					'elements' => array(
+						'options' => array(
+							'type'  => 'notice',
+							'class' => 'sui-notice-error',
+							'value' => !$is_form ? __( "You can't sync this provider because your account doesn't have any email list added. Please, go to your ActiveCampaign account to add one before retrying.", 'wordpress-popup' )
+											: __( "You don't have any form added to your account to sync here.", 'wordpress-popup' ),
 						),
 					),
-				);
-			} else {
-
-				$options =  array(
-					array(
-						'type'     => 'wrapper',
-						'style'    => 'margin-bottom: 0;',
-						'elements' => array(
-							'label'   => array(
-								'type'  => 'label',
-								'for'   => 'list_id',
-								'value' => __( 'Email List', 'wordpress-popup' ),
-							),
-							'options' => array(
-								'type'     => 'select',
-								'name'     => 'list_id',
-								'default'  => '',
-								'options'  => $lists,
-								'value'    => $selected,
-								'selected' => $selected,
-							),
-						),
-					),
-					array(
-						'type'  => 'hidden',
-						'name'  => 'is_submit',
-						'value' => '1',
-					),
-				);
-			}
+				),
+			);
 		} else {
-
-			if ( empty( $lists ) ) {
-
-				$options =  array(
-					array(
-						'type'     => 'wrapper',
-						'style'    => 'margin-bottom: 0;',
-						'elements' => array(
-							'options' => array(
-								'type'  => 'notice',
-								'class' => 'sui-notice-error',
-								'value' => __( "You don't have any form added to your account to sync here.", 'wordpress-popup' ),
+			$options =  array(
+				array(
+					'type'     => 'wrapper',
+					'style'    => 'margin-bottom: 0;',
+					'elements' => array(
+						'label'   => array(
+							'type'  => 'label',
+							'for'   => $id,
+							'value' =>!$is_form ? __( 'Email List', 'wordpress-popup' ) : __( 'Choose Form', 'wordpress-popup' ),
+						),
+						'wrapper' => array(
+							'type'     => 'wrapper',
+							'class'    => 'hui-select-refresh',
+							'is_not_field_wrapper' => true,
+							'elements' => array(
+								'lists' => array(
+									'type'     => 'select',
+									'id'       => $id,
+									'class'    => 'sui-select',
+									'name'     => $id,
+									'value'    => $selected_list,
+									'options'  => $lists,
+									'selected' => $selected_list,
+								),
+								'refresh' => array(
+									'type' => 'raw',
+									'value' => Hustle_Provider_Utils::get_provider_button_markup( __( 'Refresh', 'wordpress-popup' ), '', 'refresh_list', true ),
+								),
 							),
 						),
 					),
-				);
-			} else {
-
-				$options =  array(
-					array(
-						'type'     => 'wrapper',
-						'style'    => 'margin-bottom: 0;',
-						'elements' => array(
-							'label'   => array(
-								'type'  => 'label',
-								'for'   => 'form_id',
-								'value' => __( 'Choose Form', 'wordpress-popup' ),
-							),
-							'options' => array(
-								'type'     => 'select',
-								'name'     => 'form_id',
-								'default'  => '',
-								'options'  => $lists,
-								'value'    => $selected,
-								'selected' => $selected,
-							),
-						),
-					),
-					array(
-						'type'  => 'hidden',
-						'name'  => 'is_submit',
-						'value' => '1',
-					),
-				);
-			}
+				),
+			);
 		}
 
 		return $options;

@@ -30,8 +30,10 @@ add_action( 'the_post', function( $post ) {
 });
 
 function seopress_xml_sitemap_index() {
+	$home_url = site_url().'/';
+
 	$seopress_sitemaps ='<?xml version="1.0" encoding="UTF-8"?>';
-	$seopress_sitemaps .='<?xml-stylesheet type="text/xsl" href="'.get_home_url().'/sitemaps_xsl.xsl"?>';
+	$seopress_sitemaps .='<?xml-stylesheet type="text/xsl" href="'.$home_url.'sitemaps_xsl.xsl"?>';
 	$seopress_sitemaps .= "\n";
 	$seopress_sitemaps .='<sitemapindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 
@@ -41,14 +43,23 @@ function seopress_xml_sitemap_index() {
 			foreach ($cpt_value as $_cpt_key => $_cpt_value) {
 				if($_cpt_value =='1') {
 
-					$count_posts = wp_count_posts($cpt_key);
+					//Polylang
+					if (function_exists('pll_home_url')) {
+						$count_posts = pll_count_posts(pll_current_language());
+					} else {
+						$count_posts = wp_count_posts($cpt_key);
+					}
+
+					//Max posts per paginated sitemap
+					$max = 1000;
+					$max = apply_filters('seopress_sitemaps_max_posts_per_sitemap', $max);
 
 					if (isset($count_posts->publish)) {
 						$published_posts = $count_posts->publish;
 					}
 
-					if ($published_posts >= 1000) {
-						$max_loop = $published_posts / 1000;
+					if ($published_posts >= $max) {
+						$max_loop = $published_posts / $max;
 					} else {
 						$max_loop = 1;
 					}
@@ -58,7 +69,7 @@ function seopress_xml_sitemap_index() {
 					for ($i=0; $i < $max_loop ; $i++) {
 
 						if (isset($offset) && absint($offset) && $offset !='' && $offset !=0) {
-							$offset = ((($i)*1000));
+							$offset = ((($i)*$max));
 						} else {
 							$offset = 0;
 						}
@@ -80,7 +91,7 @@ function seopress_xml_sitemap_index() {
 							$seopress_sitemaps .= '<sitemap>';
 							$seopress_sitemaps .= "\n";
 							$seopress_sitemaps .= '<loc>';
-							$seopress_sitemaps .= get_home_url().'/sitemaps/'.$cpt_key.'-sitemap'.$paged.'.xml';
+							$seopress_sitemaps .= $home_url.'sitemaps/'.$cpt_key.'-sitemap'.$paged.'.xml';
 							$seopress_sitemaps .= '</loc>';
 					    	$seopress_sitemaps .= "\n";
 							$seopress_sitemaps .= '<lastmod>';
@@ -121,7 +132,7 @@ function seopress_xml_sitemap_index() {
 				$seopress_sitemaps .= '<sitemap>';
 				$seopress_sitemaps .= "\n";
 				$seopress_sitemaps .= '<loc>';
-				$seopress_sitemaps .= get_home_url().'/sitemaps/'.$term_value.'-sitemap.xml';
+				$seopress_sitemaps .= $home_url.'sitemaps/'.$term_value.'-sitemap.xml';
 				$seopress_sitemaps .= '</loc>';
 				$seopress_sitemaps .= "\n";
 				$seopress_sitemaps .= '</sitemap>';
@@ -164,7 +175,7 @@ function seopress_xml_sitemap_index() {
 			$seopress_sitemaps .= '<sitemap>';
 			$seopress_sitemaps .= "\n";
 			$seopress_sitemaps .= '<loc>';
-			$seopress_sitemaps .= get_home_url().'/sitemaps/news.xml';
+			$seopress_sitemaps .= $home_url.'sitemaps/news.xml';
 			$seopress_sitemaps .= '</loc>';
 			$seopress_sitemaps .= "\n";
 			$seopress_sitemaps .= '<lastmod>';
@@ -181,7 +192,19 @@ function seopress_xml_sitemap_index() {
 		$seopress_sitemaps .= '<sitemap>';
 		$seopress_sitemaps .= "\n";
 		$seopress_sitemaps .= '<loc>';
-		$seopress_sitemaps .= get_home_url().'/sitemaps/video.xml';
+		$seopress_sitemaps .= $home_url.'sitemaps/video.xml';
+		$seopress_sitemaps .= '</loc>';
+		$seopress_sitemaps .= "\n";
+		$seopress_sitemaps .= '</sitemap>';
+	}
+
+	//Author sitemap
+	if (function_exists("seopress_xml_sitemap_author_enable_option") && seopress_xml_sitemap_author_enable_option() !='') {
+		$seopress_sitemaps .= "\n";
+		$seopress_sitemaps .= '<sitemap>';
+		$seopress_sitemaps .= "\n";
+		$seopress_sitemaps .= '<loc>';
+		$seopress_sitemaps .= $home_url.'sitemaps/author.xml';
 		$seopress_sitemaps .= '</loc>';
 		$seopress_sitemaps .= "\n";
 		$seopress_sitemaps .= '</sitemap>';
@@ -189,6 +212,8 @@ function seopress_xml_sitemap_index() {
 
 	$seopress_sitemaps .= "\n";
 	$seopress_sitemaps .='</sitemapindex>';
+
+	$seopress_sitemaps = apply_filters( 'seopress_sitemaps_xml_index', $seopress_sitemaps );
 	
 	return $seopress_sitemaps;
 } 

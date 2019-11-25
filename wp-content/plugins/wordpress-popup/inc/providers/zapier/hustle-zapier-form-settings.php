@@ -65,8 +65,8 @@ class Hustle_Zapier_Form_Settings extends Hustle_Provider_Form_Settings_Abstract
 
 		$options = $this->get_first_step_options( $current_data );
 
-		$step_html = Hustle_Api_Utils::get_modal_title_markup( __( 'Setup Webhook', 'wordpress-popup' ), __( 'Put your ZAP Webhook URL below.', 'wordpress-popup' ) );
-		$step_html .= Hustle_Api_Utils::get_html_for_options( $options );
+		$step_html = Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'Setup Webhook', 'wordpress-popup' ), __( 'Put your ZAP Webhook URL below.', 'wordpress-popup' ) );
+		$step_html .= Hustle_Provider_Utils::get_html_for_options( $options );
 
 		if( ! isset( $error_message ) ) {
 			$has_errors = false;
@@ -78,12 +78,22 @@ class Hustle_Zapier_Form_Settings extends Hustle_Provider_Form_Settings_Abstract
 		$buttons = array();
 		if ( $this->first_step_is_completed( $current_data ) ) {
 			$buttons['disconnect'] = array(
-				'markup' => Hustle_Api_Utils::get_button_markup( __( 'Disconnect', 'wordpress-popup' ), 'sui-button-ghost', 'disconnect_form', true ),
+				'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+					__( 'Disconnect', 'wordpress-popup' ),
+					'sui-button-ghost sui-button-left',
+					'disconnect_form',
+					true
+				),
 			);
 		}
 
 		$buttons['save'] = array(
-			'markup' => Hustle_Api_Utils::get_button_markup( __( 'Save', 'wordpress-popup' ), '', 'next', true ),
+			'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+				__( 'Save', 'wordpress-popup' ),
+				'sui-button-right',
+				'next',
+				true
+			),
 		);
 
 		$response = array(
@@ -149,11 +159,6 @@ class Hustle_Zapier_Form_Settings extends Hustle_Provider_Form_Settings_Abstract
 						'icon'        => 'link',
 					),
 				),
-			),
-			array(
-				'type'  => 'hidden',
-				'name'  => 'is_submit',
-				'value' => '1',
 			),
 		);
 

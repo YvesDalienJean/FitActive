@@ -30,8 +30,6 @@ class Hustle_Module_Front_Ajax {
 		add_action( 'wp_ajax_hustle_unsubscribe_form_submission', array( $this, 'unsubscribe_submit_form' ) );
 		add_action( 'wp_ajax_nopriv_hustle_unsubscribe_form_submission', array( $this, 'unsubscribe_submit_form' ) );
 
-		// Handles schedule email
-		add_action( 'hustle_form_after_handle_submit', array( $this, 'send_automated_email' ), 10, 2 );
 		// schedule email cron
 		add_action( 'hustle_send_email', array( 'Hustle_Mail', 'send_email' ), 10, 3 );
 	}
@@ -97,16 +95,13 @@ class Hustle_Module_Front_Ajax {
 	/**
 	 * Send auto email if it sets
 	 *
-	 * @param int $module_id
+	 * @param Hustle_Module_Model $module
 	 * @param array $response
 	 */
-	public function send_automated_email( $module_id, $response ) {
-		if ( empty( $response['success'] ) || true !== $response['success'] ) {
-			return;
-		}
-
-		$module = Hustle_Module_Model::instance()->get( $module_id );
+	public function send_automated_email( Hustle_Module_Model $module ) {
+		$module_id = $module->module_id;
 		$emails_settings = $module->get_emails()->to_array();
+
 		if ( empty( $emails_settings['automated_email'] ) || '1' !== $emails_settings['automated_email']
 				|| empty( $emails_settings['email_time'] ) ) {
 			return;
@@ -120,22 +115,67 @@ class Hustle_Module_Front_Ajax {
 		parse_str( $data['form'], $form_data );
 		$to = $this->maybe_replace_to_field( $to, $form_data );
 		$body = $this->replace_email_body_placeholders( $module_id, $body, $form_data );
-		$args = array( $to, $subject, $body );
+
+		// Send the email right away if it's set as 'instant'.
 		if ( 'instant' === $emails_settings['email_time'] ) {
-			$schedule_time = time();
-		} elseif ( 'delay' === $emails_settings['email_time'] ) {
+			Hustle_Mail::send_email( $to, $subject, $body );
+			return;
+		}
+
+		// Adding the 4th parameter time() to prevent cron jobs from being ignored.
+		// According to wp_schedule_single_event docs: 
+		// "Attempts to schedule an event after an event of the same name and $args will also be ignored".
+		$args = array( $to, $subject, $body, time() );
+		if ( 'delay' === $emails_settings['email_time'] ) {
 			$time = !empty( $emails_settings['auto_email_time'] ) ? (int)$emails_settings['auto_email_time'] : '';
 			$unit = !empty( $emails_settings['auto_email_unit'] ) ? $emails_settings['auto_email_unit'] : '';
-			$rate = 'days' === $unit ? DAY_IN_SECONDS : 1;
-			$rate = 'minutes' === $unit ? MINUTE_IN_SECONDS : 1;
+			//get delay rate
+			switch ($unit) {
+				case 'days':
+					$rate = DAY_IN_SECONDS;
+					break;
+				case 'hours':
+					$rate = HOUR_IN_SECONDS;
+					break;
+				case 'minutes':
+					$rate = MINUTE_IN_SECONDS;
+					break;
+				default:
+					$rate = 1;
+					break;
+			}
 			$schedule_time = time() + $time * $rate;
 		} elseif ( 'schedule' === $emails_settings['email_time'] ) {
+			//time settings
 			$time = !empty( $emails_settings['time'] ) ? $emails_settings['time'] : '';
 			$day = !empty( $emails_settings['day'] ) ? $emails_settings['day'] : '';
 			$time = $this->maybe_replace_to_field( $time, $form_data );
 			$day = $this->maybe_replace_to_field( $day, $form_data );
+
+			//delay settings
+			$delay_time = !empty( $emails_settings['schedule_auto_email_time'] ) ? (int)$emails_settings['schedule_auto_email_time'] : '';
+			$delay_unit = !empty( $emails_settings['schedule_auto_email_unit'] ) ? $emails_settings['schedule_auto_email_unit'] : '';
+
+			//get delay rate
+			switch ($delay_unit) {
+				case 'days':
+					$delay_rate = DAY_IN_SECONDS;
+					break;
+				case 'hours':
+					$delay_rate = HOUR_IN_SECONDS;
+					break;
+				case 'minutes':
+					$delay_rate = MINUTE_IN_SECONDS;
+					break;
+				default:
+					$delay_rate = 1;
+					break;
+			}
+			//schedule time calculation
+			$delay = $delay_time * $delay_rate;
 			//convert from local time to GMT
 			$schedule_time = get_gmt_from_date( date( 'Y-m-d H:i:s', strtotime( $day . ' ' . $time ) ), 'U' );
+			$schedule_time = $schedule_time + $delay;
 			if ( time() > $schedule_time ) {
 				return;
 			}
@@ -197,6 +237,7 @@ class Hustle_Module_Front_Ajax {
 		$placeholder_array = array();
 		$submit_errors     = array();
 		$required_fields = array();
+		$fields_to_validate = array();
 		$entry = new Hustle_Entry_Model();
 		$entry->entry_type = $module->module_type;
 		$entry->module_id = $module_id;
@@ -225,6 +266,10 @@ class Hustle_Module_Front_Ajax {
 					$required_fields[] = $field_name;
 				}
 
+				if ( isset( $field_data['validate'] ) && 'true' === $field_data['validate'] ) {
+					$fields_to_validate[] = $field_name;
+				}
+
 				if ( isset( $form_data[ $field_name ] ) ) {
 					$value = sanitize_text_field( $form_data[ $field_name ] );
 					$field_data_array[] = array(
@@ -235,10 +280,11 @@ class Hustle_Module_Front_Ajax {
 					$placeholder_array[ $placeholder ] = $value;
 				}
 			}
-
 			if ( empty( $submit_errors ) ) {
-				$submit_errors = $this->validate_fields( $form_data, $required_fields, $fields );
+				$submit_errors = $this->validate_fields( $form_data, $required_fields, $fields_to_validate, $fields );
+				$response['message'] = $submit_errors;
 			}
+
 		}
 
 		if ( ! empty( $field_data_array ) && empty( $submit_errors ) ) {
@@ -283,7 +329,7 @@ class Hustle_Module_Front_Ajax {
 					/**
 					 * Check is tracking allowed
 					 */
-					$settings = Hustle_Settings_Admin::get_hustle_settings( 'privacy' );
+					$settings = Hustle_Settings_Admin::get_privacy_settings();
 					$ip_tracking = !isset( $settings['ip_tracking'] ) || 'on' === $settings['ip_tracking'];
 					if ( $ip_tracking ) {
 						$field_data_array[] = array(
@@ -328,6 +374,8 @@ class Hustle_Module_Front_Ajax {
 				$this->attach_addons_add_entry_fields( $module_id, $module, $formatted_submitted_data, $field_data_array );
 
 			}
+
+			$this->send_automated_email( $module );
 
 			$post_id = sanitize_text_field( $form_data['post_id'] );
 			$module_sub_type = isset( $form_data['hustle_sub_type'] ) ? $form_data['hustle_sub_type'] : null;
@@ -396,26 +444,64 @@ class Hustle_Module_Front_Ajax {
 	 * Validate fields.
 	 *
 	 * @since 4.0
+	 * @since 4.0.2 $fields_to_validate parameter added.
 	 *
 	 * @param array $form_data
 	 * @param array $required_fields
+	 * @param array $fields_to_validate
 	 * @param array $fields
 	 * @return array
 	 */
-	private function validate_fields( $form_data, $required_fields, $fields ) {
+	private function validate_fields( $form_data, $required_fields, $fields_to_validate, $fields ) {
 
 		$submit_errors = array();
 
+		// Check required fields.
 		foreach ( $required_fields as $slug ) {
 
-			if ( ! isset( $form_data[ $slug ] ) || empty( $form_data[ $slug ] ) ) {
+			if ( ! isset( $form_data[ $slug ] ) || empty( trim( $form_data[ $slug ] ) ) ) {
 				$submit_errors[][ $slug ] = sprintf( esc_html__( '%s is required.', 'wordpress-popup' ), $fields[ $slug ]['label'] );
-			} elseif ( 'email' === $fields[ $slug ]['type'] && ! is_email( $form_data[ $slug ] ) ) {
-				$submit_errors[][ $slug ] = sprintf( esc_html__( '%s is not a valid email.', 'wordpress-popup' ), $fields[ $slug ]['label'] );
 			}
 		}
 
-		return $submit_errors;
+		// Validate url and email fields.
+		if ( empty( $submit_errors ) ) {
+
+			foreach ( $fields_to_validate as $slug ) {
+
+				// Don't validate empty fields. These are validated under "required" if needed.
+				if ( empty( trim( $form_data[ $slug ] ) ) ) {
+					continue;
+				}
+
+				if ( 'email' === $fields[ $slug ]['type'] && ! is_email( $form_data[ $slug ] ) ) {
+					$submit_errors[][ $slug ] = sprintf( esc_html__( '%s is not a valid email.', 'wordpress-popup' ), $fields[ $slug ]['label'] );
+
+				} elseif ( 'url' === $fields[ $slug ]['type'] ) {
+
+					if ( false === filter_var( $form_data[ $slug ], FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED ) ) {
+						$submit_errors[][ $slug ] = sprintf( esc_html__( '%s is not a valid url.', 'wordpress-popup' ), $fields[ $slug ]['label'] );
+
+					}
+				} elseif ( 'datepicker' === $fields[ $slug ]['type'] ) {
+
+					if ( false === $this->validate_date( $form_data[ $slug ], $fields[ $slug ]['date_format'] ) ) {
+						$submit_errors[][ $slug ] = sprintf( esc_html__( '%s is not a valid date.', 'wordpress-popup' ), $fields[ $slug ]['label'] );
+
+					}
+				} elseif ( 'timepicker' === $fields[ $slug ]['type'] ) {
+
+					$time = str_replace( array( ' AM', ' PM' ), '', $form_data[ $slug ] );
+					$format = '12' === $fields[ $slug ]['time_format'] ? 'h:i' : 'H:i';
+					$created_time = DateTime::createFromFormat( $format, $time );
+					if ( ! $created_time || $created_time->format( $format ) !== $time  ) {
+						$submit_errors[][ $slug ] = sprintf( esc_html__( '%s is not a valid time.', 'wordpress-popup' ), $fields[ $slug ]['label'] );
+					}
+				}
+			}
+		}
+
+		return apply_filters( 'hustle_module_submit_errors_validated_fields', $submit_errors, $form_data, $required_fields, $fields_to_validate, $fields );
 	}
 
 	/**
@@ -558,7 +644,6 @@ class Hustle_Module_Front_Ajax {
 				if ( $form_hooks instanceof Hustle_Provider_Form_Hooks_Abstract ) {
 
 					$addon_fields = $form_hooks->add_entry_fields( $formatted_submitted_data );
-
 					//log errors
 					if ( 
 						! empty( $addon_fields[0] ) && ! empty( $addon_fields[0]['value'] ) && 
@@ -571,7 +656,7 @@ class Hustle_Module_Front_Ajax {
 
 						$error = $connected_addon->get_title() . ' ' . $error;
 
-						Hustle_Api_Utils::maybe_log( $error );
+						Opt_In_Utils::maybe_log( $error );
 					}
 					$account_settings = $connected_addon->get_settings_values();
 					if ( !empty( $connected_addon->selected_global_multi_id ) ) {
@@ -846,5 +931,39 @@ class Hustle_Module_Front_Ajax {
 		}
 
 		wp_send_json_error();
+	}
+
+	/**
+	 * Validate date field.
+	 *
+	 * @since 4.0.2
+	 */
+	private function validate_date( $date, $format ){
+		$format = $this->validate_format ( $format );
+		$d = DateTime::createFromFormat( $format, $date );
+
+    	return ( $d && $d->format( $format ) === $date );
+	}
+
+	/**
+	 * Validate date format.
+	 *
+	 * @since 4.0.2
+	 */
+	private function validate_format( $format ){
+		switch ($format) {
+			case 'dd/mm/yy':
+				$format = 'd/m/Y';
+				break;
+
+			case 'mm/dd/yy':
+				$format = 'm/d/Y';
+				break;
+
+			case 'yy/mm/dd':
+				$format = 'Y/m/d';
+				break;
+		}
+    	return ( $format );
 	}
 }

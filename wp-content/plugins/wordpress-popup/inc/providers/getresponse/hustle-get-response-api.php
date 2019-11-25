@@ -52,8 +52,15 @@ class Hustle_Get_Response_Api {
 		}else{
 			$_args['body'] = wp_json_encode( $args['body'] );
 		}
-		
+
 		$res = wp_remote_request( $url, $_args );
+
+		//logging data
+		$utils = Hustle_Provider_Utils::get_instance();
+		$utils->_last_url_request 	= $url;
+		$utils->_last_data_sent 	= $_args;
+		$utils->_last_data_received = $res;
+
 		if( ! is_wp_error( $res ) && is_array( $res ) && $res['response']['code'] <= 204 ) {
 			return json_decode(  wp_remote_retrieve_body( $res ) );
 		}
@@ -132,11 +139,6 @@ class Hustle_Get_Response_Api {
 		);
 		$res =  $this->_post( $url, $args );
 
-		$utils = Hustle_Provider_Utils::get_instance();
-		$utils->_last_data_received = $res;
-		$utils->_last_url_request = trailingslashit( $this->_endpoint ) . $url;
-		$utils->_last_data_sent = $args;
-
 		return empty( $res ) ? __("Successful subscription", 'wordpress-popup') : $res;
 	}
 
@@ -158,11 +160,6 @@ class Hustle_Get_Response_Api {
 			'body' => $custom_field,
 		);
 		$res = $this->_post( $url, $args );
-
-		$utils = Hustle_Provider_Utils::get_instance();
-		$utils->_last_data_received = $res;
-		$utils->_last_url_request = trailingslashit( $this->_endpoint ) . $url;
-		$utils->_last_data_sent = $args;
 
 		if ( is_wp_error( $res ) ) {
 			return $res;

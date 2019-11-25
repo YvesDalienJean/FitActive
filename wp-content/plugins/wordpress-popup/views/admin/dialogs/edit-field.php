@@ -159,16 +159,17 @@
 			</div>
 		<# } #>
 
-		<# if ( false && 'url' === type ) { #>
-			<label for="hustle-optin-field--validated" class="sui-toggle">
+		<# if ( 'url' === type ) { #>
+
+			<label for="hustle-optin-field--validate" class="sui-toggle">
 				<input type="checkbox"
-					name="validated"
+					name="validate"
 					value="1"
-					id="hustle-optin-field--validated"
-					{{ _.checked( _.isTrue( validated ), true ) }} />
+					id="hustle-optin-field--validate"
+					{{ _.checked( _.isTrue( validate ), true ) }} />
 				<span class="sui-toggle-slider"></span>
 			</label>
-			<label for="hustle-optin-field--validated"><?php esc_html_e( 'Validate this field', 'wordpress-popup' ); ?></label>
+			<label for="hustle-optin-field--validate"><?php esc_html_e( 'Validate this field', 'wordpress-popup' ); ?></label>
 			<span class="sui-description sui-toggle-description"><?php esc_html_e( 'Make sure the user has filled out this field correctly and warn them when they haven\'t.', 'wordpress-popup' ); ?></span>
 		<# } #>
 
@@ -425,19 +426,16 @@
 		<label for="hustle-optin-field--required"><?php esc_html_e( 'Require this field', 'wordpress-popup' ); ?></label>
 		<span class="sui-description sui-toggle-description"><?php esc_html_e( 'Force the user to fill out this field, otherwise it will be optional.', 'wordpress-popup' ); ?></span>
 
-		<# if ( 'email' === type || 'url' === type ) { #>
-			<label for="hustle-optin-field--validated" class="sui-toggle">
-				<input type="checkbox"
-					name="validated"
-					value="1"
-					id="hustle-optin-field--validated"
-					{{ _.checked( _.isTrue( validated ), true ) }} />
-				<span class="sui-toggle-slider"></span>
-			</label>
-			<label for="hustle-optin-field--validated"><?php esc_html_e( 'Validate this field', 'wordpress-popup' ); ?></label>
-			<span class="sui-description sui-toggle-description"><?php esc_html_e( 'Make sure the user has filled out this field correctly and warn them when they haven\'t.', 'wordpress-popup' ); ?></span>
-		<# } #>
-
+		<label for="hustle-optin-field--validate" class="sui-toggle">
+			<input type="checkbox"
+				name="validate"
+				value="1"
+				id="hustle-optin-field--validate"
+				{{ _.checked( _.isTrue( validate ), true ) }} />
+			<span class="sui-toggle-slider"></span>
+		</label>
+		<label for="hustle-optin-field--validate"><?php esc_html_e( 'Validate this field', 'wordpress-popup' ); ?></label>
+		<span class="sui-description sui-toggle-description"><?php esc_html_e( 'Make sure the user has filled out this field correctly and warn them when they haven\'t.', 'wordpress-popup' ); ?></span>
 	</div>
 
 </script>
@@ -580,19 +578,16 @@
 		<label for="hustle-optin-field--required"><?php esc_html_e( 'Require this field', 'wordpress-popup' ); ?></label>
 		<span class="sui-description sui-toggle-description"><?php esc_html_e( 'Force the user to fill out this field, otherwise it will be optional.', 'wordpress-popup' ); ?></span>
 
-		<# if ( 'email' === type || 'url' === type ) { #>
-			<label for="hustle-optin-field--validated" class="sui-toggle">
-				<input type="checkbox"
-					name="validated"
-					value="1"
-					id="hustle-optin-field--validated"
-					{{ _.checked( _.isTrue( validated ), true ) }} />
-				<span class="sui-toggle-slider"></span>
-			</label>
-			<label for="hustle-optin-field--validated"><?php esc_html_e( 'Validate this field', 'wordpress-popup' ); ?></label>
-			<span class="sui-description sui-toggle-description"><?php esc_html_e( 'Make sure the user has filled out this field correctly and warn them when they haven\'t.', 'wordpress-popup' ); ?></span>
-		<# } #>
-
+		<label for="hustle-optin-field--validate" class="sui-toggle">
+			<input type="checkbox"
+				name="validate"
+				value="1"
+				id="hustle-optin-field--validate"
+				{{ _.checked( _.isTrue( validate ), true ) }} />
+			<span class="sui-toggle-slider"></span>
+		</label>
+		<label for="hustle-optin-field--validate"><?php esc_html_e( 'Validate this field', 'wordpress-popup' ); ?></label>
+		<span class="sui-description sui-toggle-description"><?php esc_html_e( 'Make sure the user has filled out this field correctly and warn them when they haven\'t.', 'wordpress-popup' ); ?></span>
 	</div>
 
 </script>

@@ -5,7 +5,7 @@ $is_enabled = isset( $settings['enabled'] ) && '1' === $settings['enabled'] ? tr
 <div id="analytics-box" class="sui-box hustle-settings-tab-analytics" data-tab="analytics" <?php if ( $section && 'analytics' !== $section ) echo 'style="display: none;"'; ?>>
 
 	<form data-nonce="<?php echo esc_attr( wp_create_nonce( 'hustle-settings' ) ); ?>">
-	
+
 		<div class="sui-box-header">
 			<h2 class="sui-box-title"><?php esc_html_e( 'Dashboard Analytics Tracking', 'wordpress-popup' ); ?></h2>
 		</div>
@@ -80,20 +80,20 @@ $is_enabled = isset( $settings['enabled'] ) && '1' === $settings['enabled'] ? tr
 					<span class="sui-loading-text"><?php esc_html_e( 'Deactivate', 'wordpress-popup' ); ?></span>
 					<i class="sui-icon-loader sui-loading" aria-hidden="true"></i>
 				</button>
-			
+
 				<div class="sui-actions-right">
-				
+
 					<button class="sui-button sui-button-blue hustle-settings-save-analytics">
 						<span class="sui-loading-text"><?php esc_html_e( 'Save Settings', 'wordpress-popup' ); ?></span>
 						<i class="sui-icon-loader sui-loading" aria-hidden="true"></i>
 					</button>
-					
+
 				</div>
-				
+
 			</div>
-			
+
 		<?php } ?>
-		
+
 	</form>
 
 </div>

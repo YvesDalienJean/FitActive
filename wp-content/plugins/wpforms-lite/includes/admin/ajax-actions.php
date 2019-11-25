@@ -511,15 +511,17 @@ function wpforms_install_addon() {
 		wp_send_json_error( $error );
 	}
 
-	// We do not need any extra credentials if we have gotten this far, so let's install the plugin.
-	require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+	/*
+	 * We do not need any extra credentials if we have gotten this far, so let's install the plugin.
+	 */
+
 	require_once WPFORMS_PLUGIN_DIR . 'includes/admin/class-install-skin.php';
 
 	// Do not allow WordPress to search/download translations, as this will break JS output.
 	remove_action( 'upgrader_process_complete', array( 'Language_Pack_Upgrader', 'async_upgrade' ), 20 );
 
 	// Create the plugin upgrader with our custom skin.
-	$installer = new Plugin_Upgrader( new WPForms_Install_Skin() );
+	$installer = new WPForms\Helpers\PluginSilentUpgrader( new WPForms_Install_Skin() );
 
 	// Error check.
 	if ( ! method_exists( $installer, 'install' ) || empty( $_POST['plugin'] ) ) {
@@ -531,9 +533,9 @@ function wpforms_install_addon() {
 	// Flush the cache and return the newly installed plugin basename.
 	wp_cache_flush();
 
-	if ( $installer->plugin_info() ) {
+	$plugin_basename = $installer->plugin_info();
 
-		$plugin_basename = $installer->plugin_info();
+	if ( $plugin_basename ) {
 
 		$type = 'addon';
 		if ( ! empty( $_POST['type'] ) ) {

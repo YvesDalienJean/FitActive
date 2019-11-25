@@ -64,17 +64,25 @@ if ( version_compare( PHP_VERSION, '5.3', '>=' ) ) {
 			public function process_callback_request() {
 				if ( $this->validate_callback_request( 'constantcontact' ) ) {
 					$code 			= filter_input( INPUT_GET, 'code', FILTER_SANITIZE_STRING );
+					$status			= 'error';
+
 					// Get the referer page that sent the request
 					$referer 		= get_option( self::REFERER );
 					$current_page 	= get_option( self::CURRENTPAGE );
 					if ( $code ) {
 						if ( $this->get_access_token( $code ) ) {
 							if ( ! empty( $referer ) ) {
-								wp_safe_redirect( $referer );
-								exit;
+								$status = 'success';
 							}
 						}
 					}
+
+					if ( ! empty( $referer ) ) {
+						$referer = add_query_arg( 'status', $status, $referer );
+						wp_safe_redirect( $referer );
+						exit;
+					}
+
 					// Allow retry but don't log referrer
 					$authorization_uri = $this->get_authorization_uri( false, false, $current_page );
 
@@ -97,8 +105,10 @@ if ( version_compare( PHP_VERSION, '5.3', '>=' ) ) {
 					* Store $referer to use after retrieving the access token
 					*/
 					$params = array(
-						'page' => $page,
-						'message' => 'constant_contact_new_integration',
+						'page' 		=> $page,
+						'action'	=> 'external-redirect',
+						'slug'		=> 'constantcontact',
+						'nonce'		=> wp_create_nonce( 'hustle_provider_external_redirect' ),
 					);
 					if ( !empty( $module_id ) ) {
 						$params['id'] = $module_id;
@@ -176,6 +186,17 @@ if ( version_compare( PHP_VERSION, '5.3', '>=' ) ) {
 			}
 
 			/**
+			 * Get current account information.
+			 * 
+			 * @since 4.0.2
+			 * @return object
+			 */
+			public function get_account_info() {
+				$cc_api = new Ctct\ConstantContact( self::APIKEY );
+				return $cc_api->getAccountInfo( $this->get_token( 'access_token' ) );
+			}
+
+			/**
 			* Retrieve contact lists from ConstantContact
 			*
 			* @return array
@@ -203,8 +224,6 @@ if ( version_compare( PHP_VERSION, '5.3', '>=' ) ) {
 				$cc_api = new Ctct\ConstantContact( self::APIKEY );
 				$access_token = $this->get_token( 'access_token' );
 				$res = $cc_api->contactService->getContacts( $access_token, array( 'email' => $email ) ); // phpcs:ignore
-				$utils = Hustle_Provider_Utils::get_instance();
-				$utils->_last_data_received = $res;
 				if ( is_object( $res ) && ! empty( $res->results ) ) {
 					$contact = $res->results[0];
 				}
@@ -287,8 +306,6 @@ if ( version_compare( PHP_VERSION, '5.3', '>=' ) ) {
 				}
 
 				$response = $cc_api->contactService->addContact( $access_token, $contact ); // phpcs:ignore
-				$utils = Hustle_Provider_Utils::get_instance();
-				$utils->_last_data_received = $response;
 
 				return $response;
 			}
@@ -338,8 +355,6 @@ if ( version_compare( PHP_VERSION, '5.3', '>=' ) ) {
 				}
 
 				$response = $cc_api->contactService->updateContact( $access_token, $contact ); // phpcs:ignore
-				$utils = Hustle_Provider_Utils::get_instance();
-				$utils->_last_data_received = $response;
 
 				return $response;
 			}

@@ -27,9 +27,20 @@ class Hustle_Aweber_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		$global_multi_id = $addon_setting_values['selected_global_multi_id'];
 
 		/**
+		 * Filter submitted form data to be processed
+		 *
 		 * @since 4.0
+		 *
+		 * @param array                                    $submitted_data
+		 * @param int                                      $module_id                current module_id
+		 * @param Hustle_Aweber_Form_Settings 	   $form_settings_instance
 		 */
-		$submitted_data = apply_filters( 'hustle_provider_' . $addon->get_slug() . '_form_submitted_data', $submitted_data, $module_id, $form_settings_instance );
+		$submitted_data = apply_filters( 
+			'hustle_provider_aweber_form_submitted_data', 
+			$submitted_data, 
+			$module_id, 
+			$form_settings_instance 
+		);
 
 		try {
 
@@ -89,6 +100,9 @@ class Hustle_Aweber_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 				if ( !empty( $result->entries ) ) {
 					$custom_fields = wp_list_pluck( $result->entries, 'name' );
 				}
+
+				// Add an underscore at the beginning of the field's name if it starts with "name"
+				// since Aweber throws an error otherwise. It doesn't accept custom fields starting with "name".
 				foreach ( $subscribe_data['custom_fields'] as $cf_name => $cf_val ) {
 					if ( 0 === strpos( $cf_name, 'name' ) ) {
 						$subscribe_data['custom_fields'][ '_' . $cf_name ] = $cf_val;
@@ -107,10 +121,25 @@ class Hustle_Aweber_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			$is_sent = false;
 			$member_status = __( 'Member could not be subscribed.', 'wordpress-popup' );
 
+			/**
+			 * Fires before adding subscriber
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param int    $module_id
+			 * @param array  $submitted_data
+			 * @param object $form_settings_instance 
+			 */
+			do_action( 'hustle_provider_aweber_before_add_subscriber', 
+				$module_id, 
+				$submitted_data, 
+				$form_settings_instance 
+			);
+
 			// The user is already subscribed. Update it.
 			if ( ! empty( $find_by_email ) && ! empty( $find_by_email->entries ) ) {
 				$member_data = $find_by_email->entries[0];
-				$subscriber = $api->update_account_list_subscriber( $account_id, $list_id, $member_data->id, $subscribe_data );
+				$subscriber = (array) $api->update_account_list_subscriber( $account_id, $list_id, $member_data->id, $subscribe_data );
 
 			} else {
 				// Subscribe a new user.
@@ -118,10 +147,32 @@ class Hustle_Aweber_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 
 			}
 			
-			if ( empty( $subscriber ) ) {
+			/**
+			 * Fires after adding subscriber
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param int    $module_id
+			 * @param array  $submitted_data
+			 * @param mixed  $subscriber
+			 * @param object $form_settings_instance 
+			 */
+			do_action( 'hustle_provider_aweber_after_add_subscriber', 
+				$module_id, 
+				$submitted_data, 
+				$subscriber,
+				$form_settings_instance
+			);
+			
+			if ( empty( $subscriber ) || ( ! empty( $subscriber['response'] ) && 400 <= intval( $subscriber['response']['code'] ) ) ) {
 				$details = __( 'Something went wrong. Unable to add subscriber.', 'wordpress-popup' );
+				
+				if ( ! empty( $subscriber['response']['message'] ) && ! empty( $subscriber['response']['code'] ) ) {
+					$details .=   $subscriber['response']['code'] . ': ' . $subscriber['response']['message'];
+				}
+
 			} else {
-				$member_status = !empty( $subscriber->response['message'] ) ? $subscriber->response['message'] : __( 'OK', 'wordpress-popup' ) ;
+				$member_status = !empty( $subscriber['response']['message'] ) ? $subscriber['response']['message'] : __( 'OK', 'wordpress-popup' ) ;
 				$is_sent = true;
 				$details = __( 'Successfully added or updated member on Aweber list', 'wordpress-popup' );
 				if( ! empty( $subscriber->data ) && ! empty( $subscribe_data['custom_fields'] ) ) {
@@ -136,8 +187,10 @@ class Hustle_Aweber_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 
 					if ( $found_missing_field > 0 ) {
 						$details = __( 'Some fields are not successfully added.', 'wordpress-popup' );
+						throw new Exception( $details );
 					}
 				}
+				
 			}
 
 			$entry_fields = array(
@@ -147,9 +200,6 @@ class Hustle_Aweber_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 						'is_sent'       => $is_sent,
 						'description'   => $details,
 						'member_status' => $member_status,
-						'data_sent'     => $utils->get_last_data_sent(),
-						'data_received' => $utils->get_last_data_received(),
-						'url_request'   => $utils->get_last_url_request(),
 					),
 				),
 			);
@@ -161,7 +211,7 @@ class Hustle_Aweber_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			$entry_fields[0]['value']['list_name'] = $addon_setting_values['list_name'];
 		}
 
-		$entry_fields = apply_filters( 'hustle_provider_' . $addon->get_slug() . '_entry_fields',
+		$entry_fields = apply_filters( 'hustle_provider_aweber_entry_fields',
 			$entry_fields,
 			$module_id,
 			$submitted_data,
@@ -230,7 +280,7 @@ class Hustle_Aweber_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 				}
 
 			} catch ( Exception $e ) {
-				Hustle_Api_Utils::maybe_log( __METHOD__, $e->getMessage() );
+				Hustle_Provider_Utils::maybe_log( __METHOD__, $e->getMessage() );
 			}
 
 		}
@@ -264,6 +314,28 @@ class Hustle_Aweber_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 
 		return true;
 
+	}
+
+	/**
+	 * Get subscriber for providers
+	 *
+	 * This method is to be inherited
+	 * And extended by child classes.
+	 *
+	 * Make use of the property `$_subscriber`
+	 * Method to omit double api calls
+	 *
+	 * @since 4.0.2
+	 *
+	 * @param 	object 	$api
+	 * @param 	mixed  	$data
+	 * @return  mixed 	array/object API response on queried subscriber
+	 */
+	protected function get_subscriber( $api, $data ) {
+		if( empty ( $this->_subscriber ) && ! isset( $this->_subscriber[ md5( $data['email'] ) ] ) ){
+			$this->_subscriber[ md5( $data['email'] ) ] = $api->find_account_list_subscriber( $data['account_id'], $data['list_id'], array( 'email' => $data['email'] ) );
+		}
+		return $this->_subscriber[ md5( $data['email'] ) ];
 	}
 
 }

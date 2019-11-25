@@ -50,6 +50,9 @@ function wpforms_settings_output_field( $args ) {
 
 	$output .= '<span class="wpforms-setting-field">';
 	$output .= $field;
+	if ( ! empty( $args['desc_after'] ) ) {
+		$output .= '<div class="wpforms-clear">' . $args['desc_after'] . '</div>';
+	}
 	$output .= '</span>';
 
 	$output .= '</div>';

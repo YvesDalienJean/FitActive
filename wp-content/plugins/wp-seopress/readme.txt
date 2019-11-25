@@ -4,9 +4,9 @@ Contributors: rainbowgeek
 Donate link: https://www.seopress.org/
 Tags: SEO, XML sitemap, meta title, open graph, content analysis, knowledge graph, redirection, breadcrumbs, google analytics, rich snippets, broken link checker, Schema.org
 Requires at least: 4.6+
-Tested up to: 5.2
+Tested up to: 5.3
 Requires PHP: 5.6
-Stable tag: 3.6.4
+Stable tag: 3.7.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,8 @@ SEOPress is a powerful plugin to optimize your SEO, boost your traffic, improve 
 <strong>Import your post and term metadatas from other plugins in 1 click</strong>
 
 <a href="https://www.seopress.org/seopress-pro?utm_source=w.org&utm_campaign=seopress&utm_medium=readme" target="_blank"><strong>Buy SEOPress PRO: only $39 / year / unlimited sites</strong></a>
+
+[youtube https://www.youtube.com/watch?v=FwaJA5MY6sc]
 
 <h3>SEOPress Free Features</h3>
 
@@ -39,12 +41,13 @@ SEOPress is a powerful plugin to optimize your SEO, boost your traffic, improve 
 	<li>Build your custom HTML Sitemap to enhanced navigation for visitors and improve search indexing.</li>
 	<li>Link your social media accounts to your site.</li>
 	<li>Redirections in post, pages, custom post types</li>
-	<li>Remove stop words (english, french, spanish, german, italian, portuguese, swedish)</li>
 	<li>Remove /category/ in URLs</li>
 	<li>Remove ?replytocom to avoid duplicate content</li>
 	<li>Redirect attachment pages to post parent</li>
+	<li>Redirect attachment pages to their file URL</li>
+	<li>Automatically set the image title / alt / caption / description</li>
 	<li>Import / Export settings from site to site.</li>
-	<li>Import posts and terms metadata from Yoast SEO</li>
+	<li>Import posts and terms metadata from Yoast SEO, All In One SEO, SEO Framework, Rank Math and Squirrly</li>
 	<li>W3C check</li>
 	<li>Content analysis</li>
 	<li>...</li>
@@ -53,9 +56,11 @@ SEOPress is a powerful plugin to optimize your SEO, boost your traffic, improve 
 <h3>SEOPress PRO: to go further with your SEO</h3>
 
 <ul>
+	<li>Import metadatas (titles, open graph, robots...) from CSV file</li>
+	<li>Export metadatas (titles, open graph, robots...) to a CSV file</li>
 	<li>Video XML Sitemap</li>
 	<li>Google Suggestions in Content Analysis</li>
-	<li><a href="https://www.seopress.org/features/google-structured-data-types/" target="_blank">Google Structured Data types (schema.org)</a>: article, local business, FAQ, course, recipe, video, event, product, simple review</li>
+	<li><a href="https://www.seopress.org/features/google-structured-data-types/" target="_blank">Google Structured Data types (schema.org)</a>: article, local business, FAQ, course, recipe, video, event, product, job, simple review</li>
 	<li>Automatic Schemas</li>
 	<li>Breadcrumbs optimized with Schema.org, A11Y ready</li>
 	<li>Google Analytics Stats in Dashboard</li>
@@ -82,31 +87,29 @@ SEOPress is a powerful plugin to optimize your SEO, boost your traffic, improve 
 
 <h4><a href="https://www.seopress.org/seopress-pro?utm_source=w.org&utm_campaign=seopress&utm_medium=readme" target="_blank"><strong>Buy SEOPress PRO now!</strong></a></h4>
 
-[youtube https://www.youtube.com/watch?v=9XMXBHBdva0]
-
 <h3>Translations</h3>
 
 <ul>
-	<li>English (professional translation)</li>
-	<li>French (professional translation)</li>
-	<li>Spanish (professional translation)</li>
-	<li>German (professional translation)</li>
-	<li>Dutch (professional translation)</li>
-	<li>Russian (professional translation)</li>
-	<li>Japanese (professional translation)</li>
-	<li>Greek</li>
-	<li>Bulgarian</li>
-	<li>Indonesian</li>
-	<li>Italian</li>
-	<li>Telugu</li>
-	<li>Tamil</li>
-	<li>Brazilian Portguese</li>
-	<li>Vietnamese</li>
-	<li>Romanian</li>
-	<li>Arabic</li>
-	<li>Chinese</li>
-	<li>Persian</li>
-	<li>Turkish</li>
+	<li>🇺🇸 English (UK) (English (UK)) - professional translation</li>
+	<li>🇫🇷 Français (French (France)) - professional translation</li>
+	<li>🇪🇸 Español (Spanish (Spain)) - professional translation</li>
+	<li>🇩🇪 Deutsch (German) - professional translation</li>
+	<li>🇳🇱 Nederlands (Dutch) - professional translation</li>
+	<li>🇷🇺 Русский (Russian) - professional translation</li>
+	<li>🇯🇵 日本語 (Japanese) - professional translation</li>
+	<li>🇮🇳 हिन्दी (Hindi) - professional translation</li>
+	<li>🇬🇷 Ελληνικά (Greek)</li>
+	<li>🇧🇬 Български (Bulgarian)</li>
+	<li>🇮🇩 Bahasa Indonesia (Indonesian)</li>
+	<li>🇮🇹 Italiano (Italian)</li>
+	<li>🇧🇷 Português do Brasil (Portuguese (Brazil))</li>
+	<li>🇻🇳 Tiếng Việt (Vietnamese)</li>
+	<li>🇷🇴 Română (Romanian)</li>
+	<li>🇸🇦 العربية (Arabic)</li>
+	<li>🇨🇳 中文 (Chinese (China))</li>
+	<li>🇮🇷 فارسی (Persian)</li>
+	<li>🇹🇷 Türkçe (Turkish)</li>
+	<li>...</li>
 </ul>
 
 <h3>SEOPress integrates seamlessly with popular e-commerce, translation, performance and analytics tools.</h3>
@@ -134,6 +137,8 @@ SEOPress is a powerful plugin to optimize your SEO, boost your traffic, improve 
 
 <h3>Featured on</h3>
 <ul>
+	<li>WP Beginner</li>
+	<li>Elementor</li>
 	<li>WP Crafter</li>
 	<li>Kinsta</li>
 	<li>Pagely</li>
@@ -143,6 +148,8 @@ SEOPress is a powerful plugin to optimize your SEO, boost your traffic, improve 
 	<li>MasterWP</li>
 	<li>...</li>
 </ul>
+
+<a href="https://www.seopress.org/press/" target="_blank">Complete list on our Press page</a>
 
 <h3>Our website:</h3>
 Any questions? Visit our website <a href="https://www.seopress.org?utm_source=w.org&utm_campaign=seopress&utm_medium=readme" target="_blank">seopress.org</a>
@@ -154,7 +161,51 @@ Any questions? Visit our website <a href="https://www.seopress.org?utm_source=w.
 3. Click on SEOPress and apply settings.
 
 == Frequently Asked Questions ==
-<a href="https://www.seopress.org/support/faq/" target="_blank">Read our FAQ</a>
+
+= Can I import my post and term metadatas from other plugins? =
+
+You can import your metadatas from <a href="https://www.seopress.org/support/guides/import-post-terms-metadatas-yoast-seo-seopress/">Yoast SEO</a>, <a href="https://www.seopress.org/support/guides/import-post-and-terms-metadatas-from-all-in-one-seo-to-seopress/">All In One SEO (AIO SEO)</a>, <a href="https://www.seopress.org/support/guides/import-post-and-terms-metadatas-from-the-seo-framework-to-seopress/">The SEO Framework (TSF)</a>, <a href="https://www.seopress.org/support/guides/import-post-metadatas-from-squirrly-to-seopress/">Squirrly</a> (post metas only, not terms), and <a href="https://www.seopress.org/support/guides/import-post-terms-metadatas-rank-math-seo-seopress/">Rank Math</a> in one click to SEOPress without losing traffic.
+
+= How to use Google Tag Manager / Facebook Pixel with SEOPress? =
+
+Go to SEO > Google Analytics > Tracking tab. Paste GTM / Facebook Pixel tracking code to [HEAD] Add an additional tracking code / [BODY] Add an additional tracking code textarea fields. Save changes and clear your cache.
+
+= Which types of sitemaps support SEOPress? =
+
+XML sitemaps for search engines: post, page, post type, taxonomies, images and author.
+
+HTML sitemap for accessibility and SEO.
+
+SEOPress PRO supports Google News XML and Video sitemaps.
+
+= How do I get support? =
+
+For FREE users: <a href="https://www.seopress.org/support/guides/">guides</a>, forum on <a href="https://wordpress.org/plugins/wp-seopress/">w.org</a>, <a href="https://www.seopress.org/support/faq/">FAQ</a>, <a href="https://www.seopress.org/support/hooks/">hooks for developers</a>, and <a href="https://www.youtube.com/channel/UCH5sQx3T2QZFhFEamT51hsw" target="_blank">videos on our YouTube channel</a>.
+For PRO users: support by mail from their customer account.
+
+= Is SEOPress GDPR compliant? =
+
+Yes! Learn more here <a href="https://www.seopress.org/features/seopress-white-label/">about SEOPress and GDPR</a>
+
+= Is white label a free feature? =
+
+Yes! Learn more here <a href="https://www.seopress.org/features/seopress-white-label/">about SEOPress and the White Label feature</a>
+
+= My XML sitemap returns a 404 error =
+
+Read this <a href="https://www.seopress.org/support/guides/xml-sitemap-returns-404-error/">post to solve this issue</a>
+
+= My XML sitemap returns a blank page =
+
+Read this <a href="https://www.seopress.org/support/guides/xml-sitemap-blank-page/">post to solve this issue</a>
+
+= I don't see the correct title! =
+
+You're theme is probably using a deprecated function to handle the title. <a href="https://www.seopress.org/support/guides/fixing-missing-add_theme_support-in-your-theme/">Learn more here</a>
+
+= My question is not listed here! =
+
+<a href="https://www.seopress.org/support/faq/" target="_blank">Read our complete FAQ on our site</a>
 
 == Screenshots ==
 1. SEOPress Dashboard
@@ -219,6 +270,114 @@ Any questions? Visit our website <a href="https://www.seopress.org?utm_source=w.
 60. Installation Wizard
 
 == Changelog ==
+= 3.7.5 =
+* NEW Review schema: Add item type CreativeWorkSeason, CreativeWorkSeries, Episode, Game, MediaObject, MusicPlaylist, MusicRecording, Organization to solve "Thing is not a known valid target type for the itemReviewed property."
+* NEW Add custom tracking code just before the body closing tag
+* NEW Add an option to display/hide any SEO metaboxes for each custom post type
+* NEW 'seopress_custom_footer_tracking' hook to filter additional tracking code in body footer (https://www.seopress.org/support/hooks/filter-html-additional-tracking-code-in-footer-body/)
+* NEW 'seopress_sitemaps_xml_index' hook to filter XML index sitemap (https://www.seopress.org/support/hooks/filter-xml-index-sitemap/)
+* NEW 'seopress_sitemaps_xml_single' hook to filter XML single post type sitemap (https://www.seopress.org/support/hooks/filter-xml-single-post-type-sitemap/)
+* NEW 'seopress_sitemaps_xml_single_term' hook to filter XML single taxonomy sitemap (https://www.seopress.org/support/hooks/filter-xml-sitemap-single-taxonomy/)
+* NEW 'seopress_sitemaps_xml_author' hook to filter XML author sitemap (https://www.seopress.org/support/hooks/filter-xml-author-sitemap/)
+* NEW 'seopress_sitemaps_xml_video' hook to filter XML video sitemap (https://www.seopress.org/support/hooks/filter-xml-video-sitemap/)
+* NEW 'seopress_sitemaps_xml_news' hook to filter XML news sitemap (https://www.seopress.org/support/hooks/filter-xml-news-sitemap/)
+* INFO Support %%sitedesc%% dynamic variable (alias of %%tagline%%') in title / meta description
+* INFO Support %%excerpt%% dynamic variable (alias of %%post_excerpt%%') in title / meta description
+* INFO Support %%date%% dynamic variable (alias of %%post_date%%') in title / meta description
+* INFO Display author meta only if username is not equal to display name
+* INFO Improve UI
+* INFO Improve content analysis (UX/UI)
+* INFO Improve block editor (Gutenberg) compatibility
+* FIX XML sitemaps with Polylang
+* FIX Add '59' value for minutes in LocalBusiness schema to manage stores open 24 hours a day
+* FIX Solved undefined in broken link checker bot (log textarea)
+= 3.7.4 =
+* NEW Author meta name for singular page (enabled by default)
+* NEW 'seopress_robots_txt_file' hook to filter robots.txt file (useful with Polylang and multidomain option https://www.seopress.org/support/hooks/filter-robots-txt-file-seopress-pro/)
+* NEW 'seopress_get_custom_fields' hook to filter custom fields list in Schemas (https://www.seopress.org/support/hooks/filter-custom-fields-list-in-schemas/)
+* INFO Support hierarchical custom post type for breadcrumbs (PRO)
+* INFO Improve documentation for robots.txt page
+* INFO Improve primary category feature for post
+* INFO Breadcrumbs is now matching primary category (if set)
+* FIX get_home_url() for XSL sitemap with Polylang
+* FIX replace wp_count_posts by pll_count_posts if Polylang activated for XML Sitemap index
+* FIX check when applying "rsd_link" option (thanks to @bomalo)
+* FIX Site is experience difficulties error after requesting the bot in specific cases
+= 3.7.3 =
+* NEW WordPress 5.3 compatibility
+* NEW Export metadata to a CSV file! (PRO)
+* NEW Added multi-domain support for XML sitemaps with Polylang (https://www.seopress.org/support/guides/multidomain-xml-sitemap-with-polylang-and-seopress/)
+* NEW Import post metadata from Squirrly (https://www.seopress.org/support/guides/import-post-metadatas-from-squirrly-to-seopress/)
+* NEW 'seopress_metadata_query_args' hook to filter CSV metadata export query (https://www.seopress.org/support/hooks/filter-the-arguments-of-the-metadata-export-query/)
+* NEW 'seopress_post_types' hook to filter custom post type used by SEOPress
+* NEW 'seopress_sitemaps_single_img_url' hook to filter standard image URLs in XML image sitemaps (use it inside a mu-plugin)
+* NEW 'seopress_sitemaps_single_shortcodes' hook to filter execution of shortcodes in XML image sitemaps (use it inside a mu-plugin)
+* INFO Improve XML image sitemaps for featured images, product galleries...
+* INFO Breadcrumbs options can now be translated from WPML / Polylang (wpml-config.xml)
+* FIX Call to undefined function is_product() in /wp-seopress/inc/functions/variables/dynamic-variables.php:97
+* FIX JS error in content analysis metabox on Google Suggestions
+= 3.7.2 =
+* NEW Custom taxonomy for automatic schemas (eg: Brand for product schema) - PRO
+* NEW Add image caption and title to XML Image Sitemaps
+* NEW Image sitemaps now support shortcodes (useful with DIVI page builder)
+* NEW Add %%post_content%% dynamic variable to get the post content / product description
+* NEW 'seopress_titles_product_cat' hook to filter product categories using %%wc_single_cat%%
+* NEW 'seopress_titles_product_tag' hook to filter product categories using %%wc_single_tag%%
+* NEW 'seopress_titles_cat' hook to filter product categories using %%post_category%%
+* NEW 'seopress_titles_tag' hook to filter product tags using %%post_tag%%
+* INFO Improve schemas rendering to avoid "}" missing error in Google Search Console
+* FIX UI - Hide Redirections tab in SEO > Tools if SEOPress PRO is not enabled
+* FIX new meta robots
+* FIX Call to undefined function is_product() in /wp-seopress-pro/inc/functions/options-woocommerce.php:8
+= 3.7.1 =
+* NEW JobPosting schema (PRO)
+* NEW 'seopress_metabox_seo_tabs' hook to filter tabs in SEO metabox
+* NEW 'seopress_schemas_auto_job_html' hook to filter JobPosting global schema
+* NEW 'seopress_schemas_job_html' hook to filter JobPosting manual schema
+* NEW 'seopress_sitemaps_max_posts_per_sitemap' hook to filter max posts per paginated sitemap
+* INFO GA: we now follow all external links, even if you have not defined an empty target attribute
+* INFO Performance optimization
+* INFO Improving security
+* INFO Improving the user experience
+= 3.7 =
+* NEW Import metadata from CSV file: title, meta description, meta robots and more... (SEO > Tools > Data) - PRO
+* NEW Support the new Google meta robots (max-snippet:-1, max-image-preview:large, max-video-preview:-1), ON by default
+* INFO Improve translations
+* FIX %%current_pagination%% for first page
+* FIX robots.txt with Elementor didn't load in specific configurations
+* FIX Outbound links count in content analysis
+* FIX Last separator for breadcrumbs with "seopress_pro_breadcrumbs_crumbs" hook
+= 3.6.5 =
+* NEW XML Author sitemap
+* NEW 'seopress_schemas_organization_html' hook to filter Organization schema
+* NEW 'seopress_remove_feature_titles' hook to remove Titles and metas block in SEO > Dashboard
+* NEW 'seopress_remove_feature_xml_sitemap' hook to remove Titles and metas block in SEO > Dashboard
+* NEW 'seopress_remove_feature_social' hook to remove Social block in SEO > Dashboard
+* NEW 'seopress_remove_feature_google_analytics' hook to remove Google Analytics block in SEO > Dashboard
+* NEW 'seopress_remove_feature_advanced' hook to remove Advanced block in SEO > Dashboard
+* NEW 'seopress_remove_feature_woocommerce' hook to remove WooCommerce block in SEO > Dashboard
+* NEW 'seopress_remove_feature_edd' hook to remove Easy Digital Downloads block in SEO > Dashboard
+* NEW 'seopress_remove_feature_local_business' hook to remove Local Business block in SEO > Dashboard
+* NEW 'seopress_remove_feature_dublin_core' hook to remove Dublin Core block in SEO > Dashboard
+* NEW 'seopress_remove_feature_breadcrumbs' hook to remove Breadcrumbs block in SEO > Dashboard
+* NEW 'seopress_remove_feature_schemas' hook to remove Schemas block in SEO > Dashboard
+* NEW 'seopress_remove_feature_page_speed' hook to remove Page Speed block in SEO > Dashboard
+* NEW 'seopress_remove_feature_robots' hook to remove Robots block in SEO > Dashboard
+* NEW 'seopress_remove_feature_news' hook to remove News block in SEO > Dashboard
+* NEW 'seopress_remove_feature_redirects' hook to remove Redirects block in SEO > Dashboard
+* NEW 'seopress_remove_feature_bot' hook to remove Bot (broken links) block in SEO > Dashboard
+* NEW 'seopress_remove_feature_backlinks' hook to remove Backlinks block in SEO > Dashboard
+* NEW 'seopress_remove_feature_rewrite' hook to remove Rewrite block in SEO > Dashboard
+* NEW 'seopress_remove_feature_htaccess' hook to remove htaccess block in SEO > Dashboard
+* NEW 'seopress_remove_feature_rss' hook to remove RSS block in SEO > Dashboard
+* NEW 'seopress_remove_feature_tools' hook to remove Tools (Import / Export) block in SEO > Dashboard
+* NEW 'seopress_remove_feature_license' hook to remove License block in SEO > Dashboard
+* INFO Aria-label attribute in breadcrumbs is now translatable
+* INFO %%current_pagination%% is now set to 1 by default
+* FIX 'seopress_sitemaps_html_pages_query' hook to include $cpt_key parameter
+* FIX bounce rate with custom dimensions
+* FIX Hierarchical post types in HTML sitemap
+* FIX CSS bug in SEO dashboard with WordPress 5.2.3
 = 3.6.4 =
 * NEW Add 'seopress_bot_query' hook to filter the broken links checker query
 * INFO Relevanssi users: posts marked as noindex are no longer indexed by default (Relevanssi 4.3.2 required)

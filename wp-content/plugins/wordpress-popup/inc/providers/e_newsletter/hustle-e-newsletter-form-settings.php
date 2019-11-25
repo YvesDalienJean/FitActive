@@ -64,19 +64,19 @@ if ( ! class_exists( 'Hustle_E_Newsletter_Form_Settings' ) ) :
 			'auto_optin' => '',
 			);
 			$current_data = $this->get_current_data( $current_data, $submitted_data );
-			$is_submit = ! empty( $submitted_data['is_submit'] );
+			$is_submit = ! empty( $submitted_data['hustle_is_submit'] );
 			if ( $is_submit && empty( $submitted_data['list_id'] ) ) {
 				$error_message = __( 'The email list is required.', 'wordpress-popup' );
 			}
 
 			$options = $this->get_first_step_options( $current_data, $is_submit );
 
-			$step_html = Hustle_Api_Utils::get_modal_title_markup(
+			$step_html = Hustle_Provider_Utils::get_integration_modal_title_markup(
 				__( 'e-Newsletter List', 'wordpress-popup' ),
 				__( 'Choose the list you want to send form data to.', 'wordpress-popup' )
 			);
 
-			$step_html .= Hustle_Api_Utils::get_html_for_options( $options );
+			$step_html .= Hustle_Provider_Utils::get_html_for_options( $options );
 
 			if ( ! isset( $error_message ) ) {
 				$has_errors = false;
@@ -87,10 +87,20 @@ if ( ! class_exists( 'Hustle_E_Newsletter_Form_Settings' ) ) :
 
 			$buttons = array(
 			'disconnect' => array(
-				'markup' => Hustle_Api_Utils::get_button_markup( __( 'Disconnect', 'wordpress-popup' ), 'sui-button-ghost', 'disconnect_form', true ),
+				'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+					__( 'Disconnect', 'wordpress-popup' ),
+					'sui-button-ghost',
+					'disconnect_form',
+					true
+				),
 			),
 			'save' => array(
-				'markup' => Hustle_Api_Utils::get_button_markup( __( 'Save', 'wordpress-popup' ), '', 'next', true ),
+				'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+					__( 'Save', 'wordpress-popup' ),
+					'',
+					'next',
+					true
+				),
 			),
 			);
 
@@ -149,12 +159,7 @@ if ( ! class_exists( 'Hustle_E_Newsletter_Form_Settings' ) ) :
 			$_lists = $this->provider->get_groups();
 
 			if ( is_array( $_lists ) && ! empty( $_lists ) ) {
-
-				foreach ( $_lists as $list ) {
-					$list = (array) $list;
-					$lists[ $list['group_id'] ]['value'] = $list['group_id'];
-					$lists[ $list['group_id'] ]['label'] = $list['group_name'];
-				}
+				$lists = wp_list_pluck( $_lists, 'group_name', 'group_id' );
 
 				$this->_lists = $lists;
 
@@ -165,14 +170,6 @@ if ( ! class_exists( 'Hustle_E_Newsletter_Form_Settings' ) ) :
 			return array();
 
 		}
-
-		$total_lists = count( $lists );
-
-		$first = $total_lists > 0 ? reset( $lists ) : '';
-
-		if ( ! empty( $first ) ) {
-
-			$first = $first['value']; }
 
 			$selected_lists = isset( $submitted_data['list_id'] ) && is_array( $submitted_data['list_id'] ) ?
 				array_intersect( $submitted_data['list_id'], array_keys( $lists ) ) :
@@ -238,11 +235,6 @@ if ( ! class_exists( 'Hustle_E_Newsletter_Form_Settings' ) ) :
 					'name'  => 'synced',
 					'value' => $synced ? 1 : 0,
 					'id'    => 'synced',
-				),
-				array(
-					'type'  => 'hidden',
-					'name'  => 'is_submit',
-					'value' => '1',
 				),
 			);
 

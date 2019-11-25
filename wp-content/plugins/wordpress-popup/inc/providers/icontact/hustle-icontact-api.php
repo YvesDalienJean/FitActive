@@ -225,6 +225,13 @@ if ( ! class_exists( 'Hustle_Icontact_Api' ) ) :
 
 
             $response   = wp_remote_request( $request_url, $args );
+
+			//logging data
+			$utils = Hustle_Provider_Utils::get_instance();
+			$utils->_last_url_request 	= $request_url;
+			$utils->_last_data_sent 	= $args;
+			$utils->_last_data_received = $response;
+
             $data       = wp_remote_retrieve_body( $response );
 
             if ( is_wp_error( $data ) ) {
@@ -325,11 +332,6 @@ if ( ! class_exists( 'Hustle_Icontact_Api' ) ) :
 			$path = "/a/{$this->account_id}/c/{$this->folder_id}/customfields";
             $response = $this->_do_request( $path, 'POST', array( $field ) );
 
-			$utils = Hustle_Provider_Utils::get_instance();
-			$utils->_last_data_received = $response;
-			$utils->_last_url_request = $this->_build_url() . $path;
-			$utils->_last_data_sent = $field;
-
 			return $response;
         }
 
@@ -341,11 +343,6 @@ if ( ! class_exists( 'Hustle_Icontact_Api' ) ) :
         public function get_contacts( $list_id ) {
 			$path = "/a/{$this->account_id}/c/{$this->folder_id}/contacts?status=total&listId={$list_id}";
             $response = $this->_do_request( $path, 'GET' );
-
-			$utils = Hustle_Provider_Utils::get_instance();
-			$utils->_last_data_received = $response;
-			$utils->_last_url_request = $this->_build_url() . $path;
-			$utils->_last_data_sent = $list_id;
 
             return $response;
         }
@@ -365,11 +362,6 @@ if ( ! class_exists( 'Hustle_Icontact_Api' ) ) :
         private function _save_contact( $contact_details ) {
 			$path = "/a/{$this->account_id}/c/{$this->folder_id}/contacts";
             $response = $this->_do_request( $path, 'POST', array( $contact_details ) );
-
-			$utils = Hustle_Provider_Utils::get_instance();
-			$utils->_last_data_received = $response;
-			$utils->_last_url_request = $this->_build_url() . $path;
-			$utils->_last_data_sent = $contact_details;
 
             return $response;
         }

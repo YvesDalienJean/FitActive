@@ -42,7 +42,7 @@ class Hustle_Dashboard_Admin extends Hustle_Admin_Page_Abstract {
 
 	/**
 	 * Get the arguments used when rendering the main page.
-	 * 
+	 *
 	 * @since 4.0.1
 	 * @return array
 	 */
@@ -61,7 +61,7 @@ class Hustle_Dashboard_Admin extends Hustle_Admin_Page_Abstract {
 		$social_sharings = $collection_instance->get_all( null, array( 'module_type' => 'social_sharing' ) );
 
 		$active_modules = $collection_instance->get_all( true, array(
-			'except_types' => array( 'social_sharing' ),
+//			'except_types' => array( 'social_sharing' ),
 			'count_only' => true,
 		));
 
@@ -140,12 +140,12 @@ class Hustle_Dashboard_Admin extends Hustle_Admin_Page_Abstract {
 			'total_modules_count' => __( 'Total Modules', 'wordpress-popup' ),
 		);
 		$keys = array_keys( $names );
-		$metrics = Hustle_Settings_Admin::get_hustle_settings( 'selected_top_metrics' );
+		$metrics = Hustle_Settings_Admin::get_top_metrics_settings();
 		$metrics = array_values( array_intersect( $keys, $metrics ) );
 
 		while ( 3 > count( $metrics ) ) {
 			$key = array_shift( $keys );
-			if ( ! in_array( $key, $metrics ) ) {
+			if ( ! in_array( $key, $metrics, true ) ) {
 				$metrics[] = $key;
 			}
 		}
@@ -163,6 +163,10 @@ class Hustle_Dashboard_Admin extends Hustle_Admin_Page_Abstract {
 				break;
 				case 'most_conversions':
 					$module_id = $tracking->get_most_conversions_module_id();
+					if ( ! $module_id ) {
+						$value = __( 'None', 'wordpress-popup' );
+						break;
+					}
 					$module = Hustle_Module_Model::instance()->get( $module_id );
 					if ( ! is_wp_error( $module ) ) {
 						$value = $module->module_name;

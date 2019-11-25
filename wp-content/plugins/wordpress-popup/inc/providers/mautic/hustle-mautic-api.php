@@ -7,7 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! class_exists( 'Hustle_Mautic_Api' ) ) :
-	require_once Opt_In::$vendor_path . 'mautic/api-library/lib/MauticApi.php';
 
 	class Hustle_Mautic_Api {
 		/**
@@ -35,38 +34,282 @@ if ( ! class_exists( 'Hustle_Mautic_Api' ) ) :
 		 **/
 		private $auth;
 
-		public function __construct( $base_url, $username, $password ) {
+		/**
+		 * Instances of mautic api
+		 *
+		 * @since 4.0.2
+		 * @var array
+		 */
+		private static $_instances = array();
+
+		/**
+		 * Instances of mautic api
+		 *
+		 * @since 4.0.2
+		 * @var array
+		 */
+		const HUSTLE_ADDON_MAUTIC_VERSION = '1.0';
+
+		/**
+		 * Hustle_Mautic_Api constructor.
+		 *
+		 * @param $base_url
+		 * @param $username
+		 * @param $password
+		 */
+		private function __construct( $base_url, $username, $password ) {
+			//final check here
+			if ( ! $base_url || ! $username || ! $password ) {
+				throw new Exception( __( 'Missing required API Credentials', 'wordpress-popup' ) );
+			}
+
 			$this->base_url = $base_url;
 			$this->username = $username;
 			$this->password = $password;
+		}
 
-			if ( ! empty( $base_url ) && ! empty( $username ) && ! empty( $password ) ) {
-				$params = array(
-					'baseUrl' => $this->base_url,
-					'userName' => $this->username,
-					'password' => $this->password,
-				);
-
-				$init_auth = new Mautic\Auth\ApiAuth();
-				$this->auth = $init_auth->newAuth( $params, 'BasicAuth' );
-				$this->api = new Mautic\MauticApi( $this->auth, $this->base_url );
+		/**
+		 * Get singleton
+		 *
+		 * @since 4.0.2
+		 *
+		 * @param $base_url
+		 * @param $username
+		 * @param $password
+		 *
+		 * @return Hustle_Mautic_Api|null
+		 */
+		public static function get_instance( $base_url = '', $username, $password = '' ) {
+			//initial check here
+			if ( ! $username ) {
+				throw new Exception( __( 'Missing required API Credentials', 'wordpress-popup' ) );
 			}
+
+			if ( ! isset( self::$_instances[ md5( $username ) ] ) ) {
+				self::$_instances[ md5( $username ) ] = new self( $base_url, $username, $password );
+			}
+			return self::$_instances[ md5( $username ) ];
+		}
+
+		/**
+		 * Add custom user agent on request
+		 *
+		 * @since 4.0.2
+		 *
+		 * @param $user_agent
+		 *
+		 * @return string
+		 */
+		public function filter_user_agent( $user_agent ) {
+			$user_agent .= ' HustleMautic/' . self::HUSTLE_ADDON_MAUTIC_VERSION;
+
+			/**
+			 * Filter user agent to be used by mautic api
+			 *
+			 * @since 1.1
+			 *
+			 * @param string $user_agent current user agent
+			 */
+			$user_agent = apply_filters( 'hustle_addon_mautic_api_user_agent', $user_agent );
+
+			return $user_agent;
+		}
+
+		/**
+		 * HTTP Request
+		 *
+		 * @since 4.0.2
+		 *
+		 * @param string $verb
+		 * @param        $url
+		 * @param array  $args
+		 *
+		 * @param array  $headers
+		 *
+		 * @return array|mixed|object
+		 * @throws Exception
+		 */
+		private function _request( $verb = 'GET', $url, $args = array() ) {
+			// Adding extra user agent for wp remote request
+			add_filter( 'http_headers_useragent', array( $this, 'filter_user_agent' ) );
+
+			$url = esc_url( trailingslashit( $this->base_url ) . 'api/' . $url );
+
+			/**
+			 * Filter mautic url to be used on sending api request
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param string $url  full url with scheme
+			 * @param string $verb `GET` `POST` `PUT` `DELETE` `PATCH`
+			 * @param string $path requested path resource
+			 * @param array  $args argument sent to this function
+			 */
+			$url = apply_filters( 'hustle_addon_mautic_api_url', $url, $verb, $args );
+
+			$headers      = array(
+				'Authorization' => 'Basic ' . base64_encode( $this->username . ':' . $this->password ), //phpcs:ignore
+				'Expect' => '',
+				'Accept' => 'application/json',
+				'Content-Type'	=> 'application/json'
+			);
+
+			/**
+			 * Filter mautic headers to sent on api request
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param array  $headers
+			 * @param string $verb `GET` `POST` `PUT` `DELETE` `PATCH`
+			 * @param string $url  full url with scheme
+			 * @param array  $args argument sent to this function
+			 */
+			$headers = apply_filters( 'hustle_addon_mautic_api_request_headers', $headers, $verb, $url, $args );
+
+			$_args = array(
+				'method'  => $verb,
+				'headers' => $headers,
+			);
+
+			$request_data = $args;
+			ksort( $request_data );
+
+			/**
+			 * Filter mautic request data to be used on sending api request
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param array  $request_data
+			 * @param string $verb `GET` `POST` `PUT` `DELETE` `PATCH`
+			 * @param string $url  full url with scheme
+			 */
+			$args = apply_filters( 'hustle_addon_mautic_api_request_data', $request_data, $verb, $url );
+
+			if ( 'GET' === $verb ) {
+				$url .= ( '?' . http_build_query( $args ) );
+			} else {
+				$_args['body'] = wp_json_encode( $args );
+			}
+
+			/**
+			 * Filter mautic wp_remote_request args
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param array $_args
+			 */
+			$_args = apply_filters( 'hustle_addon_mautic_api_remote_request_args', $_args );
+
+			$res   = wp_remote_request( $url, $_args );
+
+			//logging data
+			$utils = Hustle_Provider_Utils::get_instance();
+			$utils->_last_url_request 	= $url;
+			$utils->_last_data_sent 	= $_args;
+			$utils->_last_data_received = $res;
+
+			$wp_response = $res;
+
+			remove_filter( 'http_headers_useragent', array( $this, 'filter_user_agent' ) );
+
+			if ( is_wp_error( $res ) || ! $res ) {
+				throw new Exception(
+					__( 'Failed to process request, make sure your API URL is correct and your server has internet connection.', 'wordpress-popup' )
+				);
+			}
+
+			if ( isset( $res['response']['code'] ) ) {
+				$status_code = $res['response']['code'];
+				$msg         = '';
+				if ( $status_code >= 400 ) {
+
+					if ( isset( $res['response']['message'] ) ) {
+						$msg = $res['response']['message'];
+					}
+
+					$body_json = wp_remote_retrieve_body( $res );
+
+					$res_json = json_decode( $body_json );
+					if ( ! is_null( $res_json ) && is_object( $res_json ) && isset( $res_json->error ) && isset( $res_json->error->message ) ) {
+						$msg = $res_json->error->message;
+					}
+
+					if ( 404 === $status_code ) {
+						throw new Exception( sprintf( __( 'Failed to processing request : %s', 'wordpress-popup' ), $msg ) );
+					}
+				}
+			}
+
+			$body = wp_remote_retrieve_body( $res );
+
+			// probably silent mode
+			if ( ! empty( $body ) ) {
+				$res = json_decode( $body );
+				// fallback to parse args when fail
+				if ( empty( $res ) ) {
+					$res = wp_parse_args( $body, array() );
+
+					//json-ify to make same format as json response (which is object not array)
+					$res = wp_json_encode( $res );
+					$res = json_decode( $res );
+				}
+			}
+
+			$response = $res;
+			/**
+			 * Filter mautic api response returned to addon
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param mixed          $response    original wp remote request response or decoded body if available
+			 * @param string         $body        original content of http response's body
+			 * @param array|WP_Error $wp_response original wp remote request response
+			 */
+			$res = apply_filters( 'hustle_addon_mautic_api_response', $response, $body, $wp_response );
+
+			return $res;
+		}
+
+		/**
+		 * Sends rest GET request
+		 *
+		 * @param $action
+		 * @param array $args
+		 * @return array|mixed|object|WP_Error
+		 */
+		private function _get( $action, $args = array() ){
+			return $this->_request( "GET", $action, $args );
+		}
+
+		/**
+		 * Sends rest POST request
+		 *
+		 * @param $action
+		 * @param array $args
+		 * @return array|mixed|object|WP_Error
+		 */
+		private function _post( $action, $args = array()  ){
+			return $this->_request( "POST", $action, $args );
+		}
+
+		/**
+		 * Sends rest PUT request
+		 *
+		 * @param $action
+		 * @param array $args
+		 * @return array|mixed|object|WP_Error
+		 */
+		private function _patch( $action, $args = array()  ){
+			return $this->_request( "PATCH", $action, $args );
 		}
 
 		/**
 		 * Retrieve the list of segments from Mautic installation.
 		 **/
 		public function get_segments( $offset = 0 ) {
-			if ( ! $this->api ) {
-				return false;
-			}
-
-			$segment_api = $this->api->newApi( 'segments', $this->auth, $this->base_url );
-
 			try {
-				$segments = $segment_api->getList( '', intval( $offset ) );
-
-				if ( ! empty( $segments ) && ! empty( $segments['lists'] ) ) {
+				$segments = $this->_get( 'segments' );
+				if ( ! empty( $segments ) && isset( $segments->lists ) ) {
 					return $segments;
 				}
 			} catch( Exception $e ) {
@@ -83,55 +326,23 @@ if ( ! class_exists( 'Hustle_Mautic_Api' ) ) :
 		 **/
 		public function add_contact( $data ) {
 			$err = new WP_Error();
-			if ( ! $this->api ) {
-				$err->add( 'subscribe_error', __( 'The API is not properly configured. Please contact the admin.', 'wordpress-popup' ) );
-				return $err;
-			}
-			$path = 'contacts';
-			$contact_api = $this->api->newApi( $path, $this->auth, $this->base_url );
-
 			try {
-				$res = $contact_api->create( $data );
+				$res = $this->_post( 'contacts/new', $data );
 
-				$utils = Hustle_Provider_Utils::get_instance();
-				$utils->_last_data_sent = $data;
-				$utils->_last_url_request = $path . '/new';
-				$utils->_last_data_received = $res;
-
-				if ( $res && ! empty( $res['contact'] ) ) {
-					$contact_id = $res['contact']['id'];
-
-					// Double check custom fields
-					if ( ! empty( $res['contact']['fields'] ) && ! empty( $res['contact']['fields']['core'] ) ) {
-						$found_missing = 0;
-
-						$contact_fields = array_keys( $res['contact']['fields']['core'] );
-						$common_fields = array( 'firstname', 'lastname', 'email', 'ipAddress' );
-
-						foreach ( $data as $key => $value ) {
-							// Check only uncommon fields
-							if ( ! in_array( $key, $common_fields, true ) && ! in_array( $key, $contact_fields, true ) ) {
-								$found_missing++;
-							}
-						}
-
-						if ( $found_missing > 0 ) {
-							$data['error'] = __( 'Some fields are not added.', 'wordpress-popup' );
-							unset( $data['ipAddress'] );
-						}
-					}
-
-					return $contact_id;
+				if ( $res && ! empty( $res->contact ) ) {
+					$contact = $res->contact;
+					return $contact->id;
 				} else {
 					$err->add( 'subscribe_error', __( 'Something went wrong. Please try again', 'wordpress-popup' ) );
 				}
 			} catch( Exception $e ) {
 				$error = $e->getMessage();
+				$err = new WP_Error();
 				$err->add( 'subscribe_error', $error );
 			}
 
 			return $err;
-		}		
+		}
 
 		/**
 		 * Add contact to Mautic installation.
@@ -141,50 +352,18 @@ if ( ! class_exists( 'Hustle_Mautic_Api' ) ) :
 		 **/
 		public function update_contact( $id, $data ) {
 			$err = new WP_Error();
-			if ( ! $this->api ) {
-				$err->add( 'subscribe_error', __( 'The API is not properly configured. Please contact the admin.', 'wordpress-popup' ) );
-				return $err;
-			}
-			$path = 'contacts';
-			$contact_api = $this->api->newApi( $path, $this->auth, $this->base_url );
-
 			try {
-				$res = $contact_api->edit( $id, $data );
-				
-				$utils = Hustle_Provider_Utils::get_instance();
-				$utils->_last_data_sent = $data;
-				$utils->_last_url_request = $path . '/new';
-				$utils->_last_data_received = $res;
+				$res = $this->_patch( 'contacts/' . $id . '/edit', $data );
 
-				if ( $res && ! empty( $res['contact'] ) ) {
-					$contact_id = $res['contact']['id'];
-
-					// Double check custom fields
-					if ( ! empty( $res['contact']['fields'] ) && ! empty( $res['contact']['fields']['core'] ) ) {
-						$found_missing = 0;
-
-						$contact_fields = array_keys( $res['contact']['fields']['core'] );
-						$common_fields = array( 'firstname', 'lastname', 'email', 'ipAddress' );
-
-						foreach ( $data as $key => $value ) {
-							// Check only uncommon fields
-							if ( ! in_array( $key, $common_fields, true ) && ! in_array( $key, $contact_fields, true ) ) {
-								$found_missing++;
-							}
-						}
-
-						if ( $found_missing > 0 ) {
-							$data['error'] = __( 'Some fields are not added.', 'wordpress-popup' );
-							unset( $data['ipAddress'] );
-						}
-					}
-
-					return $contact_id;
+				if ( $res && ! empty( $res->contact ) ) {
+					$contact = $res->contact;
+					return $contact->id;
 				} else {
 					$err->add( 'subscribe_error', __( 'Something went wrong. Please try again', 'wordpress-popup' ) );
 				}
 			} catch( Exception $e ) {
 				$error = $e->getMessage();
+				$err = new WP_Error();
 				$err->add( 'subscribe_error', $error );
 			}
 
@@ -199,24 +378,16 @@ if ( ! class_exists( 'Hustle_Mautic_Api' ) ) :
 		 **/
 		public function email_exist( $email ) {
 			$err = new WP_Error();
-			if ( ! $this->api ) {
-				$err->add( 'subscribe_error', __( 'The API is not properly configured. Please contact the admin.', 'wordpress-popup' ) );
-				return $err;
-			}
-			$path = 'contacts';
-			$contact_api = $this->api->newApi( $path, $this->auth, $this->base_url );
-
 			try {
-				$res = $contact_api->getList( $email, 0, 1000 );
+				$args = array(
+					'search' => $email,
+					'limit'  => 1000,
+				);
+				$res = $this->_get( 'contacts', $args );
 				$contact_id = '';
-				if ( $res && ! empty( $res['contacts'] ) ) {
-					$contact_id = wp_list_pluck( $res['contacts'], 'id' );
+				if ( $res && ! empty( $res->contacts ) ) {
+					$contact_id = wp_list_pluck( $res->contacts, 'id' );
 				}
-				$utils = Hustle_Provider_Utils::get_instance();
-				$utils->_last_data_sent = $email;
-				$utils->_last_url_request = $path;
-				$utils->_last_data_received = $res;
-				
 				return ! empty( $contact_id ) ? key( $contact_id ) : false;
 			} catch( Exception $e ) {
 				$err->add( 'server_error', $e->getMessage() );
@@ -233,21 +404,8 @@ if ( ! class_exists( 'Hustle_Mautic_Api' ) ) :
 		 **/
 		public function add_contact_to_segment( $segment_id, $contact_id ) {
 			$err = new WP_Error();
-			if ( ! $this->api ) {
-				$err->add( 'subscribe_error', __( 'The API is not properly configured. Please contact the admin.', 'wordpress-popup' ) );
-				return $err;
-			}
-			$path = 'segments';
-			$segment_api = $this->api->newApi( $path, $this->auth, $this->base_url );
-
 			try {
-				$add = $segment_api->addContact( $segment_id, $contact_id );
-
-				$utils = Hustle_Provider_Utils::get_instance();
-				$utils->_last_data_sent = '';
-				$utils->_last_url_request = $path . '/'.$segment_id.'/contact/'.$contact_id.'/add';
-				$utils->_last_data_received = $add;
-
+				$add = $this->_post( 'segments/' . $segment_id . '/contact/' . $contact_id . '/add' );
 				return $add;
 			} catch( Exception $e ) {
 				$err->add( 'subscribe_error', $e->getMessage() );
@@ -259,12 +417,7 @@ if ( ! class_exists( 'Hustle_Mautic_Api' ) ) :
 		 * Get the list of available contact custom fields.
 		 **/
 		public function get_custom_fields() {
-			if ( ! $this->api ) {
-				return false;
-			}
-			$contact_api = $this->api->newApi( 'contacts', $this->auth, $this->base_url );
-			$fields = $contact_api->getFieldList();
-
+			$fields = $this->_get('contacts/list/fields');
 			return $fields;
 		}
 
@@ -274,13 +427,8 @@ if ( ! class_exists( 'Hustle_Mautic_Api' ) ) :
 		 * @param (array) $field
 		 **/
 		public function add_custom_field( $field ) {
-			if ( ! $this->api ) {
-				return false;
-			}
-			$field_api = $this->api->newApi( 'contactFields', $this->auth, $this->base_url );
-			$res = $field_api->create( $field );
-
-			return ! empty( $res ) && ! empty( $res['field'] );
+			$res = $this->_post( 'fields/contact/new', $field );
+			return ! empty( $res ) && ! empty( $res->field );
 		}
 	}
 endif;

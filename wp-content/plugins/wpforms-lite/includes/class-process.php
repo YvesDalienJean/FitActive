@@ -691,12 +691,12 @@ class WPForms_Process {
 			wp_send_json_error();
 		}
 
-		add_filter( 'wpforms_process_redirect_url', array( $this, 'ajax_process_redirect' ), 999, 2 );
+		add_filter( 'wp_redirect', array( $this, 'ajax_process_redirect' ), 999 );
 
 		do_action( 'wpforms_ajax_submit_before_processing', $form_id );
 
-		// If redirect happens in listen(), ajax_process_redirect() gets executed.
-		// The code below listen() runs only if no redirect happened.
+		// If redirect happens in listen(), ajax_process_redirect() gets executed because of the filter on `wp_redirect`.
+		// The code, that is below listen(), runs only if no redirect happened.
 		$this->listen();
 
 		$form_data = $this->form_data;
@@ -790,10 +790,15 @@ class WPForms_Process {
 	 *
 	 * @since 1.5.3
 	 *
-	 * @param string $url     Redirect URL.
-	 * @param int    $form_id Form ID.
+	 * @param string $url Redirect URL.
 	 */
-	public function ajax_process_redirect( $url, $form_id ) {
+	public function ajax_process_redirect( $url ) {
+
+		$form_id = isset( $_POST['wpforms']['id'] ) ? absint( $_POST['wpforms']['id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification
+
+		if ( empty( $form_id ) ) {
+			wp_send_json_error();
+		}
 
 		$response = array(
 			'form_id'      => $form_id,

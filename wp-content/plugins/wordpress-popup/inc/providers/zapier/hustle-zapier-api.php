@@ -12,6 +12,7 @@ class Hustle_Zapier_API {
 		) );
 		$response = wp_remote_post( $url, $request );
 
+		//logging data
 		$utils = Hustle_Provider_Utils::get_instance();
 		$utils->_last_url_request = $url;
 		$utils->_last_data_received = $response;

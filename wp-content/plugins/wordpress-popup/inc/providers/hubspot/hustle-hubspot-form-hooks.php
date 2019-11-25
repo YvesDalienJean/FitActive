@@ -22,11 +22,23 @@ class Hustle_HubSpot_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		$addon = $this->addon;
 		$module_id = $this->module_id;
 		$form_settings_instance = $this->form_settings_instance;
+		$res = array();
 
 		/**
+		 * Filter submitted form data to be processed
+		 *
 		 * @since 4.0
+		 *
+		 * @param array                                    $submitted_data
+		 * @param int                                      $module_id                current module_id
+		 * @param Hustle_Hubspot_Form_Settings 	   	   	   $form_settings_instance
 		 */
-		$submitted_data = apply_filters( 'hustle_provider_' . $addon->get_slug() . '_form_submitted_data', $submitted_data, $module_id, $form_settings_instance );
+		$submitted_data = apply_filters(
+			'hustle_provider_hubspot_form_submitted_data',
+			$submitted_data,
+			$module_id,
+			$form_settings_instance
+		);
 
 		$addon_setting_values = $form_settings_instance->get_form_settings_values();
 
@@ -67,7 +79,22 @@ class Hustle_HubSpot_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 				$addon->add_custom_fields( $custom_fields );
 			}
 
-			$email_exist = $api->email_exists( $submitted_data['email'] );
+			$email_exist = $this->get_subscriber( $api, $submitted_data['email'] );
+
+			/**
+			 * Fires before adding subscriber
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param int    $module_id
+			 * @param array  $submitted_data
+			 * @param object $form_settings_instance
+			 */
+			do_action( 'hustle_provider_hubspot_before_add_subscriber',
+				$module_id,
+				$submitted_data,
+				$form_settings_instance
+			);
 
 			if ( $email_exist && ! empty( $email_exist->vid ) ) {
 				//Add to list
@@ -117,7 +144,23 @@ class Hustle_HubSpot_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 				}
 			}
 
-			$utils = Hustle_Provider_Utils::get_instance();
+			/**
+			 * Fires after adding subscriber
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param int    $module_id
+			 * @param array  $submitted_data
+			 * @param mixed  $res
+			 * @param object $form_settings_instance
+			 */
+			do_action( 'hustle_provider_hubspot_after_add_subscriber',
+				$module_id,
+				$submitted_data,
+				$res,
+				$form_settings_instance
+			);
+
 			$entry_fields = array(
 				array(
 					'name'  => 'status',
@@ -125,9 +168,6 @@ class Hustle_HubSpot_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 						'is_sent'       => $is_sent,
 						'description'   => $details,
 						'member_status' => $member_status,
-						'data_sent'     => $utils->get_last_data_sent(),
-						'data_received' => $utils->get_last_data_received(),
-						'url_request'   => $utils->get_last_url_request(),
 					),
 				),
 			);
@@ -192,7 +232,14 @@ class Hustle_HubSpot_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			//triggers exception if not found.
 			$api 				= $addon->api();
 			$list_id 			= $addon_setting_values['list_id'];
-			$existing_member 	= $this->_email_exists( $api, $submitted_data['email'], $list_id );
+			$existing_member	= false;
+			$member 			= $this->get_subscriber( $api, $submitted_data['email'] );
+
+			if ( $member && ! empty( $member->vid ) && ! empty( $member->{'list-memberships'} ) ) {
+				$lists = wp_list_pluck( $member->{'list-memberships'}, 'static-list-id' );
+
+				$existing_member = in_array( absint( $list_id ), $lists, true);
+			}
 
 			if ( false !== $existing_member )
 				$is_success = self::ALREADY_SUBSCRIBED_ERROR;
@@ -206,7 +253,7 @@ class Hustle_HubSpot_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		 * @param bool                                     $is_success
 		 * @param int                                      $module_id                current module_id
 		 * @param array                                    $submitted_data
-		 * @param Hustle_HubSpot_Form_Settings $form_settings_instance
+		 * @param Hustle_Hubspot_Form_Settings 			   $form_settings_instance
 		 */
 		$is_success = apply_filters(
 			'hustle_provider_hubspot_form_submitted_data_after_validation',
@@ -229,27 +276,27 @@ class Hustle_HubSpot_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 	}
 
 	/**
-	 * Check if the email is present on the current list
+	 * Get subscriber for providers
 	 *
-	 * @since 4.0
+	 * This method is to be inherited
+	 * And extended by child classes.
 	 *
-	 * @param $api
-	 * @param $email
-	 * @param $list_id
+	 * Make use of the property `$_subscriber`
+	 * Method to omit double api calls
 	 *
-	 * @return bool
+	 * @since 4.0.2
+	 *
+	 * @param 	object 	$api
+	 * @param 	mixed  	$data
+	 * @return  mixed 	array/object API response on queried subscriber
 	 */
-	private function _email_exists( $api, $email, $list_id ){
+	protected function get_subscriber( $api, $data ){
 
-		$member = $api->email_exists( $email );
-
-		if ( $member && ! empty( $member->vid ) && ! empty( $member->{'list-memberships'} ) ) {
-			$lists = wp_list_pluck( $member->{'list-memberships'}, 'static-list-id' );
-
-			return in_array( absint( $list_id ), $lists, true);
+		if( empty ( $this->_subscriber ) && ! isset( $this->_subscriber[ md5( $data ) ] ) ){
+			$this->_subscriber[ md5( $data ) ] = $api->email_exists( $data );
 		}
 
-		return false;
+		return $this->_subscriber[ md5( $data ) ];
 	}
 
 }

@@ -54,26 +54,22 @@
 
 			</div>
 
-		<?php }
-
-		if ( $is_optin ) { ?>
-
-			<?php // SETTINGS: Visibility after opt-in ?>
-			<div class="sui-form-field">
-
-				<label class="sui-settings-label"><?php esc_html_e( 'Visibility after opt-in', 'wordpress-popup' ); ?></label>
-
-				<span class="sui-description" style="margin-bottom: 10px;"><?php printf( esc_html__( "Choose the %s visibility once a visitor has opted-in using Hustle's form.", 'wordpress-popup' ), esc_html( $smallcaps_singular ) ); ?></span>
-
-				<select data-attribute="hide_after_subscription">
-					<option value="keep_show" {{ _.selected( ( 'keep_show' === hide_after_subscription ), true) }}><?php esc_html_e( 'Keep showing this module', 'wordpress-popup' ); ?></option>
-					<option value="no_show_all" {{ _.selected( ( 'no_show_all' === hide_after_subscription ), true) }}><?php esc_html_e( 'No longer show this module across the site', 'wordpress-popup' ); ?></option>
-					<option value="no_show_on_post" {{ _.selected( ( 'no_show_on_post' === hide_after_subscription ), true) }}><?php esc_html_e( 'No longer show this module on this post/page', 'wordpress-popup' ); ?></option>
-				</select>
-
-			</div>
-
 		<?php } ?>
+
+		<?php // SETTINGS: Visibility after opt-in ?>
+		<div class="sui-form-field">
+
+			<label class="sui-settings-label"><?php esc_html_e( 'Visibility after submit', 'wordpress-popup' ); ?></label>
+
+			<span class="sui-description" style="margin-bottom: 10px;"><?php printf( esc_html__( "Choose the %s visibility once a visitor has submitted the form.", 'wordpress-popup' ), esc_html( $smallcaps_singular ) ); ?></span>
+
+			<select data-attribute="hide_after_subscription">
+				<option value="keep_show" {{ _.selected( ( 'keep_show' === hide_after_subscription ), true) }}><?php esc_html_e( 'Keep showing this module', 'wordpress-popup' ); ?></option>
+				<option value="no_show_all" {{ _.selected( ( 'no_show_all' === hide_after_subscription ), true) }}><?php esc_html_e( 'No longer show this module across the site', 'wordpress-popup' ); ?></option>
+				<option value="no_show_on_post" {{ _.selected( ( 'no_show_on_post' === hide_after_subscription ), true) }}><?php esc_html_e( 'No longer show this module on this post/page', 'wordpress-popup' ); ?></option>
+			</select>
+
+		</div>
 
 		<?php // SETTINGS: External form conversion behavior ?>
 

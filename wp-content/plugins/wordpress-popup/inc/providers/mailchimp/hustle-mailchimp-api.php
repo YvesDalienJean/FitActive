@@ -1,6 +1,6 @@
 <?php
 /**
- * MailChimp API
+ * Mailchimp API
  *
  * @class Hustle_Mailchimp_Api
  **/
@@ -11,7 +11,7 @@ class Hustle_Mailchimp_Api {
 	private $_user;
 
 	/*
-	The <dc> part of the URL corresponds to the data center for your account. For example, if the last part of your MailChimp API key is us6, all API endpoints for your account are available at https://us6.api.mailchimp.com/3.0/.
+	The <dc> part of the URL corresponds to the data center for your account. For example, if the last part of your Mailchimp API key is us6, all API endpoints for your account are available at https://us6.api.mailchimp.com/3.0/.
 	*/
 	private $_endpoint = 'https://<dc>.api.mailchimp.com/3.0/';
 
@@ -59,7 +59,7 @@ class Hustle_Mailchimp_Api {
 		$utils = Hustle_Provider_Utils::get_instance();
 		$utils->_last_url_request = $url;
 		$utils->_last_data_received = $res;
-		$utils->_last_data_sent = $args;
+		$utils->_last_data_sent = $_args;
 
 		if ( !is_wp_error( $res ) && is_array( $res ) ) {
 			if( $res['response']['code'] <= 204 )
@@ -189,6 +189,18 @@ class Hustle_Mailchimp_Api {
 	}
 
 	/**
+	 * Gets all the tags/static segments on a list
+	 * @param $list_id
+	 *
+	 * @return array|mixed|object|WP_Error
+	 */
+	public function get_tags( $list_id ) {
+		return $this->_get( 'lists/' . $list_id . '/segments', array(
+			'user' => $this->_user . ':' . $this->_api_key, 'type' => 'static'
+		) );
+	}
+
+	/**
 	 * Check member email address if already existing
 	 * @param $list_id
 	 * @param $email
@@ -263,7 +275,7 @@ class Hustle_Mailchimp_Api {
 			//return __("Successful subscription", 'wordpress-popup');
 		} else {
 			if ( strpos( $res->get_error_data(), '"Forgotten Email Not Subscribed"' ) ) {
-				$error = __("This contact was previously removed from this list via MailChimp dashboard. To rejoin, they'll need to sign up using a MailChimp native form.", 'wordpress-popup');
+				$error = __("This contact was previously removed from this list via Mailchimp dashboard. To rejoin, they'll need to sign up using a Mailchimp native form.", 'wordpress-popup');
 				$error .= ' ' . __( 'Subscriber email: ', 'wordpress-popup' ) . $data['email_address'];
 			} else {
 				$error = implode( ', ', $res->get_error_messages() );
@@ -294,8 +306,10 @@ class Hustle_Mailchimp_Api {
 		$error = __( "This email address has already subscribed", 'wordpress-popup' );
 
 		if ( !is_wp_error( $res ) ) {
+			//returns object on success @since 4.0.2 as we need it for GDPR
+			return $res;
+
 			return __( "You have been added to the new group", 'wordpress-popup' );
-		} else {
 			throw new Exception( $error );
 		}
 	}

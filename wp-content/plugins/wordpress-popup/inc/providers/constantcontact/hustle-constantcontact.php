@@ -53,12 +53,6 @@ if ( ! class_exists( 'Hustle_ConstantContact' ) ) :
 	protected $is_multi_on_global = false;
 
 		/**
-	 * @since 3.0.5
-	 * @var bool
-	 */
-		protected $_supports_fields 	   = true;
-
-		/**
 	 * Class name of form settings
 	 *
 	 * @var string
@@ -108,9 +102,8 @@ if ( ! class_exists( 'Hustle_ConstantContact' ) ) :
 	 */
 		protected function settings_are_completed( $multi_id = '' ) {
 			$api = $this->api();
-			$is_authorize = (bool) $api->get_token( 'access_token' );
 
-			return $is_authorize;
+			return (bool) $api->get_token( 'access_token' );
 		}
 
 		/**
@@ -158,122 +151,106 @@ if ( ! class_exists( 'Hustle_ConstantContact' ) ) :
 	 *
 	 * @return array
 	 */
-		public function configure_api_key( $submitted_data, $module_id ) {
-			$has_errors = false;
+		public function configure_api_key( $submitted_data, $is_submit, $module_id ) {
 
 			$api = $this->api();
-			$is_authorize = (bool) $api->get_token( 'access_token' );
 
-			$is_submit = ! empty( $submitted_data['is_submit'] );
+			if ( ! $module_id ) {
+				$auth_url = $api->get_authorization_uri( 0, true, Hustle_Module_Admin::INTEGRATIONS_PAGE );
 
-			if ( $is_submit ) {
+			} else {
 
-				if ( $is_authorize && ! Hustle_Provider_Utils::is_provider_active( $this->_slug ) ) {
-					// TODO: Wrap this in a friendlier method
-					$activated = Hustle_Providers::get_instance()->activate_addon( $this->_slug );
-					if ( ! $activated ) {
-						$error_message = $this->provider_connection_falied();
-						$has_errors = true;
-					}
-				}
-
-				if ( ! $has_errors ) {
-					return array(
-						'html'         => Hustle_Api_Utils::get_modal_title_markup( __( 'Constant Contact Added', 'wordpress-popup' ), __( 'You can now go to your forms and assign them to this integration', 'wordpress-popup' ) ),
-						'buttons'      => array(
-							'close' => array(
-								'markup' => Hustle_Api_Utils::get_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
-							),
-						),
-						'redirect'     => false,
-						'has_errors'   => false,
-						'notification' => array(
-							'type' => 'success',
-							'text' => '<strong>' . $this->get_title() . '</strong> ' . __( 'Successfully connected', 'wordpress-popup' ),
-						),
-					);
-				}
-			}
-
-			if ( ! is_ssl() ) {
-				$error_message = __( 'Constant Contact requires your site to have SSL certificate.', 'wordpress-popup' );
-				$has_errors = true;
-			}
-
-			$url = $api->get_authorization_uri( $module_id, true, Hustle_Module_Admin::INTEGRATIONS_PAGE );
-			if ( $module_id ) {
 				$module = Hustle_Module_Model::instance()->get( $module_id );
 				if ( ! is_wp_error( $module ) ) {
-					$url = $api->get_authorization_uri( $module_id, true, $module->get_wizard_page() );
+					$auth_url = $api->get_authorization_uri( $module_id, true, $module->get_wizard_page() );
 				}
 			}
-			$link = '<a href="' . esc_url( $url ) . '">';
 
-			if ( $is_authorize ) {
-				$info = sprintf( __( 'You\'re successfully connected your Constant Contact account. Please, save this configuration or %1$sclick here%2$s to reconnect another Constant Contact account.', 'wordpress-popup' ), $link, '</a>' );
-			} else {
-				$info = sprintf( __( 'Please %1$sclick here%2$s to connect your Constant Contact account.', 'wordpress-popup' ), $link, '</a>' );
-			}
+			$is_connected = $this->is_connected();
 
-			$info .= ' ' . __( 'You will be asked to give us access to your selected account and will be redirected back to this page.', 'wordpress-popup' );
+			if ( $is_connected ) {
 
-			$options = array(
-			'wrapper' => array(
-				'id'    => '',
-				'class' => 'sui-form-field',
-				'type'  => 'wrapper',
-				'elements' => array(
-					'api_key' => array(
-						'name'          => 'is_submit',
-						'type'          => 'hidden',
-						'value'         => '1',
+				$description = __( 'You are already connected to Constant Contact. You can disconnect your Constant Contact Integration (if you need to) using the button below.', 'wordpress-popup' );
+
+				$buttons = array(
+					'disconnect' => array(
+						'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+							__( 'Disconnect', 'wordpress-popup' ),
+							'sui-button-ghost sui-button-center',
+							'disconnect',
+							true
+						),
 					),
-				),
-			),
-			);
+				);
 
-			$step_html = Hustle_Api_Utils::get_modal_title_markup( __( 'Configure Constant Contact', 'wordpress-popup' ), $info );
-			$step_html .= Hustle_Api_Utils::get_html_for_options( $options );
+			} else {
 
-			if ( $has_errors ) {
-				$step_html .= '<span class="sui-error-message">' . esc_html( $error_message ) . '</span>';
+				$description = __( 'Connect the Constant Contact integration by authenticating it using the button below. Note that you’ll be taken to the Constant Contact website to grant access to Hustle and then redirected back.', 'wordpress-popup' );
+
+				$buttons = array(
+					'auth' => array(
+						'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+							__( 'Authenticate', 'wordpress-popup' ),
+							'sui-button-center',
+							'',
+							true,
+							false,
+							$auth_url
+						),
+					),
+				);
 			}
 
-			$is_edit = $this->is_connected() ? true : false;
-			if ( $is_edit ) {
-				$buttons = array(
-				'disconnect' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Disconnect', 'wordpress-popup' ), 'sui-button-ghost', 'disconnect', true ),
-				),
-				'save' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Save', 'wordpress-popup' ), '', 'connect', true ),
-				),
-				);
-			} else if ( $is_authorize ) {
-				$buttons = array(
-				'close' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
-				),
-				'save' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Save', 'wordpress-popup' ), '', 'connect', true ),
-				),
-				);
-			} else {
-				$buttons = array(
-				'close' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
-				),
-				);
+			$step_html = Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'Connect Constant Contact', 'wordpress-popup' ), $description );
+
+			if ( $is_connected ) {
+
+				$account_details = $this->get_settings_values();
+
+				$account_email = isset( $account_details['email'] ) ? $account_details['email'] : $this->save_account_email();
+
+				$step_html .= Hustle_Provider_Utils::get_html_for_options( array(
+					array(
+						'type'	=> 'notice',
+						'value' => sprintf( __( 'You are connected to %s', 'wordpress-popup' ), '<strong>' . $account_email . '</strong>' ),
+						'class'	=> 'sui-notice-success',
+					)
+				));
 
 			}
 
 			$response = array(
-			'html'       => $step_html,
-			'buttons'    => $buttons,
-			'has_errors' => $has_errors,
+				'html'       => $step_html,
+				'buttons'    => $buttons,
 			);
 
 			return $response;
+		}
+
+		/**
+		 * Get the current account's email.
+		 * If not stored already, store it.
+		 *
+		 * @since 4.0.2
+		 *
+		 * @return string
+		 */
+		private function save_account_email() {
+
+			try	{
+				$account_details = $this->get_settings_values();
+				$account_info = $this->api()->get_account_info();
+				$account_email = $account_info->email;
+
+				$account_details['email'] = $account_email;
+
+				$this->save_settings_values( $account_details );
+
+			} catch( Exception $e ) {
+				$account_email = '';
+			}
+
+			return $account_email;
 		}
 
 		public function migrate_30( $module, $old_module ) {
@@ -298,6 +275,63 @@ if ( ! class_exists( 'Hustle_ConstantContact' ) ) :
 			}
 
 			return $migrated;
+		}
+
+		/**
+		 * Process the request after coming from authentication.
+		 *
+		 * @since 4.0.2
+		 * @return array
+		 */
+		public function process_external_redirect() {
+
+			$response = array();
+
+			$status = filter_input( INPUT_GET, 'status', FILTER_SANITIZE_STRING );
+
+			$api = $this->api();
+			$is_authorized = (bool) $api->get_token( 'access_token' );
+
+			// API Auth was successful.
+			if ( 'success' === $status && $is_authorized ) {
+
+				if ( ! $this->is_active() ) {
+
+					$providers_instance = Hustle_Providers::get_instance();
+					$activated = $providers_instance->activate_addon( $this->_slug );
+
+					// Provider successfully activated.
+					if ( $activated ) {
+
+						$response = array(
+							'action'	=> 'notification',
+							'status'	=> 'success',
+							'message'	=> sprintf( esc_html__( "%s successfully connected.", 'wordpress-popup' ), '<strong>' . $this->_title . '</strong>' ),
+						);
+
+						$this->save_account_email();
+
+					} else { // Provider couldn't be activated.
+
+						$response = array(
+							'action'	=> 'notification',
+							'status'	=> 'error',
+							'message'	=> $providers_instance->get_last_error_message(),
+						);
+					}
+				}
+
+			} else { // API Auth failed.
+
+				$response = array(
+					'action'	=> 'notification',
+					'status'	=> 'error',
+					'message'	=> sprintf( esc_html__( 'Authentication failed! Please check your %s credentials and try again.', 'wordpress-popup' ), $this->_title ),
+				);
+
+			}
+
+			return $response;
 		}
 
 		public function get_30_provider_mappings() {

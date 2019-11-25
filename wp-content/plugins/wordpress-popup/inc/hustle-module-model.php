@@ -392,21 +392,28 @@ class Hustle_Module_Model extends Hustle_Model {
 			$any_false = false;
 			// $display is TRUE if all conditions were met
 			foreach ( $conditions as $condition_key => $args ) {
+
 				// only cpt have 'post_type' and 'post_type_label' properties
-				if ( is_array( $args ) && isset( $args['post_type'] ) && isset( $args['post_type_label'] ) ) {
+				if (
+					is_array( $args ) &&
+					( isset( $args['post_type'] ) && isset( $args['post_type_label'] ) ) ||
+					( isset( $args['postType'] ) && isset( $args['postTypeLabel'] ) )
+				) {
+					$post_type = isset( $args['postType'] ) ? $args['postType'] : $args['post_type'];
 					// skip ms_invoice
-					if ( 'ms_invoice' === $args['post_type'] ) {
+					if ( 'ms_invoice' === $post_type ) {
 						continue;
 					}
 					// handle ms_membership
-					if ( ! in_array( $args['post_type'], array( 'ms_membership', 'ms_membership-n' ), true )
-						&& ( $skip_all_cpt || (isset( $post->post_type ) && $post->post_type !== $args['post_type'] )) ) {
+					if ( ! in_array( $post_type, array( 'ms_membership', 'ms_membership-n' ), true )
+						&& ( $skip_all_cpt || (isset( $post->post_type ) && $post->post_type !== $post_type )) ) {
 						continue;
 					}
 					$condition = Hustle_Condition_Factory::build( 'cpt', $args );
 				} else {
 					$condition = Hustle_Condition_Factory::build( $condition_key, $args );
 				}
+
 				if ( $condition ) {
 					$condition->set_type( $type );
 					$current = $condition->is_allowed( $this );

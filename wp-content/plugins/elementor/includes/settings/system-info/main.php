@@ -144,7 +144,7 @@ class Main {
 	public function display_page() {
 		$reports_info = self::get_allowed_reports();
 
-		$reports = $this->load_reports( $reports_info );
+		$reports = $this->load_reports( $reports_info, 'html' );
 
 		$raw_reports = $this->load_reports( $reports_info, 'raw' );
 
@@ -254,6 +254,7 @@ class Main {
 
 			$reporter_params = [
 				'name' => $report_name,
+				'format' => $format,
 			];
 
 			$reporter_params = array_merge( $reporter_params, $report_info );

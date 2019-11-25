@@ -1,4 +1,4 @@
-/*! elementor - v2.6.8 - 07-08-2019 */
+/*! elementor - v2.7.5 - 28-10-2019 */
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -82,18 +82,18 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 452);
+/******/ 	return __webpack_require__(__webpack_require__.s = 473);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 452:
+/***/ 473:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var NewTemplateLayout = __webpack_require__(453);
+var NewTemplateLayout = __webpack_require__(474);
 
 var NewTemplateModule = elementorModules.ViewModule.extend({
   getDefaultSettings: function getDefaultSettings() {
@@ -135,13 +135,13 @@ jQuery(function () {
 
 /***/ }),
 
-/***/ 453:
+/***/ 474:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var NewTemplateView = __webpack_require__(454);
+var NewTemplateView = __webpack_require__(475);
 
 module.exports = elementorModules.common.views.modal.Layout.extend({
   getModalOptions: function getModalOptions() {
@@ -166,7 +166,7 @@ module.exports = elementorModules.common.views.modal.Layout.extend({
 
 /***/ }),
 
-/***/ 454:
+/***/ 475:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

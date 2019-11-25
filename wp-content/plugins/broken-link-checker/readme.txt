@@ -1,10 +1,10 @@
 === Broken Link Checker ===
-Contributors: managewp
+Contributors: managewp, wpmudev
 Donate link:
 Tags: links, broken, maintenance, blogroll, custom fields, admin, comments, posts
 Requires at least: 3.2
-Tested up to: 5.1
-Stable tag: 1.11.8
+Tested up to: 5.2.4
+Stable tag: 1.11.9
 
 This plugin will check your posts, comments and other content for broken links and missing images, and notify you if any are found.
 
@@ -65,6 +65,10 @@ To upgrade your installation
 1. Reactivate the plugin. Your settings will be retained from the previous version.
 
 == Changelog ==
+
+= 1.11.9 =
+* Fixed Reflected XSS ( props to Tobias Fink for the report, ref: https://github.com/sbaresearch/advisories/tree/public/2019/SBA-ADV-20190913-02_WordPress_Plugin_Broken_Link_Checker )
+* Fixed param escaping to avoid possible XSS attack.
 
 = 1.11.7 =
 * Fixed a PHP 7.2 compatibility issue

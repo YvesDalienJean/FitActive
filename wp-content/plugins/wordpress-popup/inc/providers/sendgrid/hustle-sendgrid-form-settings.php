@@ -64,15 +64,15 @@ class Hustle_SendGrid_Form_Settings extends Hustle_Provider_Form_Settings_Abstra
 		);
 		$current_data = $this->get_current_data( $current_data, $submitted_data );
 
-		$is_submit = ! empty( $submitted_data['is_submit'] );
+		$is_submit = ! empty( $submitted_data['hustle_is_submit'] );
 		if ( $is_submit && empty( $submitted_data['list_id'] ) ) {
 			$error_message = __( 'The email list is required.', 'wordpress-popup' );
 		}
 
 		$options = $this->get_first_step_options( $current_data );
 
-		$step_html = Hustle_Api_Utils::get_modal_title_markup( __( 'Choose your list', 'wordpress-popup' ), __( 'Choose the list you want to send form data to.', 'wordpress-popup' ) );
-		$step_html .= Hustle_Api_Utils::get_html_for_options( $options );
+		$step_html = Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'Choose your list', 'wordpress-popup' ), __( 'Choose the list you want to send form data to.', 'wordpress-popup' ) );
+		$step_html .= Hustle_Provider_Utils::get_html_for_options( $options );
 
 		if( ! isset( $error_message ) ) {
 			$has_errors = false;
@@ -84,10 +84,20 @@ class Hustle_SendGrid_Form_Settings extends Hustle_Provider_Form_Settings_Abstra
 
 		$buttons = array(
 			'disconnect' => array(
-				'markup' => Hustle_Api_Utils::get_button_markup( __( 'Disconnect', 'wordpress-popup' ), 'sui-button-ghost', 'disconnect_form', true ),
+				'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+					__( 'Disconnect', 'wordpress-popup' ),
+					'sui-button-ghost',
+					'disconnect_form',
+					true
+				),
 			),
 			'save' => array(
-				'markup' => Hustle_Api_Utils::get_button_markup( __( 'Save', 'wordpress-popup' ), '', 'next', true ),
+				'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+					__( 'Save', 'wordpress-popup' ),
+					'',
+					'next',
+					true
+				),
 			),
 		);
 
@@ -101,13 +111,34 @@ class Hustle_SendGrid_Form_Settings extends Hustle_Provider_Form_Settings_Abstra
 		if( $is_submit && ! $has_errors ){
 			// Save additional data for submission's entry
 			if ( !empty( $current_data['list_id'] ) ) {
-				$current_data['list_name'] = !empty( $this->lists[ $current_data['list_id'] ]['label'] )
-						? $this->lists[ $current_data['list_id'] ]['label'] . ' (' . $current_data['list_id'] . ')' : $current_data['list_id'];
+				$current_data['list_name'] = !empty( $this->lists[ $current_data['list_id'] ] )
+						? $this->lists[ $current_data['list_id'] ] . ' (' . $current_data['list_id'] . ')' : $current_data['list_id'];
 			}
 			$this->save_form_settings_values( $current_data );
 		}
 
 		return $response;
+	}
+
+	/**
+	 * Refresh list array via API
+	 *
+	 * @param object $provider
+	 * @param string $global_multi_id
+	 * @return array
+	 */
+	public function refresh_global_multi_lists( $provider, $global_multi_id ) {
+		$api_key = $provider->get_setting( 'api_key', '', $global_multi_id );
+		$api = $provider::api( $api_key );
+
+		$lists = array();
+		$_lists = $api->get_all_lists();
+
+		if( is_array( $_lists ) ) {
+			$lists += wp_list_pluck( $_lists, 'name', 'id' );
+		}
+
+		return $lists;
 	}
 
 	/**
@@ -119,45 +150,9 @@ class Hustle_SendGrid_Form_Settings extends Hustle_Provider_Form_Settings_Abstra
 	 * @return array
 	 */
 	private function get_first_step_options( $submitted_data ) {
-		$provider = $this->provider;
-		$settings = $this->get_form_settings_values( false );
-
-		$global_multi_id = $settings['selected_global_multi_id'];
-		$api_key = $provider->get_setting( 'api_key', '', $global_multi_id );
-		$lists = array();
-
-		try {
-			$api = $provider::api( $api_key );
-
-			if ( $api ) {
-				$_lists =  $api->get_all_lists();
-			}
-
-			if( is_array( $_lists ) ) {
-				foreach( $_lists as $list ) {
-					$list = (array) $list;
-					$lists[ $list['id'] ]['value'] = $list['id'];
-					$lists[ $list['id'] ]['label'] = $list['name'];
-				}
-			}
-		} catch ( Exception $e ) {
-			// TODO: handle this properly
-			return array();
-		}
-
+		$lists = $this->get_global_multi_lists();
 		$this->lists = $lists;
-		$total_lists = count( $lists );
-
-		$first = $total_lists > 0 ? reset( $lists ) : "";
-
-		if ( !empty( $first ) )
-			$first = $first['value'];
-
-		if( ! isset( $submitted_data['list_id'] ) ) {
-			$selected_list = $first;
-		} else {
-			$selected_list = array_key_exists( $submitted_data['list_id'], $lists ) ? $submitted_data['list_id'] : $first;
-		}
+		$selected_list = $this->get_selected_list( $submitted_data );
 
 		$options =  array(
 			array(
@@ -169,20 +164,27 @@ class Hustle_SendGrid_Form_Settings extends Hustle_Provider_Form_Settings_Abstra
 						'for'   => 'list_id',
 						'value' => __( 'Email List', 'wordpress-popup' ),
 					),
-					array(
-						'type'     => 'select',
-						'name'     => 'list_id',
-						'value'    => $selected_list,
-						'id'       => 'list_id',
-						'options'  => $lists,
-						'selected' => $selected_list,
+					'wrapper' => array(
+						'type'     => 'wrapper',
+						'class'    => 'hui-select-refresh',
+						'is_not_field_wrapper' => true,
+						'elements' => array(
+							'lists' => array(
+								'type'     => 'select',
+								'id'       => 'list_id',
+								'name'     => 'list_id',
+								'class'    => 'sui-select',
+								'value'    => $selected_list,
+								'selected' => $selected_list,
+								'options'  => $lists,
+							),
+							'refresh' => array(
+								'type' => 'raw',
+								'value' => Hustle_Provider_Utils::get_provider_button_markup( __( 'Refresh', 'wordpress-popup' ), '', 'refresh_list', true ),
+							),
+						),
 					),
 				),
-			),
-			array(
-				'type'  => 'hidden',
-				'name'  => 'is_submit',
-				'value' => 1,
 			),
 		);
 

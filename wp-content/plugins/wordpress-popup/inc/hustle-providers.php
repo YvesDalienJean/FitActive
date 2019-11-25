@@ -179,7 +179,7 @@ class Hustle_Providers {
 
 			return true;
 		} catch ( Exception $e ) {
-			Hustle_Api_Utils::maybe_log( __METHOD__, $class_name, $e->getMessage() );
+			Opt_In_Utils::maybe_log( __METHOD__, $class_name, $e->getMessage() );
 			return false;
 		}
 

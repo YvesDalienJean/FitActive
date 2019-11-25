@@ -575,15 +575,14 @@ class WPForms_Frontend {
 		}
 
 		// This filter is for backwards compatibility purposes.
-		$types = array( 'text', 'textarea', 'number', 'email', 'hidden', 'url', 'html', 'divider', 'password', 'phone', 'address', 'checkbox', 'radio' );
+		$types = array( 'text', 'textarea', 'name', 'number', 'email', 'hidden', 'url', 'html', 'divider', 'password', 'phone', 'address', 'select', 'checkbox', 'radio' );
 		if ( in_array( $field['type'], $types, true ) ) {
 			$field = apply_filters( "wpforms_{$field['type']}_field_display", $field, $attributes, $form_data );
 		} elseif ( 'credit-card' === $field['type'] ) {
 			$field = apply_filters( 'wpforms_creditcard_field_display', $field, $attributes, $form_data );
-		} elseif ( 'payment-multiple' === $field['type'] ) {
-			$field = apply_filters( 'wpforms_payment_multiple_field_display', $field, $attributes, $form_data );
-		} elseif ( 'payment-checkbox' === $field['type'] ) {
-			$field = apply_filters( 'wpforms_payment_checkbox_field_display', $field, $attributes, $form_data );
+		} elseif ( in_array( $field['type'], array( 'payment-multiple', 'payment-single', 'payment-checkbox' ), true ) ) {
+			$filter_field_type = str_replace( '-', '_', $field['type'] );
+			$field             = apply_filters( 'wpforms_' . $filter_field_type . '_field_display', $field, $attributes, $form_data );
 		}
 
 		$form_id  = absint( $form_data['id'] );
@@ -1296,7 +1295,7 @@ class WPForms_Frontend {
 			'val_number'                 => wpforms_setting( 'validation-number', esc_html__( 'Please enter a valid number.', 'wpforms-lite' ) ),
 			'val_confirm'                => wpforms_setting( 'validation-confirm', esc_html__( 'Field values do not match.', 'wpforms-lite' ) ),
 			'val_fileextension'          => wpforms_setting( 'validation-fileextension', esc_html__( 'File type is not allowed.', 'wpforms-lite' ) ),
-			'val_filesize'               => wpforms_setting( 'validation-filesize', esc_html__( 'File exceeds max size allowed.', 'wpforms-lite' ) ),
+			'val_filesize'               => wpforms_setting( 'validation-filesize', esc_html__( 'File exceeds max size allowed. File was not uploaded.', 'wpforms-lite' ) ),
 			'val_time12h'                => wpforms_setting( 'validation-time12h', esc_html__( 'Please enter time in 12-hour AM/PM format (eg 8:45 AM).', 'wpforms-lite' ) ),
 			'val_time24h'                => wpforms_setting( 'validation-time24h', esc_html__( 'Please enter time in 24-hour format (eg 22:45).', 'wpforms-lite' ) ),
 			'val_requiredpayment'        => wpforms_setting( 'validation-requiredpayment', esc_html__( 'Payment is required.', 'wpforms-lite' ) ),
@@ -1304,6 +1303,8 @@ class WPForms_Frontend {
 			'val_smart_phone'            => wpforms_setting( 'validation-smart-phone', esc_html__( 'Please enter a valid phone number.', 'wpforms-lite' ) ),
 			'val_post_max_size'          => wpforms_setting( 'validation-post_max_size', esc_html__( 'The total size of the selected files {totalSize} Mb exceeds the allowed limit {maxSize} Mb.', 'wpforms-lite' ) ),
 			'val_checklimit'             => wpforms_setting( 'validation-check-limit', esc_html__( 'You have exceeded the number of allowed selections: {#}.', 'wpforms-lite' ) ),
+			'val_limit_characters'       => esc_html__( '{count} of {limit} max characters.', 'wpforms-lite' ),
+			'val_limit_words'            => esc_html__( '{count} of {limit} max words.', 'wpforms-lite' ),
 			'post_max_size'              => wpforms_size_to_bytes( ini_get( 'post_max_size' ) ),
 			'uuid_cookie'                => false,
 			'locale'                     => wpforms_get_language_code(),
@@ -1312,7 +1313,7 @@ class WPForms_Frontend {
 			'ajaxurl'                    => admin_url( 'admin-ajax.php' ),
 			'mailcheck_enabled'          => (bool) apply_filters( 'wpforms_mailcheck_enabled', true ),
 			'mailcheck_domains'          => array_map( 'sanitize_text_field', (array) apply_filters( 'wpforms_mailcheck_domains', array() ) ),
-			'mailcheck_toplevel_domains' => array_map( 'sanitize_text_field', (array) apply_filters( 'wpforms_mailcheck_toplevel_domains', array() ) ),
+			'mailcheck_toplevel_domains' => array_map( 'sanitize_text_field', (array) apply_filters( 'wpforms_mailcheck_toplevel_domains', array( 'dev' ) ) ),
 		);
 		// Include payment related strings if needed.
 		if ( function_exists( 'wpforms_get_currencies' ) ) {

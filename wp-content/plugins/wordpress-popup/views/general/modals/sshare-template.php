@@ -12,7 +12,7 @@
 				( 'flat' === $icon_style && $counter_enabled ) ? 'has-counter' : '',
 				( $counter_enabled && '1' === $inline_count ) ? 'hustle-social-inline' : ''
 			);?>
-
+			
 			<a 
 				data-social="<?php echo esc_attr( $name ); ?>"
 				data-service-type="<?php echo $counter_enabled ? esc_attr( $data['type'] ) : 'custom'; ?>"

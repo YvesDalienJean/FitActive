@@ -3,6 +3,17 @@ class Hustle_Popup_Design extends Hustle_Meta {
 
 	public function get_defaults() {
 
+		$fields_style         = 'flat';
+		$fields_border_width  = 2;
+		$fields_border_style  = 'solid';
+		$fields_border_radius = 5;
+
+		$input_border_static  = '#B0BEC6';
+		$input_border_hover   = '#4F5F6B';
+
+		$button_border_static = '#2CAE9F';
+		$button_border_hover  = '#39CDBD';
+
 		return array(
 
 			// ========================================|
@@ -40,50 +51,32 @@ class Hustle_Popup_Design extends Hustle_Meta {
 			// 3. FORM DESIGN                          |
 			// ========================================|
 
-			// Form fields style
-			'form_fields_style'                  => 'flat',
-
-			// Form fields style » Radius
-			'form_fields_border_radius'          => 5,
-
-			// Form fields style » Weight
-			'form_fields_border_weight'          => 3,
-
-			// Form fields style » Border type
-			'form_fields_border_type'            => 'solid',
-
-			// Form field icon
-			'form_fields_icon'                   => 'static',
-
-			// Form fields proximity
-			'form_fields_proximity'              => 'joined',
-
-			// Button style
-			'button_style'                       => 'flat',
-
-			// Button style » Radius
-			'button_border_radius'               => 5,
-
-			// Button style » Weight
-			'button_border_weight'               => 3,
-
-			// Button style » Border type
-			'button_border_type'                 => 'solid',
-
-			// GDPR checkbox style
-			'gdpr_checkbox_style'                => 'flat',
-
-			// GDPR checkbox style » Radius
-			'gdpr_border_radius'                 => 5,
-
-			// GDPR checkbox style » Weight
-			'gdpr_border_weight'                 => 3,
-
-			// GDPR checkbox style » Border type
-			'gdpr_border_type'                   => 'solid',
+			'form_fields_style'                  => $fields_style, // Form fields style
+			'form_fields_border_radius'          => $fields_border_radius, // Form fields style » Radius
+			'form_fields_border_weight'          => $fields_border_width, // Form fields style » Weight
+			'form_fields_border_type'            => $fields_border_style, // Form fields style » Border type
+			'form_fields_icon'                   => 'static', // Form field icon
+			'form_fields_proximity'              => 'joined', // Form fields proximity
+			'button_style'                       => $fields_style, // Button style
+			'button_border_radius'               => $fields_border_radius, // Button style » Radius
+			'button_border_weight'               => $fields_border_width, // Button style » Weight
+			'button_border_type'                 => $fields_border_style, // Button style » Border type
+			'gdpr_checkbox_style'                => $fields_style, // GDPR checkbox style
+			'gdpr_border_radius'                 => $fields_border_radius, // GDPR checkbox style » Radius
+			'gdpr_border_weight'                 => $fields_border_width, // GDPR checkbox style » Weight
+			'gdpr_border_type'                   => $fields_border_style, // GDPR checkbox style » Border type
 
 			// ========================================|
-			// 4. COLORS PALETTE                       |
+			// 4. CTA DESIGN                          |
+			// ========================================|
+
+			'cta_style'							 => 'flat', // CTA style
+			'cta_border_radius'					 => $fields_border_radius, // CTA style » Radius
+			'cta_border_weight'					 => $fields_border_width, // CTA style » Weight
+			'cta_border_type'					 => $fields_border_style, // CTA style » Border type
+
+			// ========================================|
+			// 5. COLORS PALETTE                       |
 			// ========================================|
 
 			// Colors palette.
@@ -130,17 +123,26 @@ class Hustle_Popup_Design extends Hustle_Meta {
 			// Colors table » Content » Active » Link color
 			'link_active_color'                  => '#49E2D1',
 
+			// Colors table » Call To Action » Default » Border color
+			'cta_button_static_bo'               => $button_border_static,
+
 			// Colors table » Call To Action » Default » Background color
 			'cta_button_static_bg'               => '#38C5B5',
 
 			// Colors table » Call To Action » Default » Label color
 			'cta_button_static_color'            => '#FFFFFF',
 
+			// Colors table » Call To Action » Hover » Border color
+			'cta_button_hover_bo'                => $button_border_hover,
+
 			// Colors table » Call To Action » Hover » Background color
 			'cta_button_hover_bg'                => '#49E2D1',
 
 			// Colors table » Call To Action » Hover » Label color
 			'cta_button_hover_color'             => '#FFFFFF',
+
+			// Colors table » Call To Action » Active » Border color
+			'cta_button_active_bo'               => $button_border_hover,
 
 			// Colors table » Call To Action » Active » Background color
 			'cta_button_active_bg'               => '#49E2D1',
@@ -152,7 +154,7 @@ class Hustle_Popup_Design extends Hustle_Meta {
 			'optin_input_icon'                   => '#AAAAAA',
 
 			// Colors table » Inputs » Default » Border color
-			'optin_input_static_bo'              => '#FFFFFF',
+			'optin_input_static_bo'              => $input_border_static,
 
 			// Colors table » Inputs » Default » Background color
 			'optin_input_static_bg'              => '#FFFFFF',
@@ -167,7 +169,7 @@ class Hustle_Popup_Design extends Hustle_Meta {
 			'optin_input_icon_hover'             => '#5D7380',
 
 			// Colors table » Inputs » Hover » Border color
-			'optin_input_hover_bo'               => '#FFFFFF',
+			'optin_input_hover_bo'               => $input_border_hover,
 
 			// Colors table » Inputs » Hover » Background color
 			'optin_input_hover_bg'               => '#FFFFFF',
@@ -176,7 +178,7 @@ class Hustle_Popup_Design extends Hustle_Meta {
 			'optin_input_icon_focus'             => '#5D7380',
 
 			// Colors table » Inputs » Focus » Border color
-			'optin_input_active_bo'              => '#FFFFFF',
+			'optin_input_active_bo'              => $input_border_hover,
 
 			// Colors table » Inputs » Focus » Background color
 			'optin_input_active_bg'              => '#FFFFFF',
@@ -191,7 +193,7 @@ class Hustle_Popup_Design extends Hustle_Meta {
 			'optin_input_error_background'       => '#FFFFFF',
 
 			// Colors table » Radio and Checkbox » Default » Border color
-			'optin_check_radio_bo'               => '#FFFFFF',
+			'optin_check_radio_bo'               => $input_border_static,
 
 			// Colors table » Radio and Checkbox » Default » Background color
 			'optin_check_radio_bg'               => '#FFFFFF',
@@ -200,7 +202,7 @@ class Hustle_Popup_Design extends Hustle_Meta {
 			'optin_mailchimp_labels_color'       => '#FFFFFF',
 
 			// Colors table » Radio and Checkbox » Checked » Border color
-			'optin_check_radio_bo_checked'       => '#FFFFFF',
+			'optin_check_radio_bo_checked'       => $input_border_hover,
 
 			// Colors table » Radio and Checkbox » Checked » Background color
 			'optin_check_radio_bg_checked'       => '#FFFFFF',
@@ -209,7 +211,7 @@ class Hustle_Popup_Design extends Hustle_Meta {
 			'optin_check_radio_tick_color'       => '#38C5B5',
 
 			// Colors table » GDPR Checkbox » Default » Border color
-			'gdpr_chechbox_border_static'        => '#FFFFFF',
+			'gdpr_chechbox_border_static'        => $input_border_static,
 
 			// Colors table » GDPR Checkbox » Default » Background color
 			'gdpr_chechbox_background_static'    => '#FFFFFF',
@@ -221,7 +223,7 @@ class Hustle_Popup_Design extends Hustle_Meta {
 			'gdpr_content_link'                  => '#FFFFFF',
 
 			// Colors table » GDPR Checkbox » Checked » Border color
-			'gdpr_chechbox_border_active'        => '#FFFFFF',
+			'gdpr_chechbox_border_active'        => $input_border_hover,
 
 			// Colors table » GDPR Checkbox » Checked » Background color
 			'gdpr_checkbox_background_active'    => '#FFFFFF',
@@ -236,7 +238,7 @@ class Hustle_Popup_Design extends Hustle_Meta {
 			'gdpr_checkbox_background_error'     => '#FFFFFF',
 
 			// Colors table » Select » Default » Border color
-			'optin_select_border'                => '#FFFFFF',
+			'optin_select_border'                => $input_border_static,
 
 			// Colors table » Select » Default » Background color
 			'optin_select_background'            => '#FFFFFF',
@@ -251,7 +253,7 @@ class Hustle_Popup_Design extends Hustle_Meta {
 			'optin_select_placeholder'           => '#AAAAAA',
 
 			// Colors table » Select » Hover » Border color
-			'optin_select_border_hover'      => '#FFFFFF',
+			'optin_select_border_hover'          => $input_border_hover,
 
 			// Colors table » Select » Hover » Background color
 			'optin_select_background_hover'      => '#FFFFFF',
@@ -260,7 +262,7 @@ class Hustle_Popup_Design extends Hustle_Meta {
 			'optin_select_icon_hover'            => '#49E2D1',
 
 			// Colors table » Select » Open » Border color
-			'optin_select_border_open'           => '#FFFFFF',
+			'optin_select_border_open'           => $input_border_hover,
 
 			// Colors table » Select » Open » Background color
 			'optin_select_background_open'       => '#FFFFFF',
@@ -332,7 +334,7 @@ class Hustle_Popup_Design extends Hustle_Meta {
 			'optin_calendar_cell_color_active'   => '#FFFFFF',
 
 			// Colors table » Submit Button » Default » Border color
-			'optin_submit_button_static_bo'      => '#38C5B5',
+			'optin_submit_button_static_bo'      => $button_border_static,
 
 			// Colors table » Submit Button » Default » Background color
 			'optin_submit_button_static_bg'      => '#38C5B5',
@@ -341,7 +343,7 @@ class Hustle_Popup_Design extends Hustle_Meta {
 			'optin_submit_button_static_color'   => '#FFFFFF',
 
 			// Colors table » Submit Button » Hover » Border color
-			'optin_submit_button_hover_bo'       => '#49E2D1',
+			'optin_submit_button_hover_bo'       => $button_border_hover,
 
 			// Colors table » Submit Button » Hover » Background color
 			'optin_submit_button_hover_bg'       => '#49E2D1',
@@ -350,7 +352,7 @@ class Hustle_Popup_Design extends Hustle_Meta {
 			'optin_submit_button_hover_color'    => '#FFFFFF',
 
 			// Colors table » Submit Button » Active » Border color
-			'optin_submit_button_active_bo'      => '#49E2D1',
+			'optin_submit_button_active_bo'      => $button_border_hover,
 
 			// Colors table » Submit Button » Active » Background color
 			'optin_submit_button_active_bg'      => '#49E2D1',
@@ -372,6 +374,9 @@ class Hustle_Popup_Design extends Hustle_Meta {
 
 			// Colors table » Error Message » Message color
 			'optin_error_text_color'             => '#D43858',
+
+			// Colors table » Success Message » Background color
+			'optin_success_background'           => '#38454E',
 
 			// Colors table » Success Message » Icon color
 			'optin_success_tick_color'           => '#38C5B5',
@@ -401,26 +406,17 @@ class Hustle_Popup_Design extends Hustle_Meta {
 			'never_see_link_active'              => '#49E2D1',
 
 			// ========================================|
-			// 5. BORDER                               |
+			// 6. BORDER                               |
 			// ========================================|
 
-			// Show border
-			'border'                             => '0',
-
-			// Show border » Border radius
-			'border_radius'                      => 5,
-
-			// Show border » Border weight
-			'border_weight'                      => 3,
-
-			// Show border » Border type
-			'border_type'                        => 'solid',
-
-			// Show border » Border color
-			'border_color'                       => '#DADADA',
+			'border'                             => '0', // Show border
+			'border_radius'                      => $fields_border_radius, // Show border » Border radius
+			'border_weight'                      => $fields_border_width, // Show border » Border weight
+			'border_type'                        => $fields_border_style, // Show border » Border type
+			'border_color'                       => '#DADADA', // Show border » Border color
 
 			// ========================================|
-			// 6. DROP SHADOW                          |
+			// 7. DROP SHADOW                          |
 			// ========================================|
 
 			// Show drop shadow
@@ -442,7 +438,7 @@ class Hustle_Popup_Design extends Hustle_Meta {
 			'drop_shadow_color'                  => 'rgba(0,0,0,0.4)',
 
 			// ========================================|
-			// 7. CUSTOM { MODULE } SIZE               |
+			// 8. CUSTOM { MODULE } SIZE               |
 			// ========================================|
 
 			// Enable custom size
@@ -458,7 +454,7 @@ class Hustle_Popup_Design extends Hustle_Meta {
 			'custom_height'                      => 300,
 
 			// ========================================|
-			// 8. CUSTOM CSS                           |
+			// 9. CUSTOM CSS                           |
 			// ========================================|
 
 			// Enable Custom CSS

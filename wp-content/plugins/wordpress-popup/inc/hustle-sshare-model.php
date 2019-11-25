@@ -432,7 +432,7 @@ class Hustle_SShare_Model extends Hustle_Module_Model {
 		if ( $networks_only ) {
 			return apply_filters(
 				'hustle_networks_with_share_enpoints', 
-				array( 'facebook', 'twitter', 'pinterest', 'reddit', 'linkedin', 'vkontakte', 'whatsapp', )
+				array( 'facebook', 'twitter', 'pinterest', 'reddit', 'linkedin', 'vkontakte', 'whatsapp', 'email' )
 			);
 
 		}
@@ -440,7 +440,8 @@ class Hustle_SShare_Model extends Hustle_Module_Model {
 		global $wp;
 		$current_url = esc_url( home_url( $wp->request ) );
 
-		$title = rawurlencode( html_entity_decode( esc_html( get_the_title() ) ) );
+		//let users filter the title 
+		$title = apply_filters( 'hustle_social_share_platform_title', rawurlencode( html_entity_decode( esc_html( get_the_title() ) ) ) );
 
 		return apply_filters( 'hustle_native_share_enpoints', array(
 
@@ -451,6 +452,7 @@ class Hustle_SShare_Model extends Hustle_Module_Model {
 			'linkedin' => 'https://www.linkedin.com/shareArticle?mini=true&url=' . $current_url,
 			'vkontakte' => 'https://vk.com/share.php?url=' . $current_url,
 			'whatsapp' => 'https://wa.me/?text=' . $current_url,
+			'email' => 'mailto:?subject=' . $title . '&body=' . $current_url,
 
 		), $current_url );
 	}

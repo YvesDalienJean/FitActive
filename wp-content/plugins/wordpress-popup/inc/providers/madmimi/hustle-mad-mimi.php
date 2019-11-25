@@ -49,12 +49,6 @@ class Hustle_Mad_Mimi extends Hustle_Provider_Abstract {
 	protected $_title                  = 'Mad Mimi';
 
 	/**
-	 * @since 3.0.5
-	 * @var bool
-	 */
-	protected $_supports_fields 	   = true;
-
-	/**
 	 * Class name of form hooks
 	 *
 	 * @since 4.0
@@ -96,10 +90,9 @@ class Hustle_Mad_Mimi extends Hustle_Provider_Abstract {
 	 * @return Hustle_Mad_Mimi_Api
 	 */
 	public static function api( $username, $api_key ){
-
 		if( empty( self::$api ) ){
 			try {
-				self::$api = new Hustle_Mad_Mimi_Api( $username, $api_key );
+				self::$api = Hustle_Mad_Mimi_Api::boot( $username, $api_key );
 				self::$errors = array();
 			} catch (Exception $e) {
 				self::$errors = array("api_error" => $e) ;
@@ -147,6 +140,7 @@ class Hustle_Mad_Mimi extends Hustle_Provider_Abstract {
 		$global_multi_id = $this->get_global_multi_id( $submitted_data );
 
 		$api_username_valid = $api_key_valid = true;
+		$is_validated = true;
 
 		if ( $is_submit ) {
 
@@ -182,10 +176,10 @@ class Hustle_Mad_Mimi extends Hustle_Provider_Abstract {
 			if ( ! $has_errors ) {
 
 				return array(
-					'html'         => Hustle_Api_Utils::get_modal_title_markup( __( 'Mad Mimi Added', 'wordpress-popup' ), __( 'You can now go to your forms and assign them to this integration', 'wordpress-popup' ) ),
+					'html'         => Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'Mad Mimi Added', 'wordpress-popup' ), __( 'You can now go to your pop-ups, slide-ins and embeds and assign them to this integration', 'wordpress-popup' ) ),
 					'buttons'      => array(
 						'close' => array(
-							'markup' => Hustle_Api_Utils::get_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
+							'markup' => Hustle_Provider_Utils::get_provider_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
 						),
 					),
 					'redirect'     => false,
@@ -203,7 +197,7 @@ class Hustle_Mad_Mimi extends Hustle_Provider_Abstract {
 		$options = array(
 			array(
 				'type'     => 'wrapper',
-				'class'    => $api_username_valid ? '' : 'sui-form-field-error',
+				'class'    => $is_validated ? '' : 'sui-form-field-error',
 				'elements' => array(
 					'label' => array(
 						'type'  => 'label',
@@ -219,14 +213,14 @@ class Hustle_Mad_Mimi extends Hustle_Provider_Abstract {
 					),
 					'error' => array(
 						'type'  => 'error',
-						'class' => $api_username_valid ? 'sui-hidden' : '',
+						'class' => $is_validated ? 'sui-hidden' : '',
 						'value' => __( 'Please add a valid email address registered on Mad Mimi', 'wordpress-popup' ),
 					),
 				)
 			),
 			array(
 				'type'     => 'wrapper',
-				'class'    => $api_key_valid ? '' : 'sui-form-field-error',
+				'class'    => $is_validated ? '' : 'sui-form-field-error',
 				'elements' => array(
 					'label' => array(
 						'type'  => 'label',
@@ -242,7 +236,7 @@ class Hustle_Mad_Mimi extends Hustle_Provider_Abstract {
 					),
 					'error' => array(
 						'type'  => 'error',
-						'class' => $api_key_valid ? 'sui-hidden' : '',
+						'class' => $is_validated ? 'sui-hidden' : '',
 						'value' => __( 'Please enter a valid Mad Mimi API key', 'wordpress-popup' ),
 					),
 				)
@@ -271,7 +265,7 @@ class Hustle_Mad_Mimi extends Hustle_Provider_Abstract {
 			),
 		);
 
-		$step_html = Hustle_Api_Utils::get_modal_title_markup(
+		$step_html = Hustle_Provider_Utils::get_integration_modal_title_markup(
 			__( 'Configure Mad Mimi', 'wordpress-popup' ),
 			sprintf(
 				__( 'Log in to your %1$sMad Mimi account%2$s to get your API Key.', 'wordpress-popup' ),
@@ -282,23 +276,38 @@ class Hustle_Mad_Mimi extends Hustle_Provider_Abstract {
 		if ( $has_errors ) {
 			$step_html .= '<span class="sui-notice sui-notice-error"><p>' . esc_html( $error_message ) . '</p></span>';
 		}
-		$step_html .= Hustle_Api_Utils::get_html_for_options( $options );
+		$step_html .= Hustle_Provider_Utils::get_html_for_options( $options );
 
 		$is_edit = $this->settings_are_completed( $global_multi_id );
 
 		if ( $is_edit ) {
 			$buttons = array(
 				'disconnect' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Disconnect', 'wordpress-popup' ), 'sui-button-ghost', 'disconnect', true ),
+					'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+						__( 'Disconnect', 'wordpress-popup' ),
+						'sui-button-ghost',
+						'disconnect',
+						true
+					),
 				),
 				'save' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Save', 'wordpress-popup' ), '', 'connect', true ),
+					'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+						__( 'Save', 'wordpress-popup' ),
+						'',
+						'connect',
+						true
+					),
 				),
 			);
 		} else {
 			$buttons = array(
 				'connect' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Connect', 'wordpress-popup' ), '', 'connect', true ),
+					'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+						__( 'Connect', 'wordpress-popup' ),
+						'sui-button-right',
+						'connect',
+						true
+					),
 				),
 			);
 
@@ -330,15 +339,15 @@ class Hustle_Mad_Mimi extends Hustle_Provider_Abstract {
 		// Check API Key by validating it on get_info request
 		try {
 			// Check if API key is valid
-			$_lists = self::api( $username, $api_key )->get_lists();
+			$_lists = self::api( $username, $api_key )->get_lists( array( 'limit' => 1 ) );
 
 			if ( is_wp_error( $_lists ) ) {
-				Hustle_Api_Utils::maybe_log( __METHOD__, __( 'Invalid Mad Mimi API key or username.', 'wordpress-popup' ) );
+				Hustle_Provider_Utils::maybe_log( __METHOD__, __( 'Invalid Mad Mimi API key or username.', 'wordpress-popup' ) );
 				return false;
 			}
 
 		} catch ( Exception $e ) {
-			Hustle_Api_Utils::maybe_log( __METHOD__, $e->getMessage() );
+			Hustle_Provider_Utils::maybe_log( __METHOD__, $e->getMessage() );
 			return false;
 		}
 

@@ -55,7 +55,7 @@ class Hustle_Local_List_Form_Settings extends Hustle_Provider_Form_Settings_Abst
 			'local_list_name' 	=> '',
 		);
 
-		$is_submit = ! empty( $submitted_data['is_submit'] );
+		$is_submit = ! empty( $submitted_data['hustle_is_submit'] );
 		
 		$current_data = $this->get_current_data( $current_data, $submitted_data );
 
@@ -65,9 +65,9 @@ class Hustle_Local_List_Form_Settings extends Hustle_Provider_Form_Settings_Abst
 
 		$options = $this->get_first_step_options( $current_data );
 
-		$step_html = Hustle_Api_Utils::get_modal_title_markup( __( 'Setup your list', 'wordpress-popup' ), __( 'Will save email addresses to an exportable CSV list.', 'wordpress-popup' ) );
+		$step_html = Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'Setup your list', 'wordpress-popup' ), __( 'Will save email addresses to an exportable CSV list.', 'wordpress-popup' ) );
 
-		$step_html .= Hustle_Api_Utils::get_html_for_options( $options );
+		$step_html .= Hustle_Provider_Utils::get_html_for_options( $options );
 
 		if ( ! isset( $error_message ) ) {
 			$has_errors = false;
@@ -78,10 +78,10 @@ class Hustle_Local_List_Form_Settings extends Hustle_Provider_Form_Settings_Abst
 
 		$buttons = array(
 			'disconnect' => array(
-				'markup' => Hustle_Api_Utils::get_button_markup( __( 'Disconnect', 'wordpress-popup' ), 'sui-button-ghost', 'disconnect_form', true ),
+				'markup' => Hustle_Provider_Utils::get_provider_button_markup( __( 'Disconnect', 'wordpress-popup' ), 'sui-button-ghost', 'disconnect_form', true ),
 			),
 			'save' => array(
-				'markup' => Hustle_Api_Utils::get_button_markup( __( 'Save', 'wordpress-popup' ), '', 'connect', true ),
+				'markup' => Hustle_Provider_Utils::get_provider_button_markup( __( 'Save', 'wordpress-popup' ), '', 'connect', true ),
 			),
 		);
 
@@ -131,11 +131,6 @@ class Hustle_Local_List_Form_Settings extends Hustle_Provider_Form_Settings_Abst
 						'value' => __( 'This will be visible to the visitors while unsubscribing.', 'wordpress-popup' ),
 					),
 				),
-			),
-			'api_key'       => array(
-				'name'          => 'is_submit',
-				'type'          => 'hidden',
-				'value'         => '1',
 			),
 		);
 

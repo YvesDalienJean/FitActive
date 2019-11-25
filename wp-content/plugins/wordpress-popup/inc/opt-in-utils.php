@@ -115,14 +115,18 @@ class Opt_In_Utils {
 	 * @param  array $list List of URL-patterns to test against.
 	 * @return bool
 	 */
-	public function check_url( $test_url, $list ) {
+	public function check_url( $list ) {
 		$response = false;
 
 		$list = array_map( 'trim', (array) $list );
-		$test_url = strtok( $test_url, '#' );
 		if ( empty( $list ) ) {
 			$response = true;
+
 		} else {
+			
+			$test_url = strtok( $this->get_current_actual_url( true ), '#' );
+			$test_url_no_protocol = strtok( $this->get_current_actual_url(), '#' );
+
 			foreach ( $list as $match ) {
 				$match = strtok( $match, '#' );
 
@@ -147,7 +151,7 @@ class Opt_In_Utils {
 
 					} else {
 						// Check wildcards.
-						$res = fnmatch( $match, $test_url );
+						$res = fnmatch( $match, $test_url_no_protocol );
 					}
 				} else {
 					// Check for regex urls.
@@ -186,10 +190,13 @@ class Opt_In_Utils {
 	 *
 	 * @return string
 	 */
-	public function get_current_actual_url() {
+	public function get_current_actual_url( $with_protocol = false ) {
 		if ( ! did_action( 'plugins_loaded' ) ) {
 			new Exception( 'This method should only be called after plugins_loaded hook is fired' ); }
 
+		if ( ! $with_protocol ) {
+			return "$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+		}
 		return 'http' . ( isset( $_SERVER['HTTPS'] ) ? 's' : '' ) . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 	}
 
@@ -701,9 +708,15 @@ class Opt_In_Utils {
 			'yy/mm/dd' => __( '2012/07/31', 'wordpress-popup' ),
 			'mm/dd/yy' => __( '07/31/2012', 'wordpress-popup' ),
 			'dd/mm/yy' => __( '31/07/2012', 'wordpress-popup' ),
-			//'yy, MM d' => __( '2012, July 31', 'wordpress-popup' ),
-			//'d MM, yy' => __( '31 July, 2012', 'wordpress-popup' ),
+			'yy, MM d' => __( '2012, July 31', 'wordpress-popup' ),
+			'd MM, yy' => __( '31 July, 2012', 'wordpress-popup' ),
 			'MM d, yy' => __( 'July 31, 2012', 'wordpress-popup' ),
+			'dd-mm-yy' => __( '31-07-2012', 'wordpress-popup' ),
+			'mm-dd-yy' => __( '07-31-2012', 'wordpress-popup' ),
+			'yy-mm-dd' => __( '2012-07-31', 'wordpress-popup' ),
+			'dd.mm.yy' => __( '31.07.2012', 'wordpress-popup' ),
+			'mm.dd.yy' => __( '07.31.2012', 'wordpress-popup' ),
+			'yy.mm.dd' => __( '2012.07.31', 'wordpress-popup' ),
 			);
 
 		$formats = apply_filters( 'hustle_date_formats', $formats );
@@ -753,6 +766,7 @@ class Opt_In_Utils {
 			'youtube' => esc_html__( 'YouTube', 'wordpress-popup' ),
 			'telegram' => esc_html__( 'Telegram', 'wordpress-popup' ),
 			'whatsapp' => esc_html__( 'WhatsApp', 'wordpress-popup' ),
+			'email'    	  => esc_html__( 'Email', 'wordpress-popup' ),
 		);
 
 		return $social_platform_names;
@@ -980,9 +994,9 @@ class Opt_In_Utils {
 		return $new_array;
 	}
 
-	/**
+	/*
 	 * Get the display name of a module type.
-	 * 
+	 *
 	 * @since 4.0
 	 *
 	 * @param string $module_type
@@ -1029,5 +1043,86 @@ class Opt_In_Utils {
 		}
 
 		return $display_name;
+	}
+
+	/**
+	 * Get the global placeholders for display.
+	 * The array's key has the placeholder value, that's what's inserted between
+	 * brackets and then replaced by self::replace_global_placeholders().
+	 * The array's value has the display name for the placeholder.
+	 *
+	 * @since 4.0.3
+	 * @see Opt_In_Utils::replace_global_placeholders()
+	 * @return array
+	 */
+	public static function get_global_placeholders() {
+
+		$placeholders = [
+			'site_url'   => __( 'Site URL', 'wordpress-popup' ),
+			'site_name'  => __( 'Site name', 'wordpress-popup' ),
+			'post_url'   => __( 'Post/page URL', 'wordpress-popup' ),
+			'post_title' => __( 'Post/page title', 'wordpress-popup' ),
+		];
+
+		/**
+		 * Filter the available global placeholders.
+		 * These are used in some text fields, to be replaced by
+		 * self::replace_global_placeholders().
+		 *
+		 * @since 4.0.3
+		 * @see Opt_In_Utils::replace_global_placeholders()
+		 * @return array
+		 */
+		return apply_filters( 'hustle_get_global_placeholders', $placeholders );
+	}
+
+	/**
+	 * Replace the global placeholders from a string.
+	 * These are added to some text fields by the admin.
+	 * The available ones are returned by self::get_global_placeholders().
+	 *
+	 * @since 4.0.3
+	 * @see Opt_In_Utils::replace_global_placeholders()
+	 * @param string $string String with placeholders to be replaced.
+	 * @return string
+	 */
+	public static function replace_global_placeholders( $string ) {
+
+		preg_match_all( '/\{[^}]*\}/', $string, $matches );
+
+		if ( ! empty( $matches[0] ) && is_array( $matches[0] ) ) {
+
+			$defined_placeholders = [
+				'{site_url}'   => site_url(),
+				'{site_name}'  => get_bloginfo( 'name' ),
+				'{post_url}'   => get_permalink(),
+				'{post_title}' => esc_html( get_the_title() ),
+			];
+
+			/**
+			 * Filter the placeholders and their values.
+			 * The keys of the array belong to the placeholder to be replaced.
+			 * The values of the array belong to the value to use as replacement.
+			 * Eg: [ '{post_url}' => get_permalink() ]
+			 *
+			 * @since 4.0.3
+			 * @return array
+			 */
+			$defined_placeholders = apply_filters( 'hustle_global_placeholders_to_replace', $defined_placeholders );
+
+			foreach ( $matches[0] as $placeholder ) {
+
+				if ( key_exists( $placeholder, $defined_placeholders ) ) {
+					$replacement = $defined_placeholders[ $placeholder ];
+
+					if ( $replacement !== $placeholder ) {
+						// Replace if we found something.
+						$string = str_replace( $placeholder, $replacement, $string );
+					}
+				}
+			}
+		}
+
+		return $string;
 	}
 }

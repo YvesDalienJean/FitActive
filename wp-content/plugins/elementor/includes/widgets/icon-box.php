@@ -154,7 +154,7 @@ class Widget_Icon_Box extends Widget_Base {
 				'dynamic' => [
 					'active' => true,
 				],
-				'default' => __( 'Click edit button to change this text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.', 'elementor' ),
+				'default' => __( 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.', 'elementor' ),
 				'placeholder' => __( 'Enter your description', 'elementor' ),
 				'rows' => 10,
 				'separator' => 'none',
@@ -659,7 +659,7 @@ class Widget_Icon_Box extends Widget_Base {
 				<<?php echo $settings['title_size']; ?> class="elementor-icon-box-title">
 					<<?php echo implode( ' ', [ $icon_tag, $link_attributes ] ); ?><?php echo $this->get_render_attribute_string( 'title_text' ); ?>><?php echo $settings['title_text']; ?></<?php echo $icon_tag; ?>>
 				</<?php echo $settings['title_size']; ?>>
-				<?php if ( ! empty( $settings['description_text'] ) ) : ?>
+				<?php if ( ! Utils::is_empty( $settings['description_text'] ) ) : ?>
 				<p <?php echo $this->get_render_attribute_string( 'description_text' ); ?>><?php echo $settings['description_text']; ?></p>
 				<?php endif; ?>
 			</div>

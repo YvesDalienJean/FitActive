@@ -404,13 +404,9 @@ class Hustle_Entries_Admin extends Hustle_Admin_Page_Abstract {
 			return;
 		}
 
-		$action = '';
-		if ( isset( $_REQUEST['hustle_action'] ) || isset( $_REQUEST['hustle_action_bottom'] ) ) {
-			if ( isset( $_REQUEST['hustle_action'] ) && ! empty( $_REQUEST['hustle_action'] ) ) {
-				$action = $_REQUEST['hustle_action'];
-			} elseif ( isset( $_REQUEST['hustle_action_bottom'] ) ) {
-				$action = $_REQUEST['hustle_action_bottom'];
-			}
+		$action = filter_input( INPUT_POST, 'hustle_action', FILTER_SANITIZE_STRING );
+		if ( empty( $action ) ) {
+			$action = filter_input( INPUT_POST, 'hustle_action_bottom', FILTER_SANITIZE_STRING );
 		}
 
 		switch ( $action ) {
@@ -424,10 +420,12 @@ class Hustle_Entries_Admin extends Hustle_Admin_Page_Abstract {
 				break;
 
 			case 'delete-all':
-				$entries = $_REQUEST['ids'];
-				Hustle_Entry_Model::delete_by_entries( $this->module_id, $entries );
+				$entries = filter_input( INPUT_POST, 'ids', FILTER_SANITIZE_STRING );
+				if ( ! empty( $entries ) ) {
+					Hustle_Entry_Model::delete_by_entries( $this->module_id, $entries );
+				}
 				break;
-			
+
 			default:
 				return;
 		}
@@ -765,7 +763,7 @@ class Hustle_Entries_Admin extends Hustle_Admin_Page_Abstract {
 				//$additonal_items = array_merge( $additonal_items, $addon_additional_items );
 				$additonal_items[] = $addon_additional_items;
 			} catch ( Exception $e ) {
-				Hustle_Api_Utils::maybe_log( $registered_addon->get_slug(), 'failed to on_render_entry', $e->getMessage() );
+				Opt_In_Utils::maybe_log( $registered_addon->get_slug(), 'failed to on_render_entry', $e->getMessage() );
 			}
 		}
 
@@ -856,7 +854,7 @@ class Hustle_Entries_Admin extends Hustle_Admin_Page_Abstract {
 						self::$registered_addons[] = $registered_addon;
 					}
 				} catch ( Exception $e ) {
-					Hustle_Api_Utils::maybe_log( $registered_addon->get_slug(), 'failed to get_addon_form_hooks', $e->getMessage() );
+					Opt_In_Utils::maybe_log( $registered_addon->get_slug(), 'failed to get_addon_form_hooks', $e->getMessage() );
 				}
 			}
 		}

@@ -37,12 +37,6 @@ class Hustle_Local_List extends Hustle_Provider_Abstract {
 	protected $_title                  = 'Local List';
 
 	/**
-	 * @since 3.0.5
-	 * @var bool
-	 */
-	protected $_supports_fields 	   = true;
-
-	/**
 	 * @since 4.0
 	 * @var boolean
 	 */

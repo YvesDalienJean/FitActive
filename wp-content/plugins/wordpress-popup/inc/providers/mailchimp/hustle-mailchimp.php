@@ -10,7 +10,6 @@ if( !class_exists("Hustle_Mailchimp") ):
 	class Hustle_Mailchimp extends Hustle_Provider_Abstract{
 
 		const GROUP_TRANSIENT = "hustle-mailchimp-group-transient";
-		const LIST_PAGES = "hustle-mailchimp-list-pages";
 
 		const SLUG = "mailchimp";
 
@@ -51,12 +50,6 @@ if( !class_exists("Hustle_Mailchimp") ):
 		 * @var string
 		 */
 		protected $_title = 'Mailchimp';
-
-		/**
-		 * @since 3.0.5
-		 * @var bool
-		 */
-		protected $_supports_fields 	   = true;
 
 		/**
 		 * Class name of form settings
@@ -162,7 +155,7 @@ if( !class_exists("Hustle_Mailchimp") ):
 				}
 				return $member_info;
 			} catch( Exception $e ) {
-				Hustle_Api_Utils::maybe_log( __METHOD__, 'Failed to get member from MailChimp list.', $e->getMessage() );
+				Hustle_Provider_Utils::maybe_log( __METHOD__, 'Failed to get member from Mailchimp list.', $e->getMessage() );
 
 				return false;
 			}
@@ -187,7 +180,7 @@ if( !class_exists("Hustle_Mailchimp") ):
 				}
 				return $delete_status;
 			} catch( Exception $e ) {
-				Hustle_Api_Utils::maybe_log( __METHOD__, 'Failed to delete member from MailChimp list.', $e->getMessage() );
+				Hustle_Provider_Utils::maybe_log( __METHOD__, 'Failed to delete member from Mailchimp list.', $e->getMessage() );
 
 				return false;
 			}
@@ -256,10 +249,10 @@ if( !class_exists("Hustle_Mailchimp") ):
 				if ( ! $has_errors ) {
 
 					return array(
-						'html'         => Hustle_Api_Utils::get_modal_title_markup( __( 'Mailchimp Added', 'wordpress-popup' ), __( 'You can now go to your forms and assign them to this integration', 'wordpress-popup' ) ),
+						'html'         => Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'Mailchimp Added', 'wordpress-popup' ), __( 'You can now go to your pop-ups, slide-ins and embeds and assign them to this integration', 'wordpress-popup' ) ),
 						'buttons'      => array(
 							'close' => array(
-								'markup' => Hustle_Api_Utils::get_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
+								'markup' => Hustle_Provider_Utils::get_provider_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
 							),
 						),
 						'redirect'     => false,
@@ -295,7 +288,7 @@ if( !class_exists("Hustle_Mailchimp") ):
 						'error' => array(
 							'type'  => 'error',
 							'class' => $api_key_validated ? 'sui-hidden' : '',
-							'value' => __( 'Please enter a valid MailChimp API key', 'wordpress-popup' ),
+							'value' => __( 'Please enter a valid Mailchimp API key', 'wordpress-popup' ),
 						),
 					)
 				),
@@ -328,26 +321,36 @@ if( !class_exists("Hustle_Mailchimp") ):
 				),
 			);
 
-			$step_html = Hustle_Api_Utils::get_modal_title_markup( __( 'Configure MailChimp', 'wordpress-popup' ), sprintf( __("Log in to your %1\$sMailChimp account%2\$s to get your API Key.", 'wordpress-popup'), '<a href="https://admin.mailchimp.com/account/api/" target="_blank">', '</a>' ) );
+			$step_html = Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'Configure Mailchimp', 'wordpress-popup' ), sprintf( __("Log in to your %1\$sMailchimp account%2\$s to get your API Key.", 'wordpress-popup'), '<a href="https://admin.mailchimp.com/account/api/" target="_blank">', '</a>' ) );
 			if ( $has_errors ) {
 				$step_html .= '<span class="sui-notice sui-notice-error"><p>' . esc_html( $error_message ) . '</p></span>';
 			}
-			$step_html .= Hustle_Api_Utils::get_html_for_options( $options );
+			$step_html .= Hustle_Provider_Utils::get_html_for_options( $options );
 
 			$is_edit = $this->settings_are_completed( $global_multi_id );
 			if ( $is_edit ) {
 				$buttons = array(
 					'disconnect' => array(
-						'markup' => Hustle_Api_Utils::get_button_markup( __( 'Disconnect', 'wordpress-popup' ), 'sui-button-ghost', 'disconnect', true ),
+						'markup' => Hustle_Provider_Utils::get_provider_button_markup( __( 'Disconnect', 'wordpress-popup' ), 'sui-button-ghost', 'disconnect', true ),
 					),
 					'save' => array(
-						'markup' => Hustle_Api_Utils::get_button_markup( __( 'Save', 'wordpress-popup' ), '', 'connect', true ),
+						'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+							__( 'Save', 'wordpress-popup' ),
+							'',
+							'connect',
+							true
+						),
 					),
 				);
 			} else {
 				$buttons = array(
 					'connect' => array(
-						'markup' => Hustle_Api_Utils::get_button_markup( __( 'Connect', 'wordpress-popup' ), '', 'connect', true ),
+						'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+							__( 'Connect', 'wordpress-popup' ),
+							'sui-button-right',
+							'connect',
+							true
+						),
 					),
 				);
 
@@ -380,7 +383,7 @@ if( !class_exists("Hustle_Mailchimp") ):
 				$info = $this->get_api( $api_key )->get_info();
 
 				if ( is_wp_error( $info ) ) {
-					Hustle_Api_Utils::maybe_log( __METHOD__, $info->get_error_message() );
+					Hustle_Provider_Utils::maybe_log( __METHOD__, $info->get_error_message() );
 					return false;
 				}
 
@@ -391,7 +394,7 @@ if( !class_exists("Hustle_Mailchimp") ):
 				);
 
 			} catch ( Exception $e ) {
-				Hustle_Api_Utils::maybe_log( __METHOD__, $e->getMessage() );
+				Hustle_Provider_Utils::maybe_log( __METHOD__, $e->getMessage() );
 				return false;
 			}
 

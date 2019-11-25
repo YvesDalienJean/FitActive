@@ -54,12 +54,6 @@ if ( ! class_exists( 'Hustle_ConvertKit' ) ) :
 		protected $_title                  = 'ConvertKit';
 
 		/**
-	 * @since 3.0.5
-	 * @var bool
-	 */
-		protected $_supports_fields 	   = true;
-
-		/**
 	 * Class name of form settings
 	 *
 	 * @var string
@@ -151,6 +145,7 @@ if ( ! class_exists( 'Hustle_ConvertKit' ) ) :
 
 				if ( ! $api_key_validated ) {
 					$error_message = $this->provider_connection_falied();
+					$api_key_valid = $api_secret_valid = false;
 					$has_errors = true;
 				}
 
@@ -174,10 +169,10 @@ if ( ! class_exists( 'Hustle_ConvertKit' ) ) :
 				if ( ! $has_errors ) {
 
 					return array(
-						'html'         => Hustle_Api_Utils::get_modal_title_markup( __( 'ConvertKit Added', 'wordpress-popup' ), __( 'You can now go to your forms and assign them to this integration', 'wordpress-popup' ) ),
+						'html'         => Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'ConvertKit Added', 'wordpress-popup' ), __( 'You can now go to your pop-ups, slide-ins and embeds and assign them to this integration', 'wordpress-popup' ) ),
 						'buttons'      => array(
 							'close' => array(
-								'markup' => Hustle_Api_Utils::get_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
+								'markup' => Hustle_Provider_Utils::get_provider_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
 							),
 						),
 						'redirect'     => false,
@@ -264,26 +259,41 @@ if ( ! class_exists( 'Hustle_ConvertKit' ) ) :
 				),
 			);
 
-			$step_html = Hustle_Api_Utils::get_modal_title_markup( __( 'Configure ConvertKit', 'wordpress-popup' ), sprintf( __( 'Log in to your %1$sConvertKit%2$s account to get your API Key.', 'wordpress-popup' ), '<a href="https://app.convertkit.com/account/edit" target="_blank">', '</a>' ) );
+			$step_html = Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'Configure ConvertKit', 'wordpress-popup' ), sprintf( __( 'Log in to your %1$sConvertKit%2$s account to get your API Key.', 'wordpress-popup' ), '<a href="https://app.convertkit.com/account/edit" target="_blank">', '</a>' ) );
 			if ( $has_errors ) {
 				$step_html .= '<span class="sui-notice sui-notice-error"><p>' . esc_html( $error_message ) . '</p></span>';
 			}
-			$step_html .= Hustle_Api_Utils::get_html_for_options( $options );
+			$step_html .= Hustle_Provider_Utils::get_html_for_options( $options );
 
 			$is_edit = $this->settings_are_completed( $global_multi_id );
 			if ( $is_edit ) {
 				$buttons = array(
 					'disconnect' => array(
-						'markup' => Hustle_Api_Utils::get_button_markup( __( 'Disconnect', 'wordpress-popup' ), 'sui-button-ghost', 'disconnect', true ),
+						'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+							__( 'Disconnect', 'wordpress-popup' ),
+							'sui-button-ghost',
+							'disconnect',
+							true
+						),
 					),
 					'save' => array(
-						'markup' => Hustle_Api_Utils::get_button_markup( __( 'Save', 'wordpress-popup' ), '', 'connect', true ),
+						'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+							__( 'Save', 'wordpress-popup' ),
+							'',
+							'connect',
+							true
+						),
 					),
 				);
 			} else {
 				$buttons = array(
 					'connect' => array(
-						'markup' => Hustle_Api_Utils::get_button_markup( __( 'Connect', 'wordpress-popup' ), '', 'connect', true ),
+						'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+							__( 'Connect', 'wordpress-popup' ),
+							'sui-button-right',
+							'connect',
+							true
+						),
 					),
 				);
 
@@ -319,12 +329,12 @@ if ( ! class_exists( 'Hustle_ConvertKit' ) ) :
 				$forms = $api->get_forms(); //check API key
 
 				if ( is_wp_error( $subscribers ) || is_wp_error( $forms ) ) {
-					Hustle_Api_Utils::maybe_log( __METHOD__, __( 'Invalid ConvertKit API key ore API secret.', 'wordpress-popup' ) );
+					Hustle_Provider_Utils::maybe_log( __METHOD__, __( 'Invalid ConvertKit API key ore API secret.', 'wordpress-popup' ) );
 					return false;
 				}
 
 			} catch ( Exception $e ) {
-				Hustle_Api_Utils::maybe_log( __METHOD__, $e->getMessage() );
+				Hustle_Provider_Utils::maybe_log( __METHOD__, $e->getMessage() );
 				return false;
 			}
 

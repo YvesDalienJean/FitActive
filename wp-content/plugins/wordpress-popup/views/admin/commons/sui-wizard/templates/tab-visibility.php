@@ -27,7 +27,7 @@ if ( isset( $smallcaps_singular ) ) {
 
 				<span class="sui-settings-label"><?php printf( esc_html__( '%s Visibility Rules', 'wordpress-popup' ), esc_html( $capitalize_singular ) ); ?></span>
 
-				<span class="sui-description"><?php printf( esc_html__( 'Select posts, pages and other conditions under which you want to display this %s.', 'wordpress-popup' ), esc_html( $smallcaps_singular ) ); ?><br />&nbsp;<br /><?php printf( esc_html__( 'By default, your %s will be shown on every post & page if no condition is applied.', 'wordpress-popup' ), esc_html( $smallcaps_singular ) ); ?></span>
+				<span class="sui-description"><?php printf( esc_html__( 'Select posts, pages and other conditions under which you want to display this %s module.', 'wordpress-popup' ), esc_html( $smallcaps_singular ) ); ?><br />&nbsp;<br /><?php printf( esc_html__( 'By default, your %s modules will be shown on every post & page (except 404 page) if no condition is applied.', 'wordpress-popup' ), esc_html( $smallcaps_singular ) ); ?></span>
 
 				<?php if ( isset( $description_line1 ) && '' !== $description_line1 ) { ?>
 
@@ -65,7 +65,7 @@ if ( isset( $smallcaps_singular ) ) {
 	<div class="sui-box-footer">
 
 		<button class="sui-button wpmudev-button-navigation" data-direction="prev">
-			<i class="sui-icon-arrow-left" aria-hidden="true"></i> <?php esc_html_e( 'Appearance', 'wordpress-popup' ); ?>
+			<i class="sui-icon-arrow-left" aria-hidden="true"></i> <?php echo 'embedded' === $module_type ? esc_html_e( 'Display Options', 'wordpress-popup' ) : esc_html_e( 'Appearance', 'wordpress-popup' ); ?>
 		</button>
 
 		<div class="sui-actions-right">

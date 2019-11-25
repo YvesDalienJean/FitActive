@@ -60,6 +60,12 @@ if ( ! class_exists( 'Hustle_MailerLite_Api' ) ) :
             $args['body'] = $input;
 
             $response   = wp_remote_request( $called_url, $args );
+
+			$utils = Hustle_Provider_Utils::get_instance();
+			$utils->_last_url_request = $called_url;
+			$utils->_last_data_received = $response;
+			$utils->_last_data_sent = $args;
+
             $data       = wp_remote_retrieve_body( $response );
 
             if ( is_wp_error( $data ) ) {
@@ -118,11 +124,6 @@ if ( ! class_exists( 'Hustle_MailerLite_Api' ) ) :
 
 			$res = $this->_post( $path, $subscriber_data );
 
-			$utils = Hustle_Provider_Utils::get_instance();
-			$utils->_last_data_received = $res;
-			$utils->_last_url_request = $this->_end_point . $path;
-			$utils->_last_data_sent = $subscriber_data;
-
             return $res;
         }
 
@@ -137,11 +138,6 @@ if ( ! class_exists( 'Hustle_MailerLite_Api' ) ) :
 
 			$res = $this->_put( $path, $subscriber_data );
 
-			$utils = Hustle_Provider_Utils::get_instance();
-			$utils->_last_data_received = $res;
-			$utils->_last_url_request = $this->_end_point . $path;
-			$utils->_last_data_sent = $subscriber_data;
-
             return $res;
         }
 
@@ -155,11 +151,6 @@ if ( ! class_exists( 'Hustle_MailerLite_Api' ) ) :
 
 			$res = $this->_get( $path );
 
-			$utils = Hustle_Provider_Utils::get_instance();
-			$utils->_last_data_received = $res;
-			$utils->_last_url_request = $this->_end_point . $path;
-			$utils->_last_data_sent = $email;
-
             return $res;
         }
 
@@ -172,11 +163,6 @@ if ( ! class_exists( 'Hustle_MailerLite_Api' ) ) :
 			$path = 'fields';
 
 			$res = $this->_post( $path, $field_data );
-
-			$utils = Hustle_Provider_Utils::get_instance();
-			$utils->_last_data_received = $res;
-			$utils->_last_url_request = $this->_end_point . $path;
-			$utils->_last_data_sent = $field_data;
 
             return $res;
         }

@@ -23,10 +23,23 @@ class Hustle_MailerLite_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		$module_id = $this->module_id;
 		$form_settings_instance = $this->form_settings_instance;
 
+
 		/**
+		 * Filter submitted form data to be processed
+		 *
 		 * @since 4.0
+		 *
+		 * @param array                                    $submitted_data
+		 * @param int                                      $module_id                current module_id
+		 * @param Hustle_MailerLite_Form_Settings 	   	   $form_settings_instance
 		 */
-		$submitted_data = apply_filters( 'hustle_provider_' . $addon->get_slug() . '_form_submitted_data', $submitted_data, $module_id, $form_settings_instance );
+		$submitted_data = apply_filters( 
+			'hustle_provider_mailerlite_form_submitted_data', 
+			$submitted_data, 
+			$module_id, 
+			$form_settings_instance 
+		);
+
 
 		$addon_setting_values = $form_settings_instance->get_form_settings_values();
 
@@ -73,7 +86,14 @@ class Hustle_MailerLite_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 				$merge_vals = array_merge( $merge_vals, $extra_data );
 			}
 
-			$existing_member = $addon->_email_exists( $list_id, $email, $api );
+			$existing_member 	= $this->get_subscriber( 
+				$addon,  
+				array( 
+					'list_id' 	=> $list_id, 
+					'email' 	=> $email, 
+					'api'		=> $api 
+				)
+			);
 
 			$is_sent = false;
 			$member_status = __( 'Member could not be subscribed.', 'wordpress-popup' );
@@ -86,11 +106,44 @@ class Hustle_MailerLite_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 				$subscriber_data['fields'] = $merge_vals;
 			}
 
+			/**
+			 * Fires before adding subscriber
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param int    $module_id
+			 * @param array  $submitted_data
+			 * @param object $form_settings_instance 
+			 */
+			do_action( 'hustle_provider_mailerlite_before_add_subscriber', 
+				$module_id, 
+				$submitted_data, 
+				$form_settings_instance 
+			);
+
 			if ( $existing_member ) {
-				$res 	 = $api->update_subscriber( $email, $subscriber_data, 1 );
+				$details = $api->update_subscriber( $email, $subscriber_data, 1 );
+				$res 	 = $details;
 			} else {
 				$res 	 = $api->add_subscriber( $list_id, $subscriber_data, 1 );
 			}
+
+			/**
+			 * Fires before adding subscriber
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param int    $module_id
+			 * @param array  $submitted_data
+			 * @param mixed  $res
+			 * @param object $form_settings_instance 
+			 */
+			do_action( 'hustle_provider_mailerlite_after_add_subscriber', 
+				$module_id, 
+				$submitted_data,
+				$res,
+				$form_settings_instance 
+			);
 
 			if ( is_wp_error( $res ) ) {
 				$details = $res->get_error_message();
@@ -100,7 +153,6 @@ class Hustle_MailerLite_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 				$details = __( 'Successfully added or updated member on MailerLite list', 'wordpress-popup' );
 			}
 
-			$utils = Hustle_Provider_Utils::get_instance();
 			$entry_fields = array(
 				array(
 					'name'  => 'status',
@@ -108,9 +160,6 @@ class Hustle_MailerLite_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 						'is_sent'       => $is_sent,
 						'description'   => $details,
 						'member_status' => $member_status,
-						'data_sent'     => $utils->get_last_data_sent(),
-						'data_received' => $utils->get_last_data_received(),
-						'url_request'   => $utils->get_last_url_request(),
 					),
 				),
 			);
@@ -122,7 +171,7 @@ class Hustle_MailerLite_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			$entry_fields[0]['value']['list_name'] = $addon_setting_values['list_name'];
 		}
 
-		$entry_fields = apply_filters( 'hustle_provider_' . $addon->get_slug() . '_entry_fields',
+		$entry_fields = apply_filters( 'hustle_provider_mailerlite_entry_fields',
 			$entry_fields,
 			$module_id,
 			$submitted_data,
@@ -175,7 +224,14 @@ class Hustle_MailerLite_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			$api_key 			= $addon->get_setting( 'api_key', '', $global_multi_id );
 			$api 				= $addon::api( $api_key );
 			$list_id 			= $addon_setting_values['list_id'];
-			$existing_member 	= $addon->_email_exists( $list_id, $submitted_data['email'], $api );
+			$existing_member 	= $this->get_subscriber( 
+				$addon,  
+				array( 
+					'list_id' 	=> $list_id, 
+					'email' 	=> $submitted_data['email'], 
+					'api'		=> $api 
+				)
+			);
 
 			if( $existing_member )
 				$is_success = self::ALREADY_SUBSCRIBED_ERROR;
@@ -189,7 +245,7 @@ class Hustle_MailerLite_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		 * @param bool                                     $is_success
 		 * @param int                                      $module_id                current module_id
 		 * @param array                                    $submitted_data
-		 * @param Hustle_MailerLite_Form_Settings $form_settings_instance
+		 * @param Hustle_MailerLite_Form_Settings 		   $form_settings_instance
 		 */
 		$is_success = apply_filters(
 			'hustle_provider_mailerlite_form_submitted_data_after_validation',
@@ -210,6 +266,29 @@ class Hustle_MailerLite_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 
 		return true;
 
+	}
+
+	/**
+	 * Get subscriber for providers
+	 *
+	 * This method is to be inherited
+	 * And extended by child classes.
+	 * 
+	 * Make use of the property `$_subscriber`
+	 * Method to omit double api calls
+	 *
+	 * @since 4.0.2
+	 *
+	 * @param 	object 	$api
+	 * @param 	mixed  	$data
+	 * @return  mixed 	array/object API response on queried subscriber
+	 */
+	protected function get_subscriber( $api, $data ) {
+		if( empty ( $this->_subscriber ) && ! isset( $this->_subscriber[ md5( $data['email'] ) ] ) ){
+			$this->_subscriber[ md5( $data['email'] ) ] = $api->_email_exists( $data['list_id'], $data['email'], $data['api'] );
+		}
+
+		return $this->_subscriber[ md5( $data['email'] ) ];
 	}
 
 }

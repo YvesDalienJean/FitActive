@@ -685,9 +685,11 @@ class WPForms_About {
 								<p><?php echo $name; ?></p>
 							</td>
 							<td class="wpforms-admin-column-33">
+							<?php if ( ! empty( $current ) && is_array( $current ) ) : ?>
 								<p class="features-<?php echo esc_attr( $current['status'] ); ?>">
 									<?php echo implode( '<br>', $current['text'] ); ?>
 								</p>
+							<?php endif; ?>
 							</td>
 							<td class="wpforms-admin-column-33">
 								<p class="features-full">
@@ -1085,23 +1087,21 @@ class WPForms_About {
 			),
 		);
 
-		// For debug purposes: copy pro data to ultimate and agency plans.
-		foreach ( self::$licenses_features as $slug => $name ) {
-			$data[ $slug ]['ultimate'] = $data[ $slug ]['pro'];
-			$data[ $slug ]['agency']   = $data[ $slug ]['pro'];
-		}
-
 		// Wrong feature?
 		if ( ! isset( $data[ $feature ] ) ) {
 			return false;
 		}
 
+		// Is a top level license?
+		$is_licenses_top = in_array( $license, self::$licenses_top, true );
+
 		// Wrong license type?
-		if ( ! isset( $data[ $feature ][ $license ] ) ) {
+		if ( ! isset( $data[ $feature ][ $license ] ) && ! $is_licenses_top ) {
 			return false;
 		}
 
-		return $data[ $feature ][ $license ];
+		// For debug purposes: all top level plans has no features difference and are equated to `pro` plan.
+		return $is_licenses_top ? $data[ $feature ]['pro'] : $data[ $feature ][ $license ];
 	}
 
 	/**

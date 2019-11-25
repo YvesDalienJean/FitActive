@@ -63,13 +63,12 @@ var ShortPixel = function() {
         jQuery('#request_key').attr('href', jQuery('#request_key').attr('href').split('?')[0] + '?pluginemail=' + email);
     }
 
-    /* Can be removed.
     function validateKey(button){
       console.log('validate');
         jQuery('#valid').val('validate');
 
         jQuery(button).parents('form').submit();
-    } */
+    }
 
     jQuery("#key").keypress(function(e) {
         if(e.which == 13) {
@@ -256,7 +255,7 @@ var ShortPixel = function() {
             ShortPixel.adjustSettingsTabs();
             jQuery(section).find('.wp-shortpixel-tab-content').fadeIn(50);
         }
-        if(typeof HS.beacon.suggest !== 'undefined' ){
+        if(typeof HS !== 'undefined' && typeof HS.beacon.suggest !== 'undefined' ){
             switch(tab){
                 case "settings":
                     beacon = shortpixel_suggestions_settings;
@@ -794,7 +793,7 @@ var ShortPixel = function() {
         setOptions          : setOptions,
         isEmailValid        : isEmailValid,
         updateSignupEmail   : updateSignupEmail,
-        //validateKey         : validateKey,
+        validateKey         : validateKey,
         enableResize        : enableResize,
         setupGeneralTab     : setupGeneralTab,
         apiKeyChanged       : apiKeyChanged,

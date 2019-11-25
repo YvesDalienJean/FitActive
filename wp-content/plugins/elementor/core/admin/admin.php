@@ -221,6 +221,7 @@ class Admin extends App {
 		if ( User::is_current_user_can_edit( $post->ID ) && Plugin::$instance->db->is_built_with_elementor( $post->ID ) ) {
 			$post_states['elementor'] = __( 'Elementor', 'elementor' );
 		}
+
 		return $post_states;
 	}
 
@@ -306,17 +307,39 @@ class Admin extends App {
 		return $plugin_meta;
 	}
 
+	public function admin_notices() {
+		$admin_notice = Api::get_admin_notice();
+		if ( empty( $admin_notice ) ) {
+			return;
+		}
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		if ( ! in_array( get_current_screen()->id, [ 'toplevel_page_elementor', 'edit-elementor_library', 'elementor_page_elementor-system-info', 'dashboard' ], true ) ) {
+			return;
+		}
+		$notice_id = 'admin_notice_api_' . $admin_notice['notice_id'];
+		if ( User::is_user_notice_viewed( $notice_id ) ) {
+			return;
+		}
+		?>
+		<div class="notice is-dismissible updated elementor-message-dismissed elementor-message-announcement" data-notice_id="<?php echo esc_attr( $notice_id ); ?>">
+			<p><?php echo $admin_notice['notice_text']; ?></p>
+		</div>
+		<?php
+	}
+
 	/**
-	 * Admin notices.
+	 * Admin upgrade notices.
 	 *
-	 * Add Elementor notices to WordPress admin screen.
+	 * Add Elementor upgrades notices to WordPress admin screen.
 	 *
 	 * Fired by `admin_notices` action.
 	 *
 	 * @since 1.0.0
 	 * @access public
 	 */
-	public function admin_notices() {
+	public function admin_upgrade_notices() {
 		$upgrade_notice = Api::get_upgrade_notice();
 		if ( empty( $upgrade_notice ) ) {
 			return;
@@ -721,15 +744,7 @@ class Admin extends App {
 	 * @access public
 	 */
 	public function init_beta_tester( $current_screen ) {
-		$beta_tester_email = get_user_meta( get_current_user_id(), User::BETA_TESTER_META_KEY, true );
-
-		if ( 'yes' !== get_option( 'elementor_beta', 'no' ) || $beta_tester_email ) {
-			return;
-		}
-
-		$all_introductions = User::get_introduction_meta();
-		$beta_tester_signup_dismissed = array_key_exists( Beta_Testers::BETA_TESTER_SIGNUP, $all_introductions );
-		if ( ( ( 'toplevel_page_elementor' === $current_screen->base ) && ! $beta_tester_signup_dismissed ) || 'elementor_page_elementor-tools' === $current_screen->id ) {
+		if ( ( 'toplevel_page_elementor' === $current_screen->base ) || 'elementor_page_elementor-tools' === $current_screen->id ) {
 			add_action( 'admin_head', [ $this, 'add_beta_tester_template' ] );
 			add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_beta_tester_scripts' ] );
 		}
@@ -764,6 +779,7 @@ class Admin extends App {
 		add_filter( 'plugin_row_meta', [ $this, 'plugin_row_meta' ], 10, 2 );
 
 		add_action( 'admin_notices', [ $this, 'admin_notices' ] );
+		add_action( 'admin_notices', [ $this, 'admin_upgrade_notices' ] );
 		add_filter( 'admin_body_class', [ $this, 'body_status_classes' ] );
 		add_filter( 'admin_footer_text', [ $this, 'admin_footer_text' ] );
 
@@ -783,9 +799,14 @@ class Admin extends App {
 	 * @access protected
 	 */
 	protected function get_init_settings() {
+		$beta_tester_email = get_user_meta( get_current_user_id(), User::BETA_TESTER_META_KEY, true );
+		$elementor_beta = get_option( 'elementor_beta', 'no' );
+		$all_introductions = User::get_introduction_meta();
+		$beta_tester_signup_dismissed = array_key_exists( Beta_Testers::BETA_TESTER_SIGNUP, $all_introductions );
+
 		$settings = [
 			'home_url' => home_url(),
-			'beta_tester_signup' => Beta_Testers::BETA_TESTER_SIGNUP,
+			'settings_url' => Settings::get_url(),
 			'i18n' => [
 				'rollback_confirm' => __( 'Are you sure you want to reinstall previous version?', 'elementor' ),
 				'rollback_to_previous_version' => __( 'Rollback to Previous Version', 'elementor' ),
@@ -800,7 +821,12 @@ class Admin extends App {
 			'user' => [
 				'introduction' => User::get_introduction_meta(),
 			],
-
+			'beta_tester' => [
+				'beta_tester_signup' => Beta_Testers::BETA_TESTER_SIGNUP,
+				'has_email' => $beta_tester_email,
+				'option_enabled' => 'no' !== $elementor_beta,
+				'signup_dismissed' => $beta_tester_signup_dismissed,
+			],
 		];
 
 		return apply_filters( 'elementor/admin/localize_settings', $settings );

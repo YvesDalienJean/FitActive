@@ -68,21 +68,16 @@ class Hustle_Icontact_Form_Settings extends Hustle_Provider_Form_Settings_Abstra
 			'auto_optin' => '',
 		);
 		$current_data = $this->get_current_data( $current_data, $submitted_data );
-		$is_submit = ! empty( $submitted_data['is_submit'] ) && empty( $submitted_data['page'] );
+		$is_submit = ! empty( $submitted_data['hustle_is_submit'] );
 
 		if ( $is_submit && empty( $submitted_data['list_id'] ) ) {
 			$error_message = __( 'The list is required.', 'wordpress-popup' );
 		}
-		if ( !$is_submit && ! empty( $submitted_data['page'] ) ) {
-			$settings = array();
-			$settings['page'] = $submitted_data['page'];
-			$this->save_form_settings_values( $settings );
-		}
 
 		$options = $this->get_first_step_options( $current_data );
 
-		$step_html = Hustle_Api_Utils::get_modal_title_markup( __( 'Choose list', 'wordpress-popup' ), __( 'Choose the list you want to send form data to.', 'wordpress-popup' ) );
-		$step_html .= Hustle_Api_Utils::get_html_for_options( $options );
+		$step_html = Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'Choose list', 'wordpress-popup' ), __( 'Choose the list you want to send form data to.', 'wordpress-popup' ) );
+		$step_html .= Hustle_Provider_Utils::get_html_for_options( $options );
 
 		if( ! isset( $error_message ) ) {
 			$has_errors = false;
@@ -94,10 +89,10 @@ class Hustle_Icontact_Form_Settings extends Hustle_Provider_Form_Settings_Abstra
 
 		$buttons = array(
 			'disconnect' => array(
-				'markup' => Hustle_Api_Utils::get_button_markup( __( 'Disconnect', 'wordpress-popup' ), 'sui-button-ghost', 'disconnect_form', true ),
+				'markup' => Hustle_Provider_Utils::get_provider_button_markup( __( 'Disconnect', 'wordpress-popup' ), 'sui-button-ghost', 'disconnect_form', true ),
 			),
 			'save' => array(
-				'markup' => Hustle_Api_Utils::get_button_markup( __( 'Continue', 'wordpress-popup' ), '', 'next', true ),
+				'markup' => Hustle_Provider_Utils::get_provider_button_markup( __( 'Continue', 'wordpress-popup' ), '', 'next', true ),
 			),
 		);
 
@@ -111,13 +106,45 @@ class Hustle_Icontact_Form_Settings extends Hustle_Provider_Form_Settings_Abstra
 		if( $is_submit && ! $has_errors ){
 			// Save additional data for submission's entry
 			if ( !empty( $current_data['list_id'] ) ) {
-				$current_data['list_name'] = !empty( $this->lists[ $current_data['list_id'] ]['label'] )
-						? $this->lists[ $current_data['list_id'] ]['label'] . ' (' . $current_data['list_id'] . ')' : $current_data['list_id'];
+				$current_data['list_name'] = !empty( $this->lists[ $current_data['list_id'] ] )
+						? $this->lists[ $current_data['list_id'] ] . ' (' . $current_data['list_id'] . ')' : $current_data['list_id'];
 			}
 			$this->save_form_settings_values( $current_data );
 		}
 
 		return $response;
+	}
+
+	/**
+	 * Refresh list array via API
+	 *
+	 * @param object $provider
+	 * @param string $global_multi_id
+	 * @return array
+	 */
+	public function refresh_global_multi_lists( $provider, $global_multi_id ) {
+		$app_id = $provider->get_setting( 'app_id', '', $global_multi_id );
+		$username = $provider->get_setting( 'username', '', $global_multi_id );
+		$password = $provider->get_setting( 'password', '', $global_multi_id );
+		$api = $provider::api( $app_id, $password, $username );
+
+		$lists = array();
+		$limit = 20;
+		$offset = 0;
+
+		do {
+			$current_total = 0;
+			$_lists = $api->get_lists( $offset );
+
+			if( ! is_wp_error( $_lists ) && count( $_lists ) && isset( $_lists['lists'] ) ) {
+				$current_total = count( $_lists['lists'] );
+				$lists += wp_list_pluck( $_lists['lists'], 'name', 'listId' );
+			}
+
+			$offset += $limit;
+		} while ( $current_total === $limit );
+
+		return $lists;
 	}
 
 	/**
@@ -133,53 +160,15 @@ class Hustle_Icontact_Form_Settings extends Hustle_Provider_Form_Settings_Abstra
 		$settings = $this->get_form_settings_values( false );
 
 		$global_multi_id = $settings['selected_global_multi_id'];
-		$app_id = $provider->get_setting( 'app_id', '', $global_multi_id );
-		$username = $provider->get_setting( 'username', '', $global_multi_id );
-		$password = $provider->get_setting( 'password', '', $global_multi_id );
 		$auto_optin = $provider->get_setting( 'auto_optin', '', $global_multi_id );
 
 		$saved_auto_optin = 'pending' === $auto_optin ? 'pending' : '';
 		$checked = ! isset( $submitted_data['auto_optin'] ) ? $saved_auto_optin : $submitted_data['auto_optin'];
 		$is_double_optin_enabled = 'pending' === $checked;
 
-		//Load more function
-		$load_more = !empty( $settings['page'] );
-		$page = $load_more ? (int)$settings['page'] : 1;
-		$page_limit = 20;
-		$offset = ($page-1)*$page_limit;
-
-		$lists = array();
-
-		try {
-			$api = $provider::api( $app_id, $password, $username );
-			$_lists = !is_wp_error( $api ) ? $api->get_lists( $offset ) : array();
-
-			if( ! is_wp_error( $_lists ) && count( $_lists ) && isset( $_lists['lists'] ) ) {
-				foreach( $_lists['lists'] as $list ) {
-					$list = (array) $list;
-					$lists[ $list['listId'] ]['value'] = $list['listId'];
-					$lists[ $list['listId'] ]['label'] = $list['name'];
-					// Save it in order to get the selected list name before saving first step
-				}
-
-			}
-		} catch ( Exception $e ) {
-			// TODO: handle this properly
-			return array();
-		}
-
+		$lists = $this->get_global_multi_lists();
 		$this->lists = $lists;
-		$total_lists = count( $lists );
-
-		$first = $total_lists > 0 ? reset( $lists ) : "";
-		if( !empty( $first ) )
-			$first = $first['value'];
-
-		if( ! isset( $submitted_data['list_id'] ) ) {
-			$selected_list = $first;
-		} else {
-			$selected_list = array_key_exists( $submitted_data['list_id'], $lists ) ? $submitted_data['list_id'] : $first;
-		}
+		$selected_list = $this->get_selected_list( $submitted_data );
 
 		$options =  array(
 			array(
@@ -190,15 +179,25 @@ class Hustle_Icontact_Form_Settings extends Hustle_Provider_Form_Settings_Abstra
 						'for'   => 'list_id',
 						'value' => __( 'Email List', 'wordpress-popup' ),
 					),
-					'list'  => array(
-						'type'     => 'select',
-						'name'     => 'list_id',
-						'id'       => 'list_id',
-						'class'    => 'sui-select',
-						'default'  => '',
-						'options'  => $lists,
-						'value'    => $selected_list,
-						'selected' => $selected_list,
+					'wrapper' => array(
+						'type'     => 'wrapper',
+						'class'    => 'hui-select-refresh',
+						'is_not_field_wrapper' => true,
+						'elements' => array(
+							'lists' => array(
+								'type'     => 'select',
+								'id'       => 'list_id',
+								'name'     => 'list_id',
+								'class'    => 'sui-select',
+								'value'    => $selected_list,
+								'selected' => $selected_list,
+								'options'  => $lists,
+							),
+							'refresh' => array(
+								'type' => 'raw',
+								'value' => Hustle_Provider_Utils::get_provider_button_markup( __( 'Refresh', 'wordpress-popup' ), '', 'refresh_list', true ),
+							),
+						),
 					),
 				),
 			),
@@ -224,30 +223,7 @@ class Hustle_Icontact_Form_Settings extends Hustle_Provider_Form_Settings_Abstra
 					),
 				),
 			),
-			array(
-				'type'  => 'hidden',
-				'name'  => 'is_submit',
-				'value' => '1',
-			),
 		);
-
-		$navigation_elements = array();
-		if ( 1 < $page ) {
-			$navigation_elements['navigation_prev'] = $this->get_previous_button( $page );
-		}
-
-		if ( $page_limit === $total_lists ) {
-			$navigation_elements['navigation_next'] = $this->get_next_button( $page );
-		}
-		
-		if ( ! empty( $navigation_elements ) ) {
-			$options[0]['elements']['navigation_wrapper'] = array(
-				'type' => 'wrapper',
-				'class' => 'hui-email-list-navigation',
-				'is_not_field_wrapper' => true,
-				'elements' => $navigation_elements,
-			);
-		}
 
 		return $options;
 	}
@@ -280,7 +256,7 @@ class Hustle_Icontact_Form_Settings extends Hustle_Provider_Form_Settings_Abstra
 		);
 
 		$current_data = $this->get_current_data( $current_data, $submitted_data );
-		$is_submit = ! empty( $submitted_data['is_submit'] );
+		$is_submit = ! empty( $submitted_data['hustle_is_submit'] );
 
 		if ( $is_submit && empty( $submitted_data['confirmation_message_id'] ) ) {
 			$error_message = __( 'The confirmation message is required when double opt-in is enabled.', 'wordpress-popup' );
@@ -288,8 +264,8 @@ class Hustle_Icontact_Form_Settings extends Hustle_Provider_Form_Settings_Abstra
 
 		$options = $this->get_second_step_options( $current_data );
 
-		$step_html = Hustle_Api_Utils::get_modal_title_markup( __( 'Choose confirmation message', 'wordpress-popup' ), '' );
-		$step_html .= Hustle_Api_Utils::get_html_for_options( $options );
+		$step_html = Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'Choose confirmation message', 'wordpress-popup' ), '' );
+		$step_html .= Hustle_Provider_Utils::get_html_for_options( $options );
 
 		if( ! isset( $error_message ) ) {
 			$has_errors = false;
@@ -301,10 +277,20 @@ class Hustle_Icontact_Form_Settings extends Hustle_Provider_Form_Settings_Abstra
 
 		$buttons = array(
 			'cancel' => array(
-				'markup' => Hustle_Api_Utils::get_button_markup( __( 'Back', 'wordpress-popup' ), '', 'prev', true ),
+				'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+					__( 'Back', 'wordpress-popup' ),
+					'',
+					'prev',
+					true
+				),
 			),
 			'save' => array(
-				'markup' => Hustle_Api_Utils::get_button_markup( __( 'Save', 'wordpress-popup' ), '', 'next', true ),
+				'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+					__( 'Save', 'wordpress-popup' ),
+					'',
+					'next',
+					true
+				),
 			),
 		);
 
@@ -354,8 +340,7 @@ class Hustle_Icontact_Form_Settings extends Hustle_Provider_Form_Settings_Abstra
 			if ( ! empty( $existing_messages['messages'] ) ) {
 				foreach( $existing_messages['messages'] as $message ) {
 					if( 'confirmation' === $message['messageType'] ) {
-						$confirmation_messages_list[ $message['messageId'] ]['label'] = $message['messageName'];
-						$confirmation_messages_list[ $message['messageId'] ]['value'] = $message['messageId'];
+						$confirmation_messages_list[ $message['messageId'] ] = $message['messageName'];
 					}
 				}
 
@@ -365,11 +350,7 @@ class Hustle_Icontact_Form_Settings extends Hustle_Provider_Form_Settings_Abstra
 			return array();
 		}
 
-		$total_lists = count( $confirmation_messages_list );
-
-		$first = $total_lists > 0 ? reset( $confirmation_messages_list ) : "";
-		if( !empty( $first ) )
-			$first = $first['value'];
+		$first = array_key_first( $confirmation_messages_list );
 
 		if( ! isset( $submitted_data['confirmation_message_id'] ) ) {
 			$selected_list = $first;
@@ -399,18 +380,6 @@ class Hustle_Icontact_Form_Settings extends Hustle_Provider_Form_Settings_Abstra
 						'class'			=> 'sui-select sui-styled',
 					),
 				),
-			),
-			"wrapper" => array(
-				"id"    => "",
-				"class" => "sui-form-field",
-				"type"  => "wrapper",
-				"elements" => array(
-					"api_key" => array(
-						"name"          => "is_submit",
-						"type"          => "hidden",
-						"value"         => '1',
-					),
-				)
 			),
 		);
 

@@ -395,4 +395,18 @@ class WPForms_Overview_Table extends WP_List_Table {
 			)
 		);
 	}
+
+	/**
+	 * Extending the `display_rows()` method in order to add hooks.
+	 *
+	 * @since 1.5.6
+	 */
+	public function display_rows() {
+
+		do_action( 'wpforms_admin_overview_before_rows', $this );
+
+		parent::display_rows();
+
+		do_action( 'wpforms_admin_overview_after_rows', $this );
+	}
 }

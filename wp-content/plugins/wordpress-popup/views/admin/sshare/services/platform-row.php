@@ -1,3 +1,4 @@
+<?php $global_placeholders = Opt_In_Utils::get_global_placeholders();?>
 <script id="hustle-platform-row-tpl" type="text/template">
 
 	<div class="sui-builder-field sui-accordion-item sui-can-move" id="hustle-platform-{{platform}}" data-platform="{{platform}}">
@@ -114,38 +115,105 @@
 
 			</div>
 
-			<div class="sui-form-field">
+			<# if ( 'email' !== platform ) { #>
 
-				<# if ( hasEndpoint ) { #>
+				<div class="sui-form-field">
 
-					<label class="sui-label"><?php esc_html_e( 'Custom URL (optional)', 'wordpress-popup' ); ?></label>
+					<# if ( hasEndpoint ) { #>
 
-				<# } else { #>
+						<label class="sui-label"><?php esc_html_e( 'Custom URL (optional)', 'wordpress-popup' ); ?></label>
 
-					<label class="sui-label"><?php esc_html_e( 'Custom URL', 'wordpress-popup' ); ?></label>
+					<# } else { #>
 
-				<# } #>
+						<label class="sui-label"><?php esc_html_e( 'Custom URL', 'wordpress-popup' ); ?></label>
 
-				<input
-					type="url"
-					name="{{platform}}_link"
-					data-attribute="{{platform}}_link"
-					value="{{link}}"
-					placeholder="<?php esc_html_e( 'Type the custom URL here', 'wordpress-popup' ); ?>"
-					class="sui-form-control"
-				/>
+					<# } #>
 
-				<# if ( hasEndpoint ) { #>
+					<input
+						type="url"
+						name="{{platform}}_link"
+						data-attribute="{{platform}}_link"
+						value="{{link}}"
+						placeholder="<?php esc_html_e( 'Type the custom URL here', 'wordpress-popup' ); ?>"
+						class="sui-form-control"
+					/>
 
-					<span class="sui-description"><?php esc_html_e( 'Redirect visitors to this URL when they click the icon. Leaving this blank will share the page link instead.', 'wordpress-popup' ); ?></span>
+					<# if ( hasEndpoint ) { #>
 
-				<# } else { #>
+						<span class="sui-description"><?php esc_html_e( 'Redirect visitors to this URL when they click the icon. Leaving this blank will share the page link instead.', 'wordpress-popup' ); ?></span>
 
-					<span class="sui-description"><?php esc_html_e( 'Redirect visitors to this URL when they click the icon. Note that a valid redirect URL is required to show this icon to your visitors.', 'wordpress-popup' ); ?></span>
+					<# } else { #>
 
-				<# } #>
+						<span class="sui-description"><?php esc_html_e( 'Redirect visitors to this URL when they click the icon. Note that a valid redirect URL is required to show this icon to your visitors.', 'wordpress-popup' ); ?></span>
 
-			</div>
+					<# } #>
+
+				</div>
+
+			<# } else { #>
+
+				<div class="sui-form-field">
+
+					<label for="hustle-sshare-email--subject" id="hustle-sshare-email--subject-label" class="sui-label"><?php esc_html_e( 'Email subject', 'wordpress-popup' ); ?></label>
+
+					<div class="sui-insert-variables">
+
+						<input
+							type="text"
+							name="{{platform}}_title"
+							data-attribute="{{platform}}_title"
+							value="{{title}}"
+							id="hustle-sshare-email--subject"
+							class="sui-form-control"
+							aria-labelledby="hustle-sshare-email--subject-label"
+						/>
+
+						<select class="hustle-select-field-variables" data-field="{{platform}}_title">
+
+							<?php foreach ( $global_placeholders as $placeholder => $display_name ) : ?>
+								<option value="{<?php echo esc_attr( $placeholder ); ?>}"><?php echo esc_html( $display_name ); ?></option>
+							<?php endforeach; ?>
+
+						</select>
+
+					</div>
+
+				</div>
+
+				<div class="sui-form-field">
+
+					<label
+						for="hustle-sshare-email--body"
+						id="hustle-sshare-email--body-label"
+						class="sui-label"
+					>
+						<?php esc_html_e( 'Email body', 'wordpress-popup' ); ?>
+						<span class="sui-label-note"><?php esc_html_e( 'Use the “+” icon to add variable(s)', 'wordpress-popup' ); ?></span>
+					</label>
+
+					<div class="sui-insert-variables">
+
+						<textarea
+							name="{{platform}}_message"
+							data-attribute="{{platform}}_message"
+							id="hustle-sshare-email--body"
+							class="sui-form-control"
+							aria-labelledby="hustle-sshare-email--body-label"
+						>{{message}}</textarea>
+
+						<select class="hustle-select-field-variables" data-field="{{platform}}_message">
+
+							<?php foreach ( $global_placeholders as $placeholder => $display_name ) : ?>
+								<option value="{<?php echo esc_attr( $placeholder ); ?>}" data-content="{<?php echo esc_attr( $placeholder ); ?>}" role="option"><?php echo esc_html( $display_name ); ?></option>
+							<?php endforeach; ?>
+
+						</select>
+
+					</div>
+
+				</div>
+
+			<# } #>
 
 		</div>
 

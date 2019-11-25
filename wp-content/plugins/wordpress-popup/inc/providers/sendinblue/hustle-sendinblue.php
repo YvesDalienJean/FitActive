@@ -10,7 +10,6 @@ class Hustle_SendinBlue extends Hustle_Provider_Abstract  {
 	const SLUG = "sendinblue";
 	//const NAME = "SendinBlue";
 
-	const LIST_PAGES = "hustle-sendinblue-list-pages";
 	const CURRENT_LISTS = "hustle-sendinblue-current-list";
 
 	/**
@@ -23,6 +22,15 @@ class Hustle_SendinBlue extends Hustle_Provider_Abstract  {
 	protected static $_instance = null;
 
 	/**
+	 * Provider api instance
+	 *
+	 * @since 4.0.2
+	 *
+	 * @var self|null
+	 */
+	protected  static $api;
+
+	/**
 	 * @since 3.0.5
 	 * @var string
 	 */
@@ -32,7 +40,7 @@ class Hustle_SendinBlue extends Hustle_Provider_Abstract  {
 	 * @since 3.0.5
 	 * @var string
 	 */
-	protected $_version				   = '1.0';
+	protected $_version				   = '2.0';
 
 	/**
 	 * @since 3.0.5
@@ -45,12 +53,6 @@ class Hustle_SendinBlue extends Hustle_Provider_Abstract  {
 	 * @var string
 	 */
 	protected $_title                  = 'SendinBlue';
-
-	/**
-	 * @since 3.0.5
-	 * @var bool
-	 */
-	protected $_supports_fields 	   = true;
 
 	/**
 	 * Class name of form settings
@@ -88,14 +90,22 @@ class Hustle_SendinBlue extends Hustle_Provider_Abstract  {
 		return self::$_instance;
 	}
 
-	public static function api( $api_key ) {
-		if ( ! class_exists( 'Hustle_SendinBlue_Api' ) )
-			require_once 'hustle-sendinblue-api.php';
-
-		$api = new Hustle_SendinBlue_Api( $api_key );
-
-		return $api;
+	/**
+	 * @param $api_key
+	 * @return Hustle_SendinBlue_Api
+	 */
+	public static function api( $api_key ){
+		if( empty( self::$api ) ){
+			try {
+				self::$api = Hustle_SendinBlue_Api::boot( $api_key );
+			} catch ( Exception $e ) {
+				//handle errors here
+				self::$api = null;
+			}
+		}
+		return self::$api;
 	}
+
 	/**
 	 * Get the wizard callbacks for the global settings.
 	 *
@@ -122,6 +132,7 @@ class Hustle_SendinBlue extends Hustle_Provider_Abstract  {
 	 * @return array
 	 */
 	public function configure_api_key( $submitted_data ) {
+
 		$has_errors = false;
 		$default_data = array(
 			'api_key' => '',
@@ -159,10 +170,10 @@ class Hustle_SendinBlue extends Hustle_Provider_Abstract  {
 			if ( ! $has_errors ) {
 
 				return array(
-					'html'         => Hustle_Api_Utils::get_modal_title_markup( __( 'SendinBlue Added', 'wordpress-popup' ), __( 'You can now go to your forms and assign them to this integration', 'wordpress-popup' ) ),
+					'html'         => Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'SendinBlue Added', 'wordpress-popup' ), __( 'You can now go to your pop-ups, slide-ins and embeds and assign them to this integration', 'wordpress-popup' ) ),
 					'buttons'      => array(
 						'close' => array(
-							'markup' => Hustle_Api_Utils::get_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
+							'markup' => Hustle_Provider_Utils::get_provider_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
 						),
 					),
 					'redirect'     => false,
@@ -226,10 +237,10 @@ class Hustle_SendinBlue extends Hustle_Provider_Abstract  {
 			),
 		);
 
-		$step_html = Hustle_Api_Utils::get_modal_title_markup(
+		$step_html = Hustle_Provider_Utils::get_integration_modal_title_markup(
 			__( 'Configure SendinBlue', 'wordpress-popup' ),
 			sprintf(
-				__( 'To get %1$sSendinBlue%2$s API key v2.0 log in %3$scampaigns dashboard%4$s and click on %1$sSMTP & API%2$s in left menu.', 'wordpress-popup' ),
+				__( 'To get %1$sSendinBlue%2$s API key v3.0 log in %3$scampaigns dashboard%4$s and click on %1$sSMTP & API%2$s in left menu.', 'wordpress-popup' ),
 				'<strong>',
 				'</strong>',
 				'<a href="https://account.sendinblue.com/advanced/api" target="_blank">',
@@ -239,22 +250,37 @@ class Hustle_SendinBlue extends Hustle_Provider_Abstract  {
 		if ( $has_errors ) {
 			$step_html .= '<span class="sui-notice sui-notice-error"><p>' . esc_html( $error_message ) . '</p></span>';
 		}
-		$step_html .= Hustle_Api_Utils::get_html_for_options( $options );
+		$step_html .= Hustle_Provider_Utils::get_html_for_options( $options );
 
 		$is_edit = $this->settings_are_completed( $global_multi_id );
 		if ( $is_edit ) {
 			$buttons = array(
 				'disconnect' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Disconnect', 'wordpress-popup' ), 'sui-button-ghost', 'disconnect', true ),
+					'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+						__( 'Disconnect', 'wordpress-popup' ),
+						'sui-button-ghost',
+						'disconnect',
+						true
+					),
 				),
 				'save' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Save', 'wordpress-popup' ), '', 'connect', true ),
+					'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+						__( 'Save', 'wordpress-popup' ),
+						'',
+						'connect',
+						true
+					),
 				),
 			);
 		} else {
 			$buttons = array(
 				'connect' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Connect', 'wordpress-popup' ), '', 'connect', true ),
+					'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+						__( 'Connect', 'wordpress-popup' ),
+						'sui-button-right',
+						'connect',
+						true
+					),
 				),
 			);
 
@@ -284,14 +310,9 @@ class Hustle_SendinBlue extends Hustle_Provider_Abstract  {
 
 		// Check API Key by validating it on get_info request
 		try {
-
-			if ( ! $this->check_api( $api_key ) ) {
-				Hustle_Api_Utils::maybe_log( __METHOD__, __( 'Invalid SendinBlue API key.', 'wordpress-popup' ) );
-				return false;
-			}
-
+			self::api( $api_key )->get_account();
 		} catch ( Exception $e ) {
-			Hustle_Api_Utils::maybe_log( __METHOD__, $e->getMessage() );
+			Hustle_Provider_Utils::maybe_log( __METHOD__, $e->getMessage() );
 			return false;
 		}
 
@@ -302,28 +323,6 @@ class Hustle_SendinBlue extends Hustle_Provider_Abstract  {
 		return array(
 			'api_key' => 'api_key',
 		);
-	}
-
-	/**
-	 * Check API key
-	 *
-	 * @param object $api_key Hustle_SendinBlue_Api
-	 * @return boolean | object Hustle_SendinBlue_Api
-	 */
-	public function check_api( $api_key ) {
-		// Check if API key is valid
-		$api = self::api( $api_key );
-
-		$_lists = $api->get_lists( array(
-			"page" => 1,
-			"page_limit" => 10
-		));
-
-		if ( !is_wp_error( $_lists ) && 'failure' !== $_lists['code'] ) {
-			return $api;
-		} else {
-			return false;
-		}
 	}
 
 	public static function add_custom_fields( $fields, $api ) {
@@ -349,6 +348,31 @@ class Hustle_SendinBlue extends Hustle_Provider_Abstract  {
 			'success' => true,
 			'field' => $fields,
 		);
+	}
+
+	public function slient_update_api(){
+		if ( Hustle_Provider_Utils::is_provider_active( $this->_slug )
+			|| Hustle_Providers::get_instance()->activate_addon( $this->_slug ) ) {
+			$sendinblue_instances = get_option( 'hustle_provider_sendinblue_settings' );
+			foreach ($sendinblue_instances as $global_multi_id => $creds) {
+				try{
+					$new_key = Hustle_SendinBlue_Api::boot( $creds['api_key'] )->migrate_to_v3( array( 'name'=>'hustle_v3_migrated' ) );
+					$new_key = isset( $new_key->data ) ? $new_key->data : array();
+
+					if( isset( $new_key->value ) && ! empty( $new_key->value ) ){
+						$settings_to_save = array(
+							'api_key' => $new_key->value,
+							'name' => isset( $creds['name'] ) ? $creds['name'] : '',
+						);
+						$this->save_multi_settings_values( $global_multi_id, $settings_to_save );
+						update_option( 'hustle_provider_sendinblue_version', $this->get_version() );
+					}
+				} catch( Excetption $e ){
+					Opt_In_Utils::maybe_log( 'sendinblue', 'failed to migrate silently', $e->getMessage() );
+				}
+			}
+
+		}
 	}
 }
 

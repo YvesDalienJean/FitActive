@@ -288,22 +288,38 @@ class Hustle_Renderer_Sshare extends Hustle_Renderer_Abstract {
 
 				$social_icons = $content->social_icons;
 
+				// phpcs:disable Generic.WhiteSpace.ScopeIndent.IncorrectExact
+				// Extra indentation to mimic html tree.
 				if ( ! empty( $social_icons ) ) {
 
 					foreach ( $social_icons as $icon => $data ) {
 
-						$type 	= isset( $data['type'] ) ? $data['type'] : '';
-						$label 	= isset( $data['label'] ) ? $data['label'] : '';
+						$type  = isset( $data['type'] ) ? $data['type'] : '';
+						$label = isset( $data['label'] ) ? $data['label'] : '';
 
-						if ( '' === $data['link'] ) {
+						if ( '' === $data['link'] && 'email' !== $icon ) {
 
 							$href_value = 'href="#"';
-							$link_type = 'native';
+							$link_type  = 'native';
 
 						} else {
+							// Check if is email to insert mailto.
+							if ( 'email' === $icon ) {
 
-							$href_value = 'href="' . esc_url( $data['link'] ) . '" target="_blank"';
+								$query_args = [
+									'subject' => rawurlencode( Opt_In_Utils::replace_global_placeholders( $data['title'] ) ),
+									'body'    => rawurlencode( Opt_In_Utils::replace_global_placeholders( $data['message'] ) ),
+								];
+								$mail_url   = add_query_arg( $query_args, 'mailto:' );
+								$href_value = 'href="' . esc_url( $mail_url ) . '"';
+								$title      = apply_filters( 'hustle_social_share_platform_title', rawurlencode( html_entity_decode( esc_html( get_the_title() ) ) ) );
+
+							} else {
+								$href_value = 'href="' . esc_url( $data['link'] ) . '" target="_blank"';
+							}
+
 							$link_type = 'custom';
+
 						}
 
 						if ( 'fivehundredpx' === $icon ) {
@@ -354,6 +370,7 @@ class Hustle_Renderer_Sshare extends Hustle_Renderer_Abstract {
 					}
 				}
 
+			// phpcs:enable Generic.WhiteSpace.ScopeIndent.IncorrectExact
 			$html .= '</ul>';
 
 		$html .= '</div>';

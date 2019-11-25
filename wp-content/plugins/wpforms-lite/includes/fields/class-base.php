@@ -74,13 +74,31 @@ abstract class WPForms_Field {
 	public $form_id;
 
 	/**
-	 * Current form data in.
+	 * Current field ID.
+	 *
+	 * @since 1.5.6
+	 *
+	 * @var int
+	 */
+	public $field_id;
+
+	/**
+	 * Current form data.
 	 *
 	 * @since 1.1.1
 	 *
 	 * @var array
 	 */
 	public $form_data;
+
+	/**
+	 * Current field data.
+	 *
+	 * @since 1.5.6
+	 *
+	 * @var array
+	 */
+	public $field_data;
 
 	/**
 	 * Primary class constructor.
@@ -559,7 +577,7 @@ abstract class WPForms_Field {
 		$id     = (int) $field['id'];
 		$class  = ! empty( $args['class'] ) ? sanitize_html_class( $args['class'] ) : '';
 		$slug   = ! empty( $args['slug'] ) ? sanitize_title( $args['slug'] ) : '';
-		$data   = '';
+		$attrs  = '';
 		$output = '';
 
 		if ( ! empty( $args['data'] ) ) {
@@ -567,7 +585,15 @@ abstract class WPForms_Field {
 				if ( is_array( $val ) ) {
 					$val = wp_json_encode( $val );
 				}
-				$data .= ' data-' . $arg_key . '=\'' . $val . '\'';
+				$attrs .= ' data-' . $arg_key . '=\'' . $val . '\'';
+			}
+		}
+		if ( ! empty( $args['attrs'] ) ) {
+			foreach ( $args['attrs'] as $arg_key => $val ) {
+				if ( is_array( $val ) ) {
+					$val = wp_json_encode( $val );
+				}
+				$attrs .= $arg_key . '=\'' . $val . '\'';
 			}
 		}
 
@@ -606,19 +632,19 @@ abstract class WPForms_Field {
 				if ( ! empty( $before ) ) {
 					$class .= ' has-before';
 				}
-				$output = sprintf( '%s<input type="%s" class="%s" id="wpforms-field-option-%d-%s" name="fields[%d][%s]" value="%s" placeholder="%s" %s>', $before, $type, $class, $id, $slug, $id, $slug, esc_attr( $args['value'] ), $placeholder, $data );
+				$output = sprintf( '%s<input type="%s" class="%s" id="wpforms-field-option-%d-%s" name="fields[%d][%s]" value="%s" placeholder="%s" %s>', $before, $type, $class, $id, $slug, $id, $slug, esc_attr( $args['value'] ), $placeholder, $attrs );
 				break;
 
 			// Textarea.
 			case 'textarea':
 				$rows   = ! empty( $args['rows'] ) ? (int) $args['rows'] : '3';
-				$output = sprintf( '<textarea class="%s" id="wpforms-field-option-%d-%s" name="fields[%d][%s]" rows="%d" %s>%s</textarea>', $class, $id, $slug, $id, $slug, $rows, $data, $args['value'] );
+				$output = sprintf( '<textarea class="%s" id="wpforms-field-option-%d-%s" name="fields[%d][%s]" rows="%d" %s>%s</textarea>', $class, $id, $slug, $id, $slug, $rows, $attrs, $args['value'] );
 				break;
 
 			// Checkbox.
 			case 'checkbox':
 				$checked = checked( '1', $args['value'], false );
-				$output  = sprintf( '<input type="checkbox" class="%s" id="wpforms-field-option-%d-%s" name="fields[%d][%s]" value="1" %s %s>', $class, $id, $slug, $id, $slug, $checked, $data );
+				$output  = sprintf( '<input type="checkbox" class="%s" id="wpforms-field-option-%d-%s" name="fields[%d][%s]" value="1" %s %s>', $class, $id, $slug, $id, $slug, $checked, $attrs );
 				$output .= sprintf( '<label for="wpforms-field-option-%d-%s" class="inline">%s', $id, $slug, $args['desc'] );
 				if ( isset( $args['tooltip'] ) && ! empty( $args['tooltip'] ) ) {
 					$output .= ' ' . sprintf( '<i class="fa fa-question-circle wpforms-help-tooltip" title="%s"></i>', esc_attr( $args['tooltip'] ) );
@@ -633,14 +659,14 @@ abstract class WPForms_Field {
 				$cls     = $args['value'] ? 'wpforms-on' : 'wpforms-off';
 				$status  = $args['value'] ? esc_html__( 'On', 'wpforms-lite' ) : esc_html__( 'Off', 'wpforms-lite' );
 				$output  = sprintf( '<span class="wpforms-toggle-icon %s"><i class="fa %s" aria-hidden="true"></i> <span class="wpforms-toggle-icon-label">%s</span>', $cls, $icon, $status );
-				$output .= sprintf( '<input type="checkbox" class="%s" id="wpforms-field-option-%d-%s" name="fields[%d][%s]" value="1" %s %s></span>', $class, $id, $slug, $id, $slug, $checked, $data );
+				$output .= sprintf( '<input type="checkbox" class="%s" id="wpforms-field-option-%d-%s" name="fields[%d][%s]" value="1" %s %s></span>', $class, $id, $slug, $id, $slug, $checked, $attrs );
 				break;
 
 			// Select.
 			case 'select':
 				$options = $args['options'];
 				$value   = isset( $args['value'] ) ? $args['value'] : '';
-				$output  = sprintf( '<select class="%s" id="wpforms-field-option-%d-%s" name="fields[%d][%s]" %s>', $class, $id, $slug, $id, $slug, $data );
+				$output  = sprintf( '<select class="%s" id="wpforms-field-option-%d-%s" name="fields[%d][%s]" %s>', $class, $id, $slug, $id, $slug, $attrs );
 				foreach ( $options as $arg_key => $arg_option ) {
 					$output .= sprintf( '<option value="%s" %s>%s</option>', esc_attr( $arg_key ), selected( $arg_key, $value, false ), $arg_option );
 				}
@@ -652,7 +678,7 @@ abstract class WPForms_Field {
 			return $output;
 		}
 
-		echo $output; // WPCS: XSS ok.
+		echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -1068,7 +1094,7 @@ abstract class WPForms_Field {
 			 * Default value.
 			 */
 			case 'default_value':
-				$value   = ! empty( $field['default_value'] ) ? esc_attr( $field['default_value'] ) : '';
+				$value   = ! empty( $field['default_value'] ) || ( isset( $field['default_value'] ) && '0' === (string) $field['default_value'] ) ? esc_attr( $field['default_value'] ) : '';
 				$tooltip = esc_html__( 'Enter text for the default form field value.', 'wpforms-lite' );
 				$toggle  = '<a href="#" class="toggle-smart-tag-display" data-type="other"><i class="fa fa-tags"></i> <span>' . esc_html__( 'Show Smart Tags', 'wpforms-lite' ) . '</span></a>';
 				$output  = $this->field_element( 'label', $field, array( 'slug' => 'default_value', 'value' => esc_html__( 'Default Value', 'wpforms-lite' ), 'tooltip' => $tooltip, 'after_tooltip' => $toggle ), false );
@@ -1620,7 +1646,9 @@ abstract class WPForms_Field {
 		$this->field_preview( $field );
 		$prev     = ob_get_clean();
 		$preview  = sprintf( '<div class="wpforms-field wpforms-field-%s %s %s" id="wpforms-field-%d" data-field-id="%d" data-field-type="%s">', $field_type, $field_required, $field_class, $field['id'], $field['id'], $field_type );
-		$preview .= sprintf( '<a href="#" class="wpforms-field-duplicate" title="%s"><i class="fa fa-files-o" aria-hidden="true"></i></a>', esc_attr__( 'Duplicate Field', 'wpforms-lite' ) );
+		if ( apply_filters( 'wpforms_field_new_display_duplicate_button', true, $field ) ) {
+			$preview .= sprintf( '<a href="#" class="wpforms-field-duplicate" title="%s"><i class="fa fa-files-o" aria-hidden="true"></i></a>', esc_attr__( 'Duplicate Field', 'wpforms-lite' ) );
+		}
 		$preview .= sprintf( '<a href="#" class="wpforms-field-delete" title="%s"><i class="fa fa-trash"></i></a>', esc_attr__( 'Delete Field', 'wpforms-lite' ) );
 		$preview .= sprintf( '<span class="wpforms-field-helper">%s</span>', esc_html__( 'Click to edit. Drag to reorder.', 'wpforms-lite' ) );
 		$preview .= $prev;
@@ -1718,7 +1746,7 @@ abstract class WPForms_Field {
 	 * @since 1.0.0
 	 *
 	 * @param int   $field_id     Field ID.
-	 * @param array $field_submit Field value that was submitted.
+	 * @param mixed $field_submit Field value that was submitted.
 	 * @param array $form_data    Form data and settings.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {

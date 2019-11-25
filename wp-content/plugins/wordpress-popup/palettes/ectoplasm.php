@@ -1,4 +1,10 @@
 <?php
+$button_border_static = '#A3B723';
+$button_border_hover  = '#9EAF31';
+
+$input_border_static = '#9077B9';
+$input_border_hover  = '#432C68';
+
 return array(
 	// ==================================================|
 	// 1. BASIC                                          |
@@ -62,6 +68,9 @@ return array(
 	// ***************************************************
 	// 3.1. DEFAULT
 
+	// Border color
+	'cta_button_static_bo'               => $button_border_static,
+
 	// Background color
 	'cta_button_static_bg'               => '#B9CE33',
 
@@ -71,6 +80,9 @@ return array(
 	// ***************************************************
 	// 3.2. HOVER
 
+	// Border color
+	'cta_button_hover_bo'                => $button_border_hover,
+
 	// Background color
 	'cta_button_hover_bg'                => '#92A41E',
 
@@ -79,6 +91,9 @@ return array(
 
 	// ***************************************************
 	// 3.3. ACTIVE
+
+	// Border color
+	'cta_button_active_bo'               => $button_border_hover,
 
 	// Background color
 	'cta_button_active_bg'               => '#92A41E',
@@ -97,7 +112,7 @@ return array(
 	'optin_input_icon'                   => '#AAAAAA',
 
 	// Border color
-	'optin_input_static_bo'              => '#FFFFFF',
+	'optin_input_static_bo'              => $input_border_static,
 
 	// Background color
 	'optin_input_static_bg'              => '#FFFFFF',
@@ -118,7 +133,7 @@ return array(
 	'optin_input_hover_bg'               => '#FFFFFF',
 
 	// Border color
-	'optin_input_hover_bo'               => '#FFFFFF',
+	'optin_input_hover_bo'               => $input_border_hover,
 
 
 	// ***************************************************
@@ -131,7 +146,7 @@ return array(
 	'optin_input_active_bg'              => '#FFFFFF',
 
 	// Border color
-	'optin_input_active_bo'              => '#FFFFFF',
+	'optin_input_active_bo'              => $input_border_hover,
 
 
 	// ***************************************************
@@ -155,7 +170,7 @@ return array(
 	// 5.1. DEFAULT
 
 	// Border color
-	'optin_check_radio_bo'               => '#FFFFFF',
+	'optin_check_radio_bo'               => $input_border_static,
 
 	// Background color
 	'optin_check_radio_bg'               => '#FFFFFF',
@@ -167,7 +182,7 @@ return array(
 	// 5.2. CHECKED
 
 	// Border color
-	'optin_check_radio_bo_checked'       => '#FFFFFF',
+	'optin_check_radio_bo_checked'       => $input_border_hover,
 
 	// Background color
 	'optin_check_radio_bg_checked'       => '#FFFFFF',
@@ -183,7 +198,7 @@ return array(
 	// 6.1. DEFAULT
 
 	// Border color
-	'gdpr_chechbox_border_static'        => '#FFFFFF',
+	'gdpr_chechbox_border_static'        => $input_border_static,
 
 	// Background color
 	'gdpr_chechbox_background_static'    => '#FFFFFF',
@@ -198,7 +213,7 @@ return array(
 	// 6.2. CHECKED
 
 	// Border color
-	'gdpr_chechbox_border_active'        => '#FFFFFF',
+	'gdpr_chechbox_border_active'        => $input_border_hover,
 
 	// Background color
 	'gdpr_checkbox_background_active'    => '#FFFFFF',
@@ -223,7 +238,7 @@ return array(
 	// 6.1. DEFAULT
 
 	// Select Border color
-	'optin_select_border'                => '#FFFFFF',
+	'optin_select_border'                => $input_border_static,
 
 	// Icon color
 	'optin_select_icon'                  => '#B9CE33',
@@ -241,7 +256,7 @@ return array(
 	// 6.2. HOVER
 
 	// Border color
-	'optin_select_border_hover'          => '#FFFFFF',
+	'optin_select_border_hover'          => $input_border_hover,
 
 	// Icon color
 	'optin_select_icon_hover'            => '#92A41E',
@@ -253,7 +268,7 @@ return array(
 	// 6.3. OPEN
 
 	// Border color
-	'optin_select_border_open'           => '#FFFFFF',
+	'optin_select_border_open'           => $input_border_hover,
 
 	// Icon color
 	'optin_select_icon_open'             => '#92A41E',
@@ -361,7 +376,7 @@ return array(
 	// 9.1. DEFAULT
 
 	// Border color
-	'optin_submit_button_static_bo'      => '#B9CE33',
+	'optin_submit_button_static_bo'      => $button_border_static,
 
 	// Background color
 	'optin_submit_button_static_bg'      => '#B9CE33',
@@ -373,7 +388,7 @@ return array(
 	// 9.2. HOVER
 
 	// border color
-	'optin_submit_button_hover_bo'       => '#92A41E',
+	'optin_submit_button_hover_bo'       => $button_border_hover,
 
 	// Background color
 	'optin_submit_button_hover_bg'       => '#92A41E',
@@ -385,7 +400,7 @@ return array(
 	// 9.3. ACTIVE
 
 	// Border color
-	'optin_submit_button_active_bo'      => '#92A41E',
+	'optin_submit_button_active_bo'      => $button_border_hover,
 
 	// Background color
 	'optin_submit_button_active_bg'      => '#92A41E',
@@ -419,6 +434,9 @@ return array(
 	// ==================================================|
 	// 12. SUCCESS MESSAGE                               |
 	// ==================================================|
+
+	// Background color
+	'optin_success_background'           => '#403159',
 
 	// Icon color
 	'optin_success_tick_color'           => '#B9CE33',

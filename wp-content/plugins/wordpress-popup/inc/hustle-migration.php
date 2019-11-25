@@ -102,7 +102,13 @@ class Hustle_Migration {
 	 * @return bool
 	 */
 	public static function did_hustle_exist() {
-		return get_option( 'hustle_20_migrated', false );
+		$hustle_20_migrated = get_option( 'hustle_20_migrated', false );
+
+		if ( false === $hustle_20_migrated ) {
+			update_option( 'hustle_30_migrated', true );
+		}
+
+		return $hustle_20_migrated;
 	}
 
 	// Migrating from Hustle 3.x
@@ -529,7 +535,7 @@ class Hustle_Migration {
 			if ( true === $old_form_fields[$name]['required'] ) {
 				$old_form_fields[$name]['required'] = 'true';
 			}
-			
+
 			if ( 'url' === $old_form_fields[$name]['type'] || 'email' === $old_form_fields[$name]['type'] ) {
 				$old_form_fields[$name]['validate'] = 'true';
 			}
@@ -648,7 +654,7 @@ class Hustle_Migration {
 
 			// When input's borders is disabled...
 			if ( ! $this->is_true( $design['form_fields_border'] ) ) {
-				
+
 				// Always make the input's style "outlined" instead of "flat" in order
 				// to keep the input's borders highlighted on error.
 				$design['form_fields_border'] = '1';
@@ -687,7 +693,7 @@ class Hustle_Migration {
 
 			// When gdpr checkbox's border is disabled...
 			if ( isset( $design['gdpr_border'] ) && ! $this->is_true( $design['gdpr_border'] ) ) {
-				
+
 				// Always make the input's style "outlined" instead of "flat" in order
 				// to keep the input's borders highlighted on error.
 				$design['gdpr_border'] = '1';
@@ -995,9 +1001,13 @@ class Hustle_Migration {
 				$new_conditions['shown_less_than']['less_than'] = $old_conditions['shown_less_than']['less_than'];
 			}
 
-			// Membership Pro.
-			if ( isset( $old_conditions['Membership2 Memberships'] ) ) {
-				$new_conditions['ms_membership'] = $old_conditions['Membership2 Memberships'];
+			// Custom Post Types
+			$post_types = Opt_In_Utils::get_post_types();
+			$cpts = wp_list_pluck( $post_types, 'label', 'name' );
+			foreach ( $cpts as $slug => $label ) {
+				if ( isset( $old_conditions[ $label ] ) ) {
+					$new_conditions[ $slug ] = $old_conditions[ $label ];
+				}
 			}
 
 			$regular_conditions_keys = array( 'pages', 'posts', 'categories', 'tags' );

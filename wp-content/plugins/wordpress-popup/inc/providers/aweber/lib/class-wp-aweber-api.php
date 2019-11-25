@@ -28,30 +28,6 @@ class Hustle_Addon_Aweber_Wp_Api {
 	private $_oauth_token_secret = '';
 
 	/**
-	 * Last data sent to aweber
-	 *
-	 * @since 1.0 Aweber Addon
-	 * @var array
-	 */
-	private $_last_data_sent = array();
-
-	/**
-	 * Last data received from aweber
-	 *
-	 * @since 1.0 Aweber Addon
-	 * @var array
-	 */
-	private $_last_data_received = array();
-
-	/**
-	 * Last URL requested
-	 *
-	 * @since 1.0 Aweber Addon
-	 * @var string
-	 */
-	private $_last_url_request = '';
-
-	/**
 	 * Hustle_Addon_Aweber_Wp_Api constructor.
 	 *
 	 * @since 1.0 Aweber Addon
@@ -111,7 +87,7 @@ class Hustle_Addon_Aweber_Wp_Api {
 	 * @return string
 	 */
 	public function filter_user_agent( $user_agent ) {
-		$user_agent .= self::HUSTLE_ADDON_AWEBER_VERSION;
+		$user_agent .= ' HustleAweber/' . self::HUSTLE_ADDON_AWEBER_VERSION;
 
 		/**
 		 * Filter user agent to be used by aweber api
@@ -187,9 +163,6 @@ class Hustle_Addon_Aweber_Wp_Api {
 		 */
 		$args = apply_filters( 'hustle_addon_aweber_api_request_data', $request_data, $verb, $url );
 
-		// $oauth_url_params doesnt need to be included
-		$this->_last_url_request = $url;
-
 		if ( 'PATCH' === $verb ) {
 			$oauth_url_params = $this->get_prepared_request( $verb, $url, array() );
 			$url              .= ( '?' . http_build_query( $oauth_url_params ) );
@@ -209,8 +182,6 @@ class Hustle_Addon_Aweber_Wp_Api {
 			}
 		}
 
-		$this->_last_data_sent = $args;
-
 		/**
 		 * Filter aweber wp_remote_request args
 		 *
@@ -221,6 +192,13 @@ class Hustle_Addon_Aweber_Wp_Api {
 		$_args = apply_filters( 'hustle_addon_aweber_api_remote_request_args', $_args );
 
 		$res         = wp_remote_request( $url, $_args );
+
+		//logging data
+		$utils = Hustle_Provider_Utils::get_instance();
+		$utils->_last_url_request = $url;
+		$utils->_last_data_sent = $_args;
+		$utils->_last_data_received = $res;
+
 		$wp_response = $res;
 
 		remove_filter( 'http_headers_useragent', array( $this, 'filter_user_agent' ) );
@@ -281,8 +259,6 @@ class Hustle_Addon_Aweber_Wp_Api {
 		 * @param array|WP_Error $wp_response original wp remote request response
 		 */
 		$res = apply_filters( 'hustle_addon_aweber_api_response', $response, $body, $wp_response );
-
-		$this->_last_data_received = $res;
 
 		return $res;
 	}
@@ -542,10 +518,6 @@ class Hustle_Addon_Aweber_Wp_Api {
 			$api_url,
 			$args
 		);
-		$utils = Hustle_Provider_Utils::get_instance();
-		$utils->_last_data_received = $res;
-		$utils->_last_url_request = $api_url;
-		$utils->_last_data_sent = $args;
 
 		return $res;
 	}
@@ -586,11 +558,6 @@ class Hustle_Addon_Aweber_Wp_Api {
 			$api_url,
 			$args
 		);
-
-		$utils = Hustle_Provider_Utils::get_instance();
-		$utils->_last_data_received = $res;
-		$utils->_last_url_request = $api_url;
-		$utils->_last_data_sent = $args;
 
 		return $res;
 	}
@@ -680,11 +647,6 @@ class Hustle_Addon_Aweber_Wp_Api {
 			)
 		);
 
-		$utils = Hustle_Provider_Utils::get_instance();
-		$utils->_last_data_received = $res;
-		$utils->_last_url_request = $api_url;
-		$utils->_last_data_sent = $args;
-
 		return $res;
 	}
 
@@ -752,39 +714,6 @@ class Hustle_Addon_Aweber_Wp_Api {
 	 */
 	public function get_oauth_token_secret() {
 		return $this->_oauth_token_secret;
-	}
-
-	/**
-	 * Get last data sent
-	 *
-	 * @since 1.0 Aweber Addon
-	 *
-	 * @return array
-	 */
-	public function get_last_data_sent() {
-		return $this->_last_data_sent;
-	}
-
-	/**
-	 * Get last data received
-	 *
-	 * @since 1.0 Aweber Addon
-	 *
-	 * @return array
-	 */
-	public function get_last_data_received() {
-		return $this->_last_data_received;
-	}
-
-	/**
-	 * Get last data received
-	 *
-	 * @since 1.0 Aweber Addon
-	 *
-	 * @return string
-	 */
-	public function get_last_url_request() {
-		return $this->_last_url_request;
 	}
 
 }

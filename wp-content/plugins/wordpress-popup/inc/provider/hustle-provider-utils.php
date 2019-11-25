@@ -54,33 +54,45 @@ class Hustle_Provider_Utils {
 	}
 
 	/**
-	 * Get the last URL request.
+	 * Get the last URL request and unset it.
 	 *
 	 * @since  4.0
 	 * @return string
 	 */
 	final public function get_last_url_request() {
-		return $this->_last_url_request;
+		$last_url_request = $this->_last_url_request;
+		$this->_last_url_request = null;
+
+		return $last_url_request;
 	}
 
 	/**
-	 * Get the last received data.
+	 * Get the last received data and unset it.
 	 *
 	 * @since  4.0
+	 * @param bool $unset Either unset it or not
 	 * @return string
 	 */
-	final public function get_last_data_received() {
-		return $this->_last_data_received;
+	final public function get_last_data_received( $unset = true ) {
+		$last_data_received = $this->_last_data_received;
+		if ( $unset ) {
+			$this->_last_data_received = null;
+		}
+
+		return $last_data_received;
 	}
 
 	/**
-	 * Get the last sent data.
+	 * Get the last sent data and unset it.
 	 *
 	 * @since  4.0
 	 * @return string
 	 */
 	final public function get_last_data_sent() {
-		return $this->_last_data_sent;
+		$last_data_sent = $this->_last_data_sent;
+		$this->_last_data_sent = null;
+
+		return $last_data_sent;
 	}
 
 	/**
@@ -313,7 +325,7 @@ class Hustle_Provider_Utils {
 	/**
 	 * Get the modules that are connected to the given provider.
 	 * Optionally, check that the given global multi id is in use.
-	 * 
+	 *
 	 * @since 4.0.1
 	 *
 	 * @param string $slug
@@ -324,11 +336,11 @@ class Hustle_Provider_Utils {
 
 		$modules_ids = Hustle_Module_Collection::get_active_providers_module( $slug );
 		$modules = array();
-	
+
 		foreach( $modules_ids as $id ) {
 
 			$module = Hustle_Module_Model::instance()->get( $id );
-			
+
 			if ( is_wp_error( $module ) ) {
 				continue;
 			}
@@ -336,7 +348,7 @@ class Hustle_Provider_Utils {
 			if ( $global_multi_id ) {
 
 				$provider_settings = $module->get_provider_settings( $slug );
-				
+
 				// If the provider in this module isn't connected to the instance being disconnected, skip.
 				if ( ! isset( $provider_settings['selected_global_multi_id'] ) || $provider_settings['selected_global_multi_id'] !== $global_multi_id ) {
 					continue;
@@ -415,66 +427,71 @@ class Hustle_Provider_Utils {
 	 * @return array
 	 */
 	public static function format_submitted_data_for_addon( $data ) {
-		unset( $data['form'], $data['module_id'], $data['uri'], $data['hustle_module_id'], $data['post_id'], $data['gdpr'], $data['recaptcha'], $data['g-recaptcha-response'], $data['hustle_sub_type'] );
+		$new_data = $data;
+		unset( $new_data['form'], $new_data['module_id'], $new_data['uri'], $new_data['hustle_module_id'], $new_data['post_id'], $new_data['recaptcha'], $new_data['g-recaptcha-response'], $new_data['hustle_sub_type'] );
+		$new_data = apply_filters( 'hustle_provider_form_formatted_submitted_data', $new_data, $data );
 
-		return $data;
+		return $new_data;
 	}
 
-}
-
-
-/**
- * Retrieves the HTML markup given an array of options.
- * Renders it from the file "general/option.php", which is a template.
- * The array should be something like:
- * array(
- * 		"optin_url_label" => array(
- *			"id"    => "optin_url_label",
- *			"for"   => "optin_url",
- *			"value" => "Enter a Webhook URL:",
- *			"type"  => "label",
- *		),
- *		"optin_url_field_wrapper" => array(
- *			"id"        => "optin_url_id",
- *			"class"     => "optin_url_id_wrapper",
- *			"type"      => "wrapper",
- *			"elements"  => array(
- *				"optin_url_field" => array(
- *					"id"            => "optin_url",
- *					"name"          => "api_key",
- *					"type"          => "text",
- *					"default"       => "",
- *					"value"         => "",
- *					"placeholder"   => "",
- *					"class"         => "wpmudev-input_text",
- *				)
- *			)
- *		),
- *	);
- *
- * @since 4.0
- * @uses Opt_In::static_render()
- * @param array $options
- * @return string
- */
-if ( ! function_exists( 'hustle_get_html_for_options' ) ) {
-
-	function hustle_get_html_for_options( $options ) {
+	/**
+	 * Retrieves the HTML markup given an array of options.
+	 * Renders it from the file "general/option.php", which is a template.
+	 * The array should be something like:
+	 * array(
+	 * 		"optin_url_label" => array(
+	 *			"id"    => "optin_url_label",
+	 *			"for"   => "optin_url",
+	 *			"value" => "Enter a Webhook URL:",
+	 *			"type"  => "label",
+	 *		),
+	 *		"optin_url_field_wrapper" => array(
+	 *			"id"        => "optin_url_id",
+	 *			"class"     => "optin_url_id_wrapper",
+	 *			"type"      => "wrapper",
+	 *			"elements"  => array(
+	 *				"optin_url_field" => array(
+	 *					"id"            => "optin_url",
+	 *					"name"          => "api_key",
+	 *					"type"          => "text",
+	 *					"default"       => "",
+	 *					"value"         => "",
+	 *					"placeholder"   => "",
+	 *					"class"         => "wpmudev-input_text",
+	 *				)
+	 *			)
+	 *		),
+	 *	);
+	 *
+	 * @since 4.0
+	 * @uses Opt_In::static_render()
+	 * @param array $options
+	 * @return string
+	 */
+	public static function get_html_for_options( $options ) {
 		$html = '';
 		foreach( $options as $key =>  $option ){
 			$html .= Opt_In::static_render( 'general/option', array_merge( $option, array( 'key' => $key ) ), true );
+
+			// TODO: remove this and add it per provider where needed.
+			//if ( !empty( $option['elements']['lists']['name'] ) && in_array( $option['elements']['lists']['name'], array( 'list_id', 'form_id' ), true ) ) {
+			//	// Add refresh button after provider lists selectbox
+			//	$html = str_replace(
+			//		'</select>',
+			//		'</select>' . call_user_func_array(
+			//			'Hustle_Provider_Utils::get_provider_button_markup',
+			//			array( __( 'Refresh', 'wordpress-popup' ), '', 'refresh_list', true )
+			//		),
+			//		$html
+			//	);
+			//}
 		}
 		return $html;
 	}
 
-}
-
-
-if ( ! function_exists( 'hustle_get_integration_modal_title_markup' ) ) {
-
 	/**
 	 * Return the markup used for the title of Integrations modal.
-	 * 
+	 *
 	 * @since 4.0
 	 *
 	 * @param string $title
@@ -482,7 +499,7 @@ if ( ! function_exists( 'hustle_get_integration_modal_title_markup' ) ) {
 	 * @param string $class
 	 * @return string
 	 */
-	function hustle_get_integration_modal_title_markup( $title = '', $subtitle = '', $class = '' ) {
+	public static function get_integration_modal_title_markup( $title = '', $subtitle = '', $class = '' ) {
 
 		$html = '<div class="integration-header ' . esc_attr( $class ) . '">';
 
@@ -499,13 +516,9 @@ if ( ! function_exists( 'hustle_get_integration_modal_title_markup' ) ) {
 		return $html;
 	}
 
-}
-
-if ( ! function_exists( 'hustle_get_provider_button_markup' ) ) {
-
 	/**
 	 * Return the markup for buttons.
-	 * 
+	 *
 	 * @since 4.0
 	 *
 	 * @param string $value
@@ -514,9 +527,13 @@ if ( ! function_exists( 'hustle_get_provider_button_markup' ) ) {
 	 * @param bool $loading whether the button should have the 'loading' markup.
 	 * @return string
 	 */
-	function hustle_get_provider_button_markup( $value = '', $class = '', $action = '', $loading = false, $disabled = false ) {
+	public static function get_provider_button_markup( $value = '', $class = '', $action = '', $loading = false, $disabled = false, $custom_url = '' ) {
+
+		$html = '';
+		$action_class = '';
 
 		if ( ! empty( $action ) ) {
+
 			switch( $action ) {
 				case 'next':
 					$action_class =	'hustle-provider-next ';
@@ -536,20 +553,55 @@ if ( ! function_exists( 'hustle_get_provider_button_markup' ) ) {
 				case 'disconnect_form':
 					$action_class =	'hustle-provider-form-disconnect ';
 					break;
+				case 'refresh_list':
+					$action_class =	'hustle-refresh-email-lists ';
+					break;
 				default:
 					$action_class = '';
 			}
 		}
 
-		$inner = $loading ? '<span class="sui-loading-text">' . esc_html( $value ) . '</span><i class="sui-icon-loader sui-loading" aria-hidden="true"></i>' : esc_html( $value );
-		// Maybe render this from "options" template.
-		$html = '<button type="button" class="sui-button '. esc_attr( $action_class ) . esc_attr( $class ) . '" ' . disabled( $disabled, true, false  ) . '>' . $inner . '</button>';
+		if ( empty( $custom_url ) ) {
+			$tag = 'button';
+			$custom_attr = 'type="button"';
+		} else {
+			$tag = 'a';
+			$custom_attr = 'href="' . esc_url( $custom_url ) . '"';
+		}
+
+		if ( $loading ) {
+			$action_class .= 'hustle-onload-icon-action ';
+			$inner = '<span class="sui-loading-text">' . esc_html( $value ) . '</span><i class="sui-icon-loader sui-loading" aria-hidden="true"></i>';
+
+		} else {
+			$inner = esc_html( $value );
+		}
+
+		if ( 'refresh_list' === $action ) {
+
+			$html .= sprintf( '<%1$s class="sui-button-icon sui-tooltip %2$s" data-tooltip="%3$s" %4$s >',
+				$tag,
+				esc_attr( $action_class . $class ),
+				__( 'Refresh list', 'wordpress-popup' ),
+				disabled( $disabled, true, false )
+			);
+				$html .= '<span class="sui-loading-text" aria-hidden="true">';
+					$html .= '<i class="sui-icon-refresh"></i>';
+				$html .= '</span>';
+				$html .= '<i class="sui-icon-loader sui-loading" aria-hidden="true"></i>';
+				$html .= '<span class="sui-screen-reader-text">' . esc_html( $value ) . '</span>';
+			$html .= '</' . $tag . '>';
+
+		} else {
+
+			$html .= '<' . $tag . ' ' . $custom_attr . ' class="sui-button '. esc_attr( $action_class ) . esc_attr( $class ) . '" ' . disabled( $disabled, true, false  ) . '>';
+				$html .= $inner;
+			$html .= '</' . $tag . '>';
+
+		}
 
 		return $html;
 	}
-}
-
-if ( ! function_exists( 'hustle_provider_maybe_log' ) ) {
 
 	/**
 	 * Adds an entry to debug log
@@ -559,7 +611,7 @@ if ( ! function_exists( 'hustle_provider_maybe_log' ) ) {
 	 *
 	 * @since 4.0
 	 */
-	function hustle_provider_maybe_log() {
+	public static function maybe_log() {
 		$enabled = ( defined( 'HUSTLE_PROVIDER_DEBUG' ) && HUSTLE_PROVIDER_DEBUG );
 
 		/**
@@ -571,21 +623,11 @@ if ( ! function_exists( 'hustle_provider_maybe_log' ) ) {
 		 */
 		$enabled = apply_filters( 'hustle_provider_enable_log', $enabled );
 
-		if ( $enabled ) {
-			$args    = func_get_args();
-			$message = wp_json_encode( $args );
-			if ( false !== $message ) {
-				error_log( '[Hustle] ' . $message ); // phpcs:ignore
-			}
-
-			
-			if ( is_callable( array( 'Opt_In_Utils', 'maybe_log' ) ) ) {
-				$args  = array( '[PROVIDER]' );
-				$fargs = func_get_args();
-				$args  = array_merge( $args, $fargs );
-				call_user_func_array( array( 'Opt_In_Utils', 'maybe_log' ), $args );
-			}
-
+		if ( $enabled && is_callable( array( 'Opt_In_Utils', 'maybe_log' ) ) ) {
+			$args  = array( '[PROVIDER]' );
+			$fargs = func_get_args();
+			$args  = array_merge( $args, $fargs );
+			call_user_func_array( array( 'Opt_In_Utils', 'maybe_log' ), $args );
 		}
 	}
 }

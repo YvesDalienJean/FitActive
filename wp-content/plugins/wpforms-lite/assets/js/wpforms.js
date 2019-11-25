@@ -670,6 +670,13 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 				}
 			} );
 
+			// IE: Click on the `image choice` image should trigger the click event on the input (checkbox or radio) field.
+			$( document ).on( 'click', '.wpforms-image-choices-item img', function( e ) {
+
+				e.preventDefault();
+				$( this ).closest( 'label' ).find( 'input' ).click();
+			} );
+
 			$( document ).on( 'change', '.wpforms-field-checkbox input, .wpforms-field-radio input, .wpforms-field-payment-multiple input, .wpforms-field-payment-checkbox input, .wpforms-field-gdpr-checkbox input', function( event ) {
 
 				var $this  = $( this ),
@@ -701,9 +708,9 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 			} );
 
 			// Upload fields: Check combined file size.
-			$( document ).on( 'change', '.wpforms-field-file-upload input', function() {
+			$( document ).on( 'change', '.wpforms-field-file-upload input[type=file]:not(".dropzone-input")', function() {
 				var $this       = $( this ),
-					$uploads    = $this.closest( 'form.wpforms-form' ).find( '.wpforms-field-file-upload input' ),
+					$uploads    = $this.closest( 'form.wpforms-form' ).find( '.wpforms-field-file-upload input:not(".dropzone-input")' ),
 					totalSize   = 0,
 					postMaxSize = Number( wpforms_settings.post_max_size ),
 					errorMsg    = '<div class="wpforms-error-container-post_max_size">' + wpforms_settings.val_post_max_size + '</div>',
@@ -1423,6 +1430,13 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 		 */
 		displayFormAjaxErrors: function( $form, errors ) {
 
+			if ( 'string' === typeof errors ) {
+				app.displayFormAjaxGeneralErrors( $form, errors );
+				return;
+			}
+
+			errors = 'errors' in errors ? errors.errors : null;
+
 			if ( app.empty( errors ) || ( app.empty( errors.general ) && app.empty( errors.field ) ) ) {
 				app.consoleLogAjaxError();
 				return;
@@ -1452,6 +1466,12 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 			}
 
 			if ( app.empty( errors ) ) {
+				return;
+			}
+
+			// Safety net for random errors thrown by a third-party code. Should never be used intentionally.
+			if ( 'string' === typeof errors ) {
+				$form.find( '.wpforms-submit-container' ).before( '<div class="wpforms-error-container">' + errors + '</div>' );
 				return;
 			}
 
@@ -1557,10 +1577,14 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 					return;
 				}
 
+				if ( json.data && json.data.action_required ) {
+					$form.trigger( 'wpformsAjaxSubmitActionRequired', json );
+					return;
+				}
+
 				if ( ! json.success ) {
 					app.resetFormRecaptcha( $form );
-					var errors = json.data && 'errors' in json.data ? json.data.errors : null;
-					app.displayFormAjaxErrors( $form, errors );
+					app.displayFormAjaxErrors( $form, json.data );
 					$form.trigger( 'wpformsAjaxSubmitFailed', json );
 					return;
 				}
@@ -1594,6 +1618,11 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 			};
 
 			args.complete = function( jqHXR, textStatus ) {
+
+				// Do not make form active if the action is required.
+				if ( jqHXR.responseJSON && jqHXR.responseJSON.data && jqHXR.responseJSON.data.action_required ) {
+					return;
+				}
 
 				var $submit     = $form.find( '.wpforms-submit' ),
 					submitText  = $submit.data( 'submit-text' );

@@ -134,7 +134,7 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 
 				<?php if ( 'invisible' !== $recaptcha ) : ?>
 				<p class="wpforms-field-recaptcha">
-					<img src="<?php echo WPFORMS_PLUGIN_URL; ?>/assets/images/recaptcha-placeholder.png" style="max-width: 304px;">
+					<img src="<?php echo esc_url( WPFORMS_PLUGIN_URL . 'assets/images/recaptcha-placeholder.png' ); ?>" style="max-width: 304px;">
 				</p>
 				<?php endif; ?>
 
@@ -283,7 +283,9 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 
 			printf( '<div class="wpforms-field wpforms-field-%s %s" id="wpforms-field-%d" data-field-id="%d" data-field-type="%s">', $field['type'], $css, $field['id'], $field['id'], $field['type'] );
 
-			printf( '<a href="#" class="wpforms-field-duplicate" title="%s"><i class="fa fa-files-o" aria-hidden="true"></i></a>', esc_html__( 'Duplicate Field', 'wpforms-lite' ) );
+			if ( apply_filters( 'wpforms_field_preview_display_duplicate_button', true, $field, $this->form_data ) ) {
+				printf( '<a href="#" class="wpforms-field-duplicate" title="%s"><i class="fa fa-files-o" aria-hidden="true"></i></a>', esc_html__( 'Duplicate Field', 'wpforms-lite' ) );
+			}
 
 			printf( '<a href="#" class="wpforms-field-delete" title="%s"><i class="fa fa-trash" aria-hidden="true"></i></a>', esc_html__( 'Delete Field', 'wpforms-lite' ) );
 

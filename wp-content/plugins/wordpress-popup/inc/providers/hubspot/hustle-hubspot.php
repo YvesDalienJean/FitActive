@@ -48,7 +48,7 @@ if ( ! class_exists( 'Hustle_HubSpot' ) ) :
 	 * @since 4.0
 	 * @var boolean
 	 */
-	protected $is_multi_on_global = false;
+	protected $is_multi_on_global 			= false;
 
 		/**
 	 * Class name of form settings
@@ -136,113 +136,89 @@ if ( ! class_exists( 'Hustle_HubSpot' ) ) :
 
 
 		/**
-	 * Configure the API key settings. Global settings.
-	 *
-	 * @since 4.0
-	 *
-	 * @return array
-	 */
-		public function configure_api_key( $submitted_data, $module_id ) {
-			$has_errors = false;
+		 * Configure the API key settings. Global settings.
+		 *
+		 * @since 4.0
+		 *
+		 * @return array
+		 */
+		public function configure_api_key( $submitted_data, $is_submit, $module_id ) {
 
 			$api = $this->api();
-			$is_authorize = $api && ! $api->is_error && $api->is_authorized();
 
-			$is_submit = ! empty( $submitted_data['is_submit'] );
+			if ( ! $module_id ) {
+				$auth_url = $api->get_authorization_uri( 0, true, Hustle_Module_Admin::INTEGRATIONS_PAGE );
 
-			if ( $is_submit ) {
+			} else {
 
-				if ( $is_authorize && ! Hustle_Provider_Utils::is_provider_active( $this->_slug ) ) {
-					// TODO: Wrap this in a friendlier method
-					$activated = Hustle_Providers::get_instance()->activate_addon( $this->_slug );
-					if ( ! $activated ) {
-						$error_message = $this->provider_connection_falied();
-						$has_errors = true;
-					}
-				}
-
-				if ( ! $has_errors ) {
-					return array(
-					'html'         => Hustle_Api_Utils::get_modal_title_markup( __( 'HubSpot Added', 'wordpress-popup' ), __( 'You can now go to your forms and assign them to this integration', 'wordpress-popup' ) ),
-					'buttons'      => array(
-						'close' => array(
-							'markup' => Hustle_Api_Utils::get_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
-						),
-					),
-					'redirect'     => false,
-					'has_errors'   => false,
-					'notification' => array(
-						'type' => 'success',
-						'text' => '<strong>' . $this->get_title() . '</strong> ' . __( 'Successfully connected', 'wordpress-popup' ),
-					),
-					);
-				}
-			}
-
-			$url = $api->get_authorization_uri( $module_id, true, Hustle_Module_Admin::INTEGRATIONS_PAGE );
-			if ( $module_id ) {
 				$module = Hustle_Module_Model::instance()->get( $module_id );
 				if ( ! is_wp_error( $module ) ) {
-					$url = $api->get_authorization_uri( $module_id, true, $module->get_wizard_page() );
+					$auth_url = $api->get_authorization_uri( $module_id, true, $module->get_wizard_page() );
 				}
 			}
-			$link = '<a href="' . esc_url( $url ) . '">';
 
-			if ( $is_authorize ) {
-				$info = sprintf( __( 'You\'re successfully connected your HubSpot account. Please, save this configuration or %1$sclick here%2$s to reconnect another HubSpot account.', 'wordpress-popup' ), $link, '</a>' );
+			$is_connected = $this->is_connected();
+
+			if ( $is_connected ) {
+
+				$description = __( 'You are already connected to Hubspot. You can disconnect your Hubspot Integration (if you need to) using the button below.', 'wordpress-popup' );
+
+				$buttons = array(
+					'disconnect' => array(
+						'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+							__( 'Disconnect', 'wordpress-popup' ),
+							'sui-button-ghost sui-button-center',
+							'disconnect',
+							true
+						),
+					),
+				);
+
 			} else {
-				$info = sprintf( __( 'Please %1$sclick here%2$s to connect your HubSpot account.', 'wordpress-popup' ), $link, '</a>' );
+
+				$description = __( 'Connect the Hubspot integration by authenticating it using the button below. Note that you’ll be taken to the Hubspot website to grant access to Hustle and then redirected back.', 'wordpress-popup' );
+
+				$buttons = array(
+					'auth' => array(
+						'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+							__( 'Authenticate', 'wordpress-popup' ),
+							'sui-button-center',
+							'',
+							true,
+							false,
+							$auth_url
+						),
+					),
+				);
 			}
 
-			$info .= ' ' . __( 'You will be asked to give us access to your selected account and will be redirected back to this page.', 'wordpress-popup' );
+			$step_html = Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'Connect Hubspot', 'wordpress-popup' ), $description );
 
-			$options = array(
-				array(
-					'type'  => 'hidden',
-					'name'  => 'is_submit',
-					'value' => '1',
-				),
-			);
+			if ( $is_connected ) {
+				$account_details = $this->get_settings_values();
 
-			$step_html = Hustle_Api_Utils::get_modal_title_markup( __( 'Configure HubSpot', 'wordpress-popup' ), $info );
-			$step_html .= Hustle_Api_Utils::get_html_for_options( $options );
+				// Integrations coming from before 4.0.2 don't have this data.
+				if ( ! isset( $account_details['user'] ) ) {
+					$account_details = $this->save_account_details();
+				}
 
-			if ( $has_errors ) {
-				$step_html .= '<span class="sui-error-message">' . esc_html( $error_message ) . '</span>';
-			}
+				$account = ! empty( $account_details['hub_domain'] ) ? '<b>' . $account_details['user'] . ' - ' . $account_details['hub_domain'] . '</b>' : '<b>' . $account_details['user'] . '</b>';
 
-			$is_edit = $this->is_connected() ? true : false;
-			if ( $is_edit ) {
-				$buttons = array(
-				'disconnect' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Disconnect', 'wordpress-popup' ), 'sui-button-ghost', 'disconnect', true ),
-				),
-				'save' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Save', 'wordpress-popup' ), '', 'connect', true ),
-				),
-				);
-			} else if ( $is_authorize ) {
-				$buttons = array(
-				'close' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
-				),
-				'save' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Save', 'wordpress-popup' ), '', 'connect', true ),
-				),
-				);
-			} else {
-				$buttons = array(
-				'close' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
-				),
+				$step_html .= Hustle_Provider_Utils::get_html_for_options(
+					array(
+						array(
+							'type'	=> 'notice',
+							'value' => sprintf( __( 'You are connected to %s', 'wordpress-popup' ), $account ),
+							'class'	=> 'sui-notice-success',
+						)
+					)
 				);
 
 			}
 
 			$response = array(
-			'html'       => $step_html,
-			'buttons'    => $buttons,
-			'has_errors' => $has_errors,
+				'html'       => $step_html,
+				'buttons'    => $buttons,
 			);
 
 			return $response;
@@ -318,6 +294,91 @@ if ( ! class_exists( 'Hustle_HubSpot' ) ) :
 					'code' => 'cannot_create_custom_field',
 				);
 			}
+		}
+
+		/**
+		 * Save the account details.
+		 *
+		 * @since 4.0.2
+		 * @return array
+		 */
+		private function save_account_details() {
+
+			$api = $this->api();
+			$account_details = $api->get_access_token_information();
+			$account_data = array();
+
+			if ( isset( $account_details->response ) && 400 <= $account_details->response['code'] ) {
+				Hustle_Providers_Utils::maybe_log( $this->_title, __METHOD__, $account_details->response['code'], $account_details['response']['message'] );
+
+			} else {
+				$account_data = array(
+					'user' => $account_details->user,
+					'hub_domain' => $account_details->hub_domain,
+				);
+
+				$this->save_settings_values( $account_data );
+			}
+
+			return $account_data;
+		}
+
+		/**
+		 * Process the request after coming from authentication.
+		 *
+		 * @since 4.0.2
+		 * @return array
+		 */
+		public function process_external_redirect() {
+
+			$status = filter_input( INPUT_GET, 'status', FILTER_SANITIZE_STRING );
+			$response = array();
+
+			$api = $this->api();
+			$is_authorized = $api && ! $api->is_error && $api->is_authorized();
+
+			// API Auth was successful.
+			if ( 'success' === $status && $is_authorized ) {
+
+				$providers_instance = Hustle_Providers::get_instance();
+
+				if ( ! $this->is_active() ) {
+
+					$activated = $providers_instance->activate_addon( $this->_slug );
+
+					// Provider successfully activated.
+					if ( $activated ) {
+
+						$response = array(
+							'action'	=> 'notification',
+							'status'	=> 'success',
+							'message'	=> sprintf( esc_html__( "%s successfully connected.", 'wordpress-popup' ), '<strong>' . $this->_title . '</strong>' ),
+						);
+
+						$this->save_account_details();
+
+					} else { // Provider couldn't be activated.
+
+						$response = array(
+							'action'	=> 'notification',
+							'status'	=> 'error',
+							'message'	=> $providers_instance->get_last_error_message(),
+						);
+					}
+				}
+
+			} else { // API Auth failed.
+
+				$response = array(
+					'action'	=> 'notification',
+					'status'	=> 'error',
+					'message'	=> sprintf( esc_html__( 'Authentication failed! Please check your %s credentials and try again.', 'wordpress-popup' ), $this->_title ),
+				);
+
+			}
+
+			return $response;
+
 		}
 	}
 

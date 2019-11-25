@@ -4,7 +4,6 @@ if( !class_exists("Hustle_Zapier") ):
 class Hustle_Zapier extends Hustle_Provider_Abstract {
 
 	const SLUG = "zapier";
-	//const NAME = "Zapier";
 
 	/**
 	 * Provider Instance
@@ -50,12 +49,6 @@ class Hustle_Zapier extends Hustle_Provider_Abstract {
 	 * @var bool
 	 */
 	protected $is_multi_on_form		   = true;
-
-	/**
-	 * @since 3.0.5
-	 * @var bool
-	 */
-	protected $_supports_fields 	   = true;
 
 	/**
 	 * Class name of form settings
@@ -145,7 +138,7 @@ class Hustle_Zapier extends Hustle_Provider_Abstract {
 	public function configure_zapier( $submitted_data ) {
 		$has_errors = false;
 		$active = $this->active();
-		$is_submit = isset( $submitted_data['is_submit'] );
+		$is_submit = isset( $submitted_data['hustle_is_submit'] );
 
 		if ( $is_submit ) {
 
@@ -167,10 +160,10 @@ class Hustle_Zapier extends Hustle_Provider_Abstract {
 			if ( ! $has_errors ) {
 
 				return array(
-					'html'         => Hustle_Api_Utils::get_modal_title_markup( __( 'Zapier Added', 'wordpress-popup' ), __( 'You can now go to your forms and assign them to this integration', 'wordpress-popup' ) ),
+					'html'         => Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'Zapier Added', 'wordpress-popup' ), __( 'You can now go to your pop-ups, slide-ins and embeds and assign them to this integration', 'wordpress-popup' ) ),
 					'buttons'      => array(
 						'close' => array(
-							'markup' => Hustle_Api_Utils::get_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
+							'markup' => Hustle_Provider_Utils::get_provider_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
 						),
 					),
 					'redirect'     => false,
@@ -191,15 +184,10 @@ class Hustle_Zapier extends Hustle_Provider_Abstract {
 				'name'  => 'active',
 				'value' => 1,
 			),
-			array(
-				'type'  => 'hidden',
-				'name'  => 'is_submit',
-				'value' => 1,
-			),
 		);
 
-		$step_html = Hustle_Api_Utils::get_modal_title_markup( __( 'Configure Zapier', 'wordpress-popup' ), __("Activate Zapier to start using it on your forms.", 'wordpress-popup') );
-		$step_html .= Hustle_Api_Utils::get_html_for_options( $options );
+		$step_html = Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'Configure Zapier', 'wordpress-popup' ), __("Activate Zapier to start using it on your forms.", 'wordpress-popup') );
+		$step_html .= Hustle_Provider_Utils::get_html_for_options( $options );
 
 		if ( $has_errors ) {
 			$step_html .= '<span class="sui-error-message">' . esc_html( $error_message ) . '</span>';
@@ -209,16 +197,30 @@ class Hustle_Zapier extends Hustle_Provider_Abstract {
 		if ( $is_edit ) {
 			$buttons = array(
 				'disconnect' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Disconnect', 'wordpress-popup' ), 'sui-button-ghost', 'disconnect', true ),
+					'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+						__( 'Disconnect', 'wordpress-popup' ),
+						'sui-button-ghost sui-button-center',
+						'disconnect',
+						true
+					),
 				),
 				'close' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Save', 'wordpress-popup' ), '', 'close' ),
+					'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+						__( 'Save', 'wordpress-popup' ),
+						'sui-button-center',
+						'close'
+					),
 				),
 			);
 		} else {
 			$buttons = array(
 				'connect' => array(
-					'markup' => Hustle_Api_Utils::get_button_markup( __( 'Activate', 'wordpress-popup' ), '', 'connect', true ),
+					'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+						__( 'Activate', 'wordpress-popup' ),
+						'sui-button-center',
+						'connect',
+						true
+					),
 				),
 			);
 

@@ -417,7 +417,7 @@ class WPForms_Conditional_Logic_Core {
 												// Only text based fields support
 												// these additional operators.
 												$disabled = '';
-												if ( ! empty( $form_fields[ $rule['field'] ]['type'] ) ) {
+												if ( ! empty( $rule['field'] ) && ! empty( $form_fields[ $rule['field'] ]['type'] ) ) {
 													$disabled = in_array( $form_fields[ $rule['field'] ]['type'], array( 'text', 'textarea', 'email', 'url', 'number', 'hidden', 'rating', 'net_promoter_score' ), true ) ? '' : ' disabled';
 												}
 

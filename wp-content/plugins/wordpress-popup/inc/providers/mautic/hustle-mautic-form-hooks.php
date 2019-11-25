@@ -24,9 +24,20 @@ class Hustle_Mautic_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		$form_settings_instance = $this->form_settings_instance;
 
 		/**
+		 * Filter submitted form data to be processed
+		 *
 		 * @since 4.0
+		 *
+		 * @param array                                    	$submitted_data
+		 * @param int                                      	$module_id                current module_id
+		 * @param Hustle_Mautic_Form_Settings 	   	   		$form_settings_instance
 		 */
-		$submitted_data = apply_filters( 'hustle_provider_' . $addon->get_slug() . '_form_submitted_data', $submitted_data, $module_id, $form_settings_instance );
+		$submitted_data = apply_filters(
+			'hustle_provider_mautic_form_submitted_data',
+			$submitted_data,
+			$module_id,
+			$form_settings_instance
+		);
 
 		$addon_setting_values = $form_settings_instance->get_form_settings_values();
 
@@ -61,8 +72,7 @@ class Hustle_Mautic_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 
 			$api = $addon::api( $url, $username, $password );
 
-			$existing_member = $api->email_exist( $submitted_data['email'] );
-
+			$existing_member = $this->get_subscriber( $api, $submitted_data['email'] );
 
 			// Add extra fields
 			$extra_data = array_diff_key( $submitted_data, array(
@@ -90,6 +100,20 @@ class Hustle_Mautic_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 				$addon->add_custom_fields( $custom_fields, $api );
 			}
 
+			/**
+			 * Fires before adding subscriber
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param int    $module_id
+			 * @param array  $submitted_data
+			 * @param object $form_settings_instance
+			 */
+			do_action( 'hustle_provider_mautic_before_add_subscriber',
+				$module_id,
+				$submitted_data,
+				$form_settings_instance
+			);
 			$submitted_data['ipAddress'] = Opt_In_Geo::get_user_ip();
 
 			if ( false !== $existing_member && ! is_wp_error( $existing_member ) ) {
@@ -103,10 +127,12 @@ class Hustle_Mautic_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 				// Remove ipAddress
 				unset( $submitted_data['ipAddress'] );
 				$error_code = $contact_id->get_error_code();
-
 				$details = $contact_id->get_error_message( $error_code );
-			} elseif( ! $updated ) {
-
+			} elseif( $updated ) {
+				$is_sent = true;
+				$details = __( 'Successfully updated member on Mautic list', 'wordpress-popup' );
+				$member_status = __( 'OK', 'wordpress-popup' );
+			}elseif( ! $updated ){
 				$api->add_contact_to_segment( $list_id, $contact_id );
 
 				$is_sent = true;
@@ -119,7 +145,23 @@ class Hustle_Mautic_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 				$member_status = __( 'Updated', 'wordpress-popup' );
 			}
 
-			$utils = Hustle_Provider_Utils::get_instance();
+			/**
+			 * Fires before adding subscriber
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param int    $module_id
+			 * @param array  $submitted_data
+			 * @param mixed  $contact_id
+			 * @param object $form_settings_instance
+			 */
+			do_action( 'hustle_provider_mailerlite_after_add_subscriber',
+				$module_id,
+				$submitted_data,
+				$contact_id,
+				$form_settings_instance
+			);
+
 			$entry_fields = array(
 				array(
 					'name'  => 'status',
@@ -127,9 +169,6 @@ class Hustle_Mautic_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 						'is_sent'       => $is_sent,
 						'description'   => $details,
 						'member_status' => $member_status,
-						'data_sent'     => $utils->get_last_data_sent(),
-						'data_received' => $utils->get_last_data_received(),
-						'url_request'   => $utils->get_last_url_request(),
 					),
 				),
 			);
@@ -195,20 +234,19 @@ class Hustle_Mautic_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			$username 			= $addon->get_setting( 'username', '', $global_multi_id );
 			$password 			= $addon->get_setting( 'password', '', $global_multi_id );
 			$api 				= $addon::api( $url, $username, $password );
-			$existing_member 	= $api->email_exist( $submitted_data['email'] );
+			$existing_member 	= $this->get_subscriber( $api, $submitted_data['email'] );
 
 			if( false !== $existing_member && ! is_wp_error( $existing_member ) )
 				$is_success = self::ALREADY_SUBSCRIBED_ERROR;
 		}
 
 		/**
-		 * Return `true` if success, or **(string) error message** on fail
+		 * Filter submitted form data to be processed
 		 *
 		 * @since 4.0
 		 *
-		 * @param bool                                     $is_success
-		 * @param int                                      $module_id                current module_id
 		 * @param array                                    $submitted_data
+		 * @param int                                      $module_id                current module_id
 		 * @param Hustle_Mautic_Form_Settings $form_settings_instance
 		 */
 		$is_success = apply_filters(
@@ -216,6 +254,7 @@ class Hustle_Mautic_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			$is_success,
 			$module_id,
 			$submitted_data,
+			$module_id,
 			$form_settings_instance
 		);
 
@@ -230,5 +269,28 @@ class Hustle_Mautic_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 
 		return true;
 
+	}
+
+	/**
+	 * Get subscriber for providers
+	 *
+	 * This method is to be inherited
+	 * And extended by child classes.
+	 *
+	 * Make use of the property `$_subscriber`
+	 * Method to omit double api calls
+	 *
+	 * @since 4.0.2
+	 *
+	 * @param 	object 	$api
+	 * @param 	mixed  	$data
+	 * @return  mixed 	array/object API response on queried subscriber
+	 */
+	protected function get_subscriber( $api, $data ) {
+		if( empty ( $this->_subscriber ) && ! isset( $this->_subscriber[ md5( $data ) ] ) ){
+			$this->_subscriber[ md5( $data ) ] = $api->email_exist( $data );
+		}
+
+		return $this->_subscriber[ md5( $data ) ];
 	}
 }

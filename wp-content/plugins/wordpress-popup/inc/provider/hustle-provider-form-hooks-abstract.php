@@ -17,7 +17,7 @@ abstract class Hustle_Provider_Form_Hooks_Abstract {
 
 	/**
 	 * Constant string for the common error when the user has already subscribed.
-	 * 
+	 *
 	 * @since 4.0
 	 */
 	const ALREADY_SUBSCRIBED_ERROR = 'email_already_subscribed';
@@ -57,6 +57,15 @@ abstract class Hustle_Provider_Form_Hooks_Abstract {
 	 */
 	protected $form_settings_instance;
 
+	/**
+	 * Details of the subscriber from api
+	 *
+	 * @since 4.0.2
+	 * @var Hustle_Provider_Form_Settings_Abstract|null
+	 *
+	 */
+	protected $_subscriber = array();
+
 
 	/**
 	 * Hustle_Provider_Form_Hooks_Abstract constructor.
@@ -85,6 +94,7 @@ abstract class Hustle_Provider_Form_Hooks_Abstract {
 	 * @since 4.0
 	 *
 	 * @param $submitted_data
+	 * @param $allow_subscribed Module setting
 	 *
 	 * @return bool
 	 */
@@ -239,6 +249,22 @@ abstract class Hustle_Provider_Form_Hooks_Abstract {
 		$entry_fields = array();
 
 		return $entry_fields;
+	}
+
+
+	public function add_additional_data( $addon_fields ) {
+		$utils = Hustle_Provider_Utils::get_instance();
+		if ( empty( $addon_fields[0]['value']['url_request'] ) ) {
+			$addon_fields[0]['value']['url_request'] = $utils->get_last_url_request();
+		}
+		if ( empty( $addon_fields[0]['value']['data_sent'] ) ) {
+			$addon_fields[0]['value']['data_sent'] = $utils->get_last_data_sent();
+		}
+		if ( empty( $addon_fields[0]['value']['data_received'] ) ) {
+			$addon_fields[0]['value']['data_received'] = $utils->get_last_data_received();
+		}
+
+		return $addon_fields;
 	}
 
 	/**
@@ -457,6 +483,28 @@ abstract class Hustle_Provider_Form_Hooks_Abstract {
 
 		return $additional_fields;
 
+	}
+
+	/**
+	 * Get subscriber for providers
+	 *
+	 * This method is to be inherited
+	 * And extended by child classes.
+	 *
+	 * Make use of the static $subscriber
+	 * Method to omit double api calls
+	 *
+	 * @since 4.0.2
+	 *
+	 * @param 	object 	$api
+	 * @param 	mixed  	$data
+	 * @return  mixed 	array/object API response on queried subscriber
+	 */
+	protected function get_subscriber( $api, $data ) {
+		if( empty ( $this->_subscriber ) ){
+			$this->_subscriber = array();
+		}
+		return $this->_subscriber;
 	}
 
 }

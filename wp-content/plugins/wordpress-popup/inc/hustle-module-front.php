@@ -15,6 +15,8 @@ class Hustle_Module_Front {
 	private $_non_inline_modules = array();
 	private $_inline_modules = array();
 
+	private static $the_content_filter_priority = 20;
+
 	private $_styles;
 
 	const AFTERCONTENT_CSS_CLASS = 'hustle_module_after_content_wrap';
@@ -80,14 +82,32 @@ class Hustle_Module_Front {
 		add_filter(
 			'the_content',
 			array( $this, 'show_after_page_post_content' ),
-			20
+			self::$the_content_filter_priority
 		);
+
+		add_filter( 'get_the_excerpt', array( $this, 'remove_the_content_filter' ), 9 );
+		add_filter( 'wp_trim_excerpt', array( $this, 'restore_the_content_filter' ) );
 
 		// NextGEN Gallery compat
 		add_filter(
 			'run_ngg_resource_manager',
 			array( $this, 'nextgen_compat' )
 		);
+	}
+
+	/**
+	 * Don't apply the_content filter for excerpts
+	 */
+	public function remove_the_content_filter( $post_excerpt ) {
+		remove_filter( 'the_content', array( $this, 'show_after_page_post_content' ), self::$the_content_filter_priority );
+
+		return $post_excerpt;
+	}
+
+	public function restore_the_content_filter( $text ) {
+		add_filter( 'the_content', array( $this, 'show_after_page_post_content' ), self::$the_content_filter_priority );
+
+		return $text;
 	}
 
 	public function register_widget() {
@@ -180,15 +200,6 @@ class Hustle_Module_Front {
 	 * @since 4.0
 	 */
 	public static function add_hui_scripts() {
-
-		// Load jQuery UI on front
-		wp_enqueue_script(
-			'jquery-ui',
-			'https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js',
-			array( 'jquery' ),
-			'1.12.1',
-			false
-		);
 
 		wp_enqueue_script( 'jquery-ui-core' );
 		wp_enqueue_script( 'jquery-ui-datepicker' );
@@ -956,7 +967,7 @@ class Hustle_Module_Front {
 			}
 		}
 
-		remove_filter( 'the_content', array( $this, 'show_after_page_post_content' ) );
+		remove_filter( 'the_content', array( $this, 'show_after_page_post_content' ), self::$the_content_filter_priority );
 
 		return $content;
 	}

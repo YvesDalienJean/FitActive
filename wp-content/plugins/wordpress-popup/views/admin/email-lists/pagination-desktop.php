@@ -50,8 +50,7 @@ $order_by_array = array(
 			/>
 
 			<button
-				id="hustle-apply-button"
-				class="sui-button"
+				class="sui-button hustle-bulk-apply-button"
 				<?php echo isset( $input_id ) ? 'form="' . esc_attr( $input_id ) . '"' : ''; ?>
 				<?php disabled( true ); ?>
 			>
@@ -63,7 +62,8 @@ $order_by_array = array(
 			echo '</form>';
 		else :
 			echo '</div>';
-		endif; ?>
+		endif;
+		?>
 
 		<?php
 		// ELEMENT: Pagination (Desktop) ?>

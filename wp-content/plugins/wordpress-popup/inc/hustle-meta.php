@@ -86,7 +86,9 @@ abstract class Hustle_Meta {
 			'day' => '',
 			'time' => '',
 			'auto_email_time' => '5',
+			'schedule_auto_email_time' => '5',
 			'auto_email_unit' => 'seconds',
+			'schedule_auto_email_unit' => 'seconds',
 			'email_subject' => '',
 			'email_body'=> '',
 		);

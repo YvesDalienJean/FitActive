@@ -32,9 +32,20 @@ class Hustle_InfusionSoft_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract
 		);
 
 		/**
+		 * Filter submitted form data to be processed
+		 *
 		 * @since 4.0
+		 *
+		 * @param array                                    $submitted_data
+		 * @param int                                      $module_id                current module_id
+		 * @param Hustle_InfusionSoft_Form_Settings 	   $form_settings_instance
 		 */
-		$submitted_data = apply_filters( 'hustle_provider_' . $this->addon->get_slug() . '_form_submitted_data', $submitted_data, $module_id, $form_settings_instance );
+		$submitted_data = apply_filters(
+			'hustle_provider_infusionsoft_form_submitted_data',
+			$submitted_data,
+			$module_id,
+			$form_settings_instance
+		);
 
 		$addon_setting_values = $form_settings_instance->get_form_settings_values();
 		
@@ -82,9 +93,6 @@ class Hustle_InfusionSoft_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract
 				$response = array(
 					'is_sent'       => false,
 					'description'   => '',
-					'data_sent'     => $utils->get_last_data_sent(),
-					'data_received' => $utils->get_last_data_received(),
-					'url_request'   =>  $utils->get_last_url_request(),
 				);
 
 			} else { // If there weren't errors.
@@ -103,34 +111,70 @@ class Hustle_InfusionSoft_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract
 							$submitted_data[ $name_from_key ] = $value;
 							
 						} else {
+							//$res = $api->add_custom_field( $key );
+							//if ( is_wp_error( $res ) ) {
+							//	$err = $res;
+							//}
 							$found_extra[ $name_from_key ] = $value;
 						}
 						unset( $submitted_data[ $key ] );
 					}
+
+					// Add new custom fields.
+					if ( ! empty( $found_extra ) ) {
+						// DON'T ADD CUSTOM FIELD SUPPORT YET.
+						// We weren't supporting it before, so let's do the upgrade to REST and then
+						// add the support once it's implemented on Infusionsoft's REST side.
+	
+						//foreach( $found_extra as $name => $value ) {
+						//	$api->add_custom_field( $name );
+						//}
+	
+						$message = __( "The contact was subscribed but these custom fields couldn't be added: ", 'wordpress-popup' ) . implode( ', ', array_keys( $found_extra ) );
+						throw new Exception( $message );
+					}
 				}
 
-				// Add new custom fields.
-				if ( ! empty( $found_extra ) ) {
-					// DON'T ADD CUSTOM FIELD SUPPORT YET.
-					// We weren't supporting it before, so let's do the upgrade to REST and then
-					// add the support once it's implemented on Infusionsoft's REST side.
-
-					//foreach( $found_extra as $name => $value ) {
-					//	$api->add_custom_field( $name );
-					//}
-
-					$message = __( "The contact was subscribed but these custom fields couldn't be added: ", 'wordpress-popup' ) . implode( ', ', array_keys( $found_extra ) );
-					throw new Exception( $message );
-				}
+				/**
+				 * Fires before adding subscriber
+				 *
+				 * @since 4.0.2
+				 *
+				 * @param int    $module_id
+				 * @param array  $submitted_data
+				 * @param object $form_settings_instance
+				 */
+				do_action( 'hustle_provider_infusionsoft_before_add_subscriber',
+					$module_id,
+					$submitted_data,
+					$form_settings_instance
+				);
 
 				$email_exists = $api->email_exist( $submitted_data['Email'] );
-
+	
 				if ( $email_exists ) {
 					$contact_id = $api->update_contact( $submitted_data );
 				} else {
 					$contact_id = $api->add_contact( $submitted_data );
 				}
-	
+
+				/**
+				 * Fires after adding subscriber
+				 *
+				 * @since 4.0.2
+				 *
+				 * @param int    $module_id
+				 * @param array  $submitted_data
+				 * @param mixed  $contact_id
+				 * @param object $form_settings_instance
+				 */
+				do_action( 'hustle_provider_infusionsoft_after_add_subscriber',
+					$module_id,
+					$submitted_data,
+					$contact_id,
+					$form_settings_instance
+				);
+
 				if ( is_wp_error( $contact_id ) ) {
 					throw new Exception( $contact_id->get_error_message() );
 				}
@@ -171,7 +215,7 @@ class Hustle_InfusionSoft_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract
 			);
 		}
 
-		return apply_filters( 'hustle_provider_' . $this->addon->get_slug() . '_entry_fields',
+		return apply_filters( 'hustle_provider_infusionsoft_entry_fields',
 			$entry_fields,
 			$module_id,
 			$submitted_data,
@@ -181,7 +225,7 @@ class Hustle_InfusionSoft_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract
 
 	/**
 	 * Check whether the email is already subscribed.
-	 * 
+	 *
 	 * @since 4.0
 	 *
 	 * @param $submitted_data
@@ -223,12 +267,12 @@ class Hustle_InfusionSoft_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract
 			$api_key 			= $addon->get_setting( 'api_key', '', $global_multi_id );
 			$account_name 		= $addon->get_setting( 'account_name', '', $addon_setting_values['selected_global_multi_id'] );
 			$api 				= Hustle_Infusion_Soft::api( $api_key, $account_name );
-			$existing_member 	= $api->email_exist( $submitted_data['email'] );
-			
+			$existing_member 	= $this->get_subscriber( $api, $submitted_data['email'] );
+
 			if ( $existing_member )
 				$is_success = self::ALREADY_SUBSCRIBED_ERROR;
 		}
-		
+
 		/**
 		 * Return `true` if success, or **(string) error message** on fail
 		 *
@@ -257,5 +301,29 @@ class Hustle_InfusionSoft_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract
 		}
 
 		return true;
+	}
+
+	/**
+	 * Get subscriber for providers
+	 *
+	 * This method is to be inherited
+	 * And extended by child classes.
+	 *
+	 * Make use of the property `$_subscriber`
+	 * Method to omit double api calls
+	 *
+	 * @since 4.0.2
+	 *
+	 * @param 	object 	$api
+	 * @param 	mixed  	$data
+	 * @return  mixed 	array/object API response on queried subscriber
+	 */
+	protected function get_subscriber( $api, $data ){
+
+		if( empty ( $this->_subscriber ) && ! isset( $this->_subscriber[ md5( $data ) ] ) ){
+			$this->_subscriber[ md5( $data ) ] = $api->email_exist( $data );
+		}
+
+		return $this->_subscriber[ md5( $data ) ];
 	}
 }

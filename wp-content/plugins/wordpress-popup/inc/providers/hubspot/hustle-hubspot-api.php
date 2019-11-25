@@ -47,18 +47,25 @@ if ( ! class_exists( 'Hustle_HubSpot_Api' ) ) :
 		*/
 		public function process_callback_request() {
 			if ( $this->validate_callback_request( 'hubspot' ) ) {
-				$code 			= filter_input( INPUT_GET, 'code', FILTER_SANITIZE_STRING );
+
+				$code = filter_input( INPUT_GET, 'code', FILTER_SANITIZE_STRING );
+				$status = 'error';
+
 				// Get the referer page that sent the request
 				$referer 		= get_option( self::REFERER );
 				$current_page 	= get_option( self::CURRENTPAGE );
 				if ( $code ) {
 					if ( $this->get_access_token( array( 'code' => $code ) ) ) {
-						if ( ! empty( $referer ) ) {
-							wp_safe_redirect( $referer );
-							exit;
-						}
+						$status = 'success';
 					}
 				}
+
+				if ( ! empty( $referer ) ) {
+					$referer = add_query_arg( 'status', $status, $referer );
+					wp_safe_redirect( $referer );
+					exit;
+				}
+
 				// Allow retry but don't log referrer
 				$authorization_uri = $this->get_authorization_uri( false, false, $current_page );
 
@@ -172,6 +179,12 @@ if ( ! class_exists( 'Hustle_HubSpot_Api' ) ) :
 
 			$response = wp_remote_request( $url, $_args );
 
+			//logging data
+			$utils = Hustle_Provider_Utils::get_instance();
+			$utils->_last_url_request 	= $url;
+			$utils->_last_data_sent 	= $_args;
+			$utils->_last_data_received = $response;
+
 			$this->sending = false;
 
 			if ( ! is_wp_error( $response ) ) {
@@ -268,13 +281,14 @@ if ( ! class_exists( 'Hustle_HubSpot_Api' ) ) :
 			$args = http_build_query( $args );
 
 			if ( $log_referrer ) {
-				/**
-				* Store $referer to use after retrieving the access token
-				*/
+
 				$params = array(
-					'page' => $page,
-					'message' => 'hubspot_new_integration',
+					'page' 		=> $page,
+					'action'	=> 'external-redirect',
+					'slug'		=> 'hubspot',
+					'nonce'		=> wp_create_nonce( 'hustle_provider_external_redirect' ),
 				);
+
 				if ( !empty( $module_id ) ) {
 					$params['id'] = $module_id;
 					$params['section'] = 'integrations';
@@ -289,7 +303,25 @@ if ( ! class_exists( 'Hustle_HubSpot_Api' ) ) :
 		}
 
 		/**
-		* Retrieve contact lists from HubSpot
+		 * Get the current token's information.
+		 *
+		 * @since 4.0.2
+		 * @return array
+		 */
+		public function get_access_token_information() {
+
+			$res = array();
+			$token = $this->get_token( 'access_token' );
+
+			if ( ! empty( $token ) ) {
+				$res = $this->send_authenticated_get( 'oauth/v1/access-tokens/' . $token );
+			}
+
+			return $res;
+		}
+
+		/**
+		* Retrieve contact lists from Hubspot
 		*
 		* @return array
 		*/
@@ -303,11 +335,7 @@ if ( ! class_exists( 'Hustle_HubSpot_Api' ) ) :
 			$res = $this->send_authenticated_get( 'contacts/v1/lists/static', $args );
 
 			if ( ! is_wp_error( $res ) && ! empty( $res->lists ) ) {
-				foreach ( $res->lists as $list ) {
-					$listing[ $list->listId ] = array( // phpcs:ignore
-						'value' => $list->listId, // phpcs:ignore
-						'label' => $list->name,
-					); }
+				$listing = wp_list_pluck( $res->lists, 'name', 'listId' );
 			}
 
 			return $listing;
@@ -325,11 +353,6 @@ if ( ! class_exists( 'Hustle_HubSpot_Api' ) ) :
 			$endpoint = 'contacts/v1/contact/email/' . $email . '/profile';
 
 			$res = $this->send_authenticated_get( $endpoint, $args );
-
-			$utils = Hustle_Provider_Utils::get_instance();
-			$utils->_last_data_received = $res;
-			$utils->_last_url_request = self::API_URL . $endpoint;
-			$utils->_last_data_sent = $args;
 
 			if ( ! is_wp_error( $res ) && ! empty( $res->vid ) ) {
 				return $res; }
@@ -383,8 +406,8 @@ if ( ! class_exists( 'Hustle_HubSpot_Api' ) ) :
 
 			$difference = array_diff_key( $data, $filtered_data );
 			if ( ! empty( $difference ) ) {
-				$message = 'These fields are preventing your users from subscribing because they do not exist in your HubSpot account: ' . implode( ', ', array_keys( $difference ) );
-				Hustle_Api_Utils::maybe_log( $message );
+				$message = 'These fields are preventing your users from subscribing because they do not exist in your Hubspot account: ' . implode( ', ', array_keys( $difference ) );
+				throw new Exception( $message );
 			}
 
 			foreach ( $data as $key => $value ) {
@@ -403,11 +426,6 @@ if ( ! class_exists( 'Hustle_HubSpot_Api' ) ) :
 			$endpoint = 'contacts/v1/contact';
 
 			$res = $this->send_authenticated_post( $endpoint, $args, false, true );
-
-			$utils = Hustle_Provider_Utils::get_instance();
-			$utils->_last_data_received = $res;
-			$utils->_last_url_request = self::API_URL . $endpoint;
-			$utils->_last_data_sent = $args;
 
 			if ( ! is_wp_error( $res ) && ! empty( $res->vid ) ) {
 				return $res->vid; }
@@ -432,8 +450,8 @@ if ( ! class_exists( 'Hustle_HubSpot_Api' ) ) :
 
 			$difference = array_diff_key( $data, $filtered_data );
 			if ( ! empty( $difference ) ) {
-				$message = 'These fields are preventing your users from subscribing because they do not exist in your HubSpot account: ' . implode( ', ', array_keys( $difference ) );
-				Hustle_Api_Utils::maybe_log( $message );
+				$message = 'These fields are preventing your users from subscribing because they do not exist in your Hubspot account: ' . implode( ', ', array_keys( $difference ) );
+				throw new Exception( $message );
 			}
 
 			foreach ( $data as $key => $value ) {
@@ -452,11 +470,6 @@ if ( ! class_exists( 'Hustle_HubSpot_Api' ) ) :
 			$endpoint = 'contacts/v1/contact/vid/' . $id .'/profile';
 
 			$res = $this->send_authenticated_post( $endpoint, $args, false, true );
-
-			$utils = Hustle_Provider_Utils::get_instance();
-			$utils->_last_data_received = $res;
-			$utils->_last_url_request = self::API_URL . $endpoint;
-			$utils->_last_data_sent = $args;
 
 			if ( ! is_wp_error( $res ) && ! empty( $res->vid ) ) {
 				return $res->vid; }
@@ -481,11 +494,6 @@ if ( ! class_exists( 'Hustle_HubSpot_Api' ) ) :
 			);
 			$endpoint = 'contacts/v1/lists/' . $email_list . '/add';
 			$res = $this->send_authenticated_post( $endpoint, $args, false, true );
-
-			$utils = Hustle_Provider_Utils::get_instance();
-			$utils->_last_data_received = $res;
-			$utils->_last_url_request = self::API_URL . $endpoint;
-			$utils->_last_data_sent = $args;
 
 			if ( ! is_wp_error( $res ) && ! empty( $res->updated ) ) {
 				return true;

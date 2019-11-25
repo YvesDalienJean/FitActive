@@ -95,6 +95,11 @@ $palette_optin = array(
 				'name'    => esc_html__( 'Default', 'wordpress-popup' ),
 				'current' => true,
 				'colors'  => array(
+					'cta_button_border'     => array(
+						'name'  => esc_html__( 'Border color', 'wordpress-popup' ),
+						'value' => 'cta_button_static_bo',
+						'alpha' => 'true',
+					),
 					'cta_button_background' => array(
 						'name'  => esc_html__( 'Background color', 'wordpress-popup' ),
 						'value' => 'cta_button_static_bg',
@@ -111,6 +116,11 @@ $palette_optin = array(
 				'name'    => esc_html__( 'Hover', 'wordpress-popup' ),
 				'current' => false,
 				'colors'  => array(
+					'cta_button_border_hover'     => array(
+						'name'  => esc_html__( 'Border color', 'wordpress-popup' ),
+						'value' => 'cta_button_hover_bo',
+						'alpha' => 'true',
+					),
 					'cta_button_background_hover' => array(
 						'name'  => esc_html__( 'Background color', 'wordpress-popup' ),
 						'value' => 'cta_button_hover_bg',
@@ -127,6 +137,11 @@ $palette_optin = array(
 				'name'    => esc_html__( 'Active', 'wordpress-popup' ),
 				'current' => false,
 				'colors'  => array(
+					'cta_button_border_active' => array(
+						'name'  => esc_html__( 'Border color', 'wordpress-popup' ),
+						'value' => 'cta_button_active_bo',
+						'alpha' => 'true',
+					),
 					'cta_button_background_active' => array(
 						'name'  => esc_html__( 'Background color', 'wordpress-popup' ),
 						'value' => 'cta_button_active_bg',
@@ -696,6 +711,11 @@ $palette_optin = array(
 	'success'    => array(
 		'group_name' => esc_html__( 'Success Message', 'wordpress-popup' ),
 		'colors'     => array(
+			'success_background'  => array(
+				'name'  => esc_html__( 'Background color', 'wordpress-popup' ),
+				'value' => 'optin_success_background',
+				'alpha' => 'true',
+			),
 			'success_icon'  => array(
 				'name'  => esc_html__( 'Icon color', 'wordpress-popup' ),
 				'value' => 'optin_success_tick_color',
@@ -710,7 +730,7 @@ $palette_optin = array(
 	),
 	'additional' => array(
 		'group_name'   => esc_html__( 'Additional Settings', 'wordpress-popup' ),
-		
+
 	),
 );
 

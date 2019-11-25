@@ -40,6 +40,7 @@ class Hustle_Module_Renderer extends Hustle_Renderer_Abstract {
 
 		$module         = $this->module;
 		$content        = $module->content;
+		$design         = $module->design;
 		$settings       = $module->settings;
 		$trigger        = $module->triggers;
 		$module_type    = $module->module_type;
@@ -121,6 +122,13 @@ class Hustle_Module_Renderer extends Hustle_Renderer_Abstract {
 				$auto_close,
 				$has_shadow
 			);
+
+			if ( '1' === $design->customize_size ) {
+
+				if ( '' !== $design->custom_width || '' !== $design->custom_height ) {
+					$custom_classes .= ' hustle-size--custom';
+				}
+			}
 		}
 
 		$image_class = '';
@@ -1177,9 +1185,19 @@ class Hustle_Module_Renderer extends Hustle_Renderer_Abstract {
 		$design = $module->design;
 		$fields = $module->emails->form_elements;
 
-		$tag = ( $this->is_admin ) ? 'div' : 'form';
+		if ( ! $this->is_admin ) {
+			$tag = 'form';
+			$extra_data = ' novalidate="novalidate"';
+		} else {
+			$tag = 'div';
+			$extra_data = '';
+		}
 
-		$html .= sprintf( '<%s class="hustle-layout-form">', $tag );
+		$html .= sprintf(
+			'<%s class="hustle-layout-form"%s>',
+			$tag,
+			$extra_data
+		);
 
 		// Form fields
 		$html .= sprintf(
@@ -1248,6 +1266,8 @@ class Hustle_Module_Renderer extends Hustle_Renderer_Abstract {
 		$name = isset( $field['name'] )? $field['name']:'first_name';
 		$label = ( '' !== $field['placeholder'] ) ? $field['placeholder'] : $field['label'];
 		$required = isset( $field['required'] ) && 'true' === $field['required'] ? true : false;
+		$to_validate = isset(  $field['validate'] ) && 'true' === $field['validate'] ? true : false;
+
 		$module = $this->module;
 		$module_type = $module->module_type;
 		$module_id = $module->module_id;
@@ -1258,7 +1278,7 @@ class Hustle_Module_Renderer extends Hustle_Renderer_Abstract {
 		$class_icon = '';
 		$class_input = '';
 		$class_status = $required ? ' hustle-field-required' : '';
-		$data_attributes = '';
+		$data_attributes = sprintf( 'data-validate="%s" ', $to_validate );
 
 		switch ( $type ) {
 
@@ -1268,6 +1288,7 @@ class Hustle_Module_Renderer extends Hustle_Renderer_Abstract {
 
 			case 'phone' :
 				$type = 'text';
+				$data_attributes .= 'data-type="phone"';
 				break;
 
 			case 'url' :
@@ -1298,7 +1319,7 @@ class Hustle_Module_Renderer extends Hustle_Renderer_Abstract {
 					$value = $time_default;
 				}
 
-				$data_attributes = 'data-time-format="' . $time_format . '" data-time-default="' . $time_default . '" data-time-interval="1" data-time-dropdown="true"';
+				$data_attributes .= 'data-time-format="' . $time_format . '" data-time-default="' . $time_default . '" data-time-interval="1" data-time-dropdown="true"';
 				break;
 
 			case 'datepicker':
@@ -1311,7 +1332,7 @@ class Hustle_Module_Renderer extends Hustle_Renderer_Abstract {
 				}
 
 				$class_input = 'hustle-date';
-				$data_attributes = 'data-min-date="null" data-rtl-support="false" data-format="' . $date_format . '" readonly="readonly"';
+				$data_attributes .= 'data-min-date="null" data-rtl-support="false" data-format="' . $date_format . '"';
 				break;
 
 			default:
@@ -1399,7 +1420,7 @@ class Hustle_Module_Renderer extends Hustle_Renderer_Abstract {
 
 	/**
 	 * Get opt-in custom fields markup.
-	 * These custom fields are added by provider's, for example: MailChimp groups.
+	 * These custom fields are added by provider's, for example: Mailchimp groups.
 	 *
 	 * @since 4.0
 	 * @return string
@@ -1516,6 +1537,17 @@ class Hustle_Module_Renderer extends Hustle_Renderer_Abstract {
 			'frameborder'     => array(),
 			'allowfullscreen' => array(),
 		);
+		// Form.
+		$allowed_html['form'] = array(
+			'action'         => true,
+			'accept'         => true,
+			'accept-charset' => true,
+			'enctype'        => true,
+			'method'         => true,
+			'name'           => true,
+			'target'         => true,
+			'role'           => array(),
+		);
 		// Inputs.
 		$allowed_html['input'] = array(
 			'class' => array(),
@@ -1581,12 +1613,15 @@ class Hustle_Module_Renderer extends Hustle_Renderer_Abstract {
 			$message = __( 'There was an error submitting the form', 'wordpress-popup' );
 		}
 
-		$default_error = __( 'Something went wrong, please try again.', 'wordpress-popup' );
+		$default_error 	 	= __( 'Something went wrong, please try again.', 'wordpress-popup' );
+
+		$validation_error 	= __( 'You have some errors on the fields, please provide valid details.', 'wordpress-popup' );
 
 		$html = sprintf(
-			'<div class="hustle-error-message" style="display: none;" data-default-error="%1$s" data-required-error="%2$s">',
+			'<div class="hustle-error-message" style="display: none;" data-default-error="%1$s" data-required-error="%2$s" data-validation-error="%3$s">',
 			esc_attr( $default_error ),
-			esc_attr( $message )
+			esc_attr( $message ),
+			esc_attr( $validation_error )
 		);
 
 			$html .= '<p>' . esc_html( $message ) . '</p>';

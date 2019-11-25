@@ -8,7 +8,6 @@
  */
 class Hustle_SendinBlue_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 
-
 	/**
 	 * Add SendinBlue data to entry.
 	 *
@@ -19,118 +18,174 @@ class Hustle_SendinBlue_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 	 */
 	public function add_entry_fields( $submitted_data ) {
 
-		$addon = $this->addon;
-		$module_id = $this->module_id;
+		$addon 					= $this->addon;
+		$module_id 				= $this->module_id;
 		$form_settings_instance = $this->form_settings_instance;
+		$addon_setting_values 	= $form_settings_instance->get_form_settings_values();
 
 		/**
+		 * Filter submitted form data to be processed
+		 *
 		 * @since 4.0
+		 *
+		 * @param array                                         $submitted_data
+		 * @param int                                           $module_id                current Form ID
+		 * @param Hustle_Sendinblue_Form_Settings 			 	$form_settings_instance
 		 */
-		$submitted_data = apply_filters( 'hustle_provider_' . $addon->get_slug() . '_form_submitted_data', $submitted_data, $module_id, $form_settings_instance );
-
-		$addon_setting_values = $form_settings_instance->get_form_settings_values();
+		$submitted_data = apply_filters(
+			'hustle_provider_sendinblue_form_submitted_data',
+			$submitted_data,
+			$module_id,
+			$form_settings_instance
+		);
 
 		try {
+
 			if ( empty( $submitted_data['email'] ) ) {
 				throw new Exception( __('Required Field "email" was not filled by the user.', 'wordpress-popup' ) );
 			}
-			$global_multi_id = $addon_setting_values['selected_global_multi_id'];
-			$api_key = $addon->get_setting( 'api_key', '', $global_multi_id );
-			$api = $addon::api( $api_key );
 
-			$list_id = (int)$addon_setting_values['list_id'];
+			$addon_setting_values 	= $form_settings_instance->get_form_settings_values();
+			$is_sent 				= false;
+			$global_multi_id 		= $addon_setting_values['selected_global_multi_id'];
+			$list_id 				= (int)$addon_setting_values['list_id'];
+			$submitted_data 		= $this->check_legacy( $submitted_data );
+			$api 					= $addon::api( $addon->get_setting( 'api_key', '', $global_multi_id ) );
 
-			$submitted_data = $this->check_legacy( $submitted_data );
-
-			$email		 = $submitted_data['email'];
-
-			//First get the contact
-			//We cannot add to a new list without getting the old list
-			//We first get the old list id and merge with the new one
-			$contact = $api->get_user( array( 'email' => $email ) );
-
+			$email = $submitted_data['email'];
 			$is_sent = false;
 			$member_status = __( 'Member could not be subscribed.', 'wordpress-popup' );
-
 			$merge_vals	 = array();
 
-			if ( isset( $submitted_data['first_name'] ) ) {
-				$merge_vals['FIRSTNAME'] = $submitted_data['first_name'];
-				$merge_vals['NAME']		 = $submitted_data['first_name'];
+			if ( isset( $submitted_data['first_name'] ) && ! empty( $submitted_data['first_name'] ) ) {
+				$submitted_data['FIRSTNAME'] = $submitted_data['first_name'];
 			}
-			if ( isset( $submitted_data['last_name'] ) ) {
-				$merge_vals['LASTNAME']	 = $submitted_data['last_name'];
-				$merge_vals['NAME']		 .= ' ' . $submitted_data['last_name'];
+			if ( isset( $submitted_data['last_name'] ) && ! empty( $submitted_data['last_name'] ) ) {
+				$submitted_data['LASTNAME']	 = $submitted_data['last_name'];
 			}
 
-			// Add extra fields
-			$extra_data	 = array_diff_key( $submitted_data, array(
-				'email'		 => '',
-				'firstname'	 => '',
-				'lastname'	 => '',
-					) );
-			$extra_data	 = array_filter( $extra_data );
+			//unset this as we don't need it
+			unset( $submitted_data['first_name'] );
+			unset( $submitted_data['last_name'] );
 
-			if ( !empty( $extra_data ) ) {
-				$custom_fields = array();
-				foreach ( $extra_data as $key => $value ) {
-					$custom_fields[] = array(
-						'name' => $key,
-						'type' => 'text',
-					);
+			foreach( $submitted_data as $key => $sub_d ){
+
+				if( 'email' === $key ) continue;
+
+				$custom_fields[] = array(
+					'name' 	=> strtoupper( $key ),
+				);
+
+				$merge_vals[ strtoupper( $key ) ] = $sub_d;
+			}
+
+			//currently only supports text fields
+			if ( ! empty( $merge_vals ) ) {
+
+				//get custom fields
+				$result = $api->get_attributes();
+				$api_fields = array();
+
+				if ( !empty( $result ) ) {
+					$api_fields = wp_list_pluck( $result->attributes, 'name' );
 				}
-				$addon->add_custom_fields( $custom_fields, $api );
-				$merge_vals = array_merge( $merge_vals, $extra_data );
-			}
-			$merge_vals = array_change_key_case( $merge_vals, CASE_UPPER );
 
-			$list_array = array( $list_id );
+				$_fields 	= wp_list_pluck( $custom_fields, 'name' );
+				$new_fields = array_udiff( $_fields, $api_fields, 'strcasecmp' );
 
-			if ( !empty( $contact['data']['listid'] ) ) {
-				$list_array = array_merge( $list_array, $contact['data']['listid'] );
+				foreach ( $new_fields as $custom_field ) {
+					//create custom fields
+					$api->create_attributes( $custom_field, 'normal', array( 'type' => 'text' ) );
+				}
 			}
+
+			//check if email exists
+			try{
+				$email_exists = $this->get_subscriber( $api, $email );
+			} catch( Exception $e ){
+				$email_exists = false;
+			}
+
 			$subscribe_data = array(
-				'email'	 => $email,
-				'listid' => $list_array
+				'email'	 	=> $email,
+				'listIds' 	=> array( $list_id ),
+				"smtpBlacklistSender"=> array(),
+				"updateEnabled" => true
 			);
-			if ( !empty( $merge_vals ) ) {
+
+			if ( ! empty( $merge_vals ) ) {
 				$subscribe_data['attributes'] = $merge_vals;
 			}
-			$res = $api->create_update_user( $subscribe_data );
+
+			/**
+			 * Fires before adding subscriber
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param int    $module_id
+			 * @param array  $submitted_data
+			 * @param object $form_settings_instance
+			 */
+			do_action( 'hustle_provider_sendinblue_before_add_subscriber',
+				$module_id,
+				$submitted_data,
+				$form_settings_instance
+			);
+
+			//update contact if email exists
+			if( false === $email_exists ){
+				$res = $api->create_contact( $subscribe_data );
+			} else {
+				//phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+				$subscribe_data['listIds'] = array_unique( array_merge( $email_exists->listIds, $subscribe_data['listIds'] ) );
+				$res = $api->update_contact( $subscribe_data );
+			}
+
+			/**
+			 * Fires before adding subscriber
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param int    $module_id
+			 * @param array  $submitted_data
+			 * @param mixed  $res
+			 * @param object $form_settings_instance
+			 */
+			do_action( 'hustle_provider_sendinblue_after_add_subscriber',
+				$module_id,
+				$submitted_data,
+				$res,
+				$form_settings_instance
+			);
 
 			if ( is_wp_error( $res ) ) {
 				$details = $res->get_error_message();
-			} elseif ( 'failure' === $res['code'] ) {
-				$details = $res['message'];
 			} else {
 				$is_sent = true;
 				$details = __( 'Successfully added or updated member on SendinBlue list', 'wordpress-popup' );
 				$member_status = __( 'OK', 'wordpress-popup' );
 			}
 
-			$utils = Hustle_Provider_Utils::get_instance();
-			$entry_fields = array(
-				array(
-					'name'  => 'status',
-					'value' => array(
-						'is_sent'       => $is_sent,
-						'description'   => $details,
-						'member_status' => $member_status,
-						'data_sent'     => $utils->get_last_data_sent(),
-						'data_received' => $utils->get_last_data_received(),
-						'url_request'   => $utils->get_last_url_request(),
-					),
-				),
-			);
 		} catch ( Exception $e ) {
 			$entry_fields = $this->exception( $e );
 		}
 
-		if ( !empty( $addon_setting_values['list_name'] ) ) {
+		$entry_fields = array(
+			array(
+				'name'  => 'status',
+				'value' => array(
+					'is_sent'       => $is_sent,
+					'description'   => $details,
+					'member_status' => $member_status
+				),
+			),
+		);
+
+		if( !empty( $addon_setting_values['list_name'] ) ) {
 			$entry_fields[0]['value']['list_name'] = $addon_setting_values['list_name'];
 		}
 
-		$entry_fields = apply_filters( 'hustle_provider_' . $addon->get_slug() . '_entry_fields',
+		$entry_fields = apply_filters( 'hustle_provider_sendinblue_entry_fields',
 			$entry_fields,
 			$module_id,
 			$submitted_data,
@@ -142,7 +197,7 @@ class Hustle_SendinBlue_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 
 	/**
 	 * Check whether the email is already subscribed.
-	 * 
+	 *
 	 * @since 4.0
 	 *
 	 * @param $submitted_data
@@ -155,13 +210,16 @@ class Hustle_SendinBlue_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		$form_settings_instance 	= $this->form_settings_instance;
 		$addon 						= $this->addon;
 		$addon_setting_values 		= $form_settings_instance->get_form_settings_values();
+		$global_multi_id 			= $addon_setting_values['selected_global_multi_id'];
+		$api 						= $addon::api( $addon->get_setting( 'api_key', '', $global_multi_id ) );
+		$list_id 					= (int)$addon_setting_values['list_id'];
 
 		if ( empty( $submitted_data['email'] ) ) {
 			return __( 'Required Field "email" was not filled by the user.', 'wordpress-popup' );
 		}
 
 		if ( ! $allow_subscribed ) {
-	
+
 			/**
 			 * Filter submitted form data to be processed
 			 *
@@ -169,7 +227,7 @@ class Hustle_SendinBlue_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			 *
 			 * @param array                                    $submitted_data
 			 * @param int                                      $module_id                current module_id
-			 * @param Hustle_SendinBlue_Form_Settings $form_settings_instance
+			 * @param Hustle_Sendinblue_Form_Settings $form_settings_instance
 			 */
 			$submitted_data = apply_filters(
 				'hustle_provider_sendinblue_form_submitted_data_before_validation',
@@ -178,19 +236,18 @@ class Hustle_SendinBlue_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 				$form_settings_instance
 			);
 
-			//triggers exception if not found.
-			$global_multi_id 	= $addon_setting_values['selected_global_multi_id'];
-			$api_key 			= $addon->get_setting( 'api_key', '', $global_multi_id );
-			$api 				= $addon::api( $api_key );
-			$list_id 			= (int)$addon_setting_values['list_id'];
-			$existing_member 	= $api->get_user( array( 'email' => $submitted_data['email'] ) );
+			try{
+				//triggers exception if not found.
+				$existing_user = $this->get_subscriber( $api, $submitted_data['email'] );
 
-			if ( !is_wp_error( $existing_member ) && 'failure' !== $existing_member['code'] && isset( $existing_member['data'] ) && isset( $existing_member['data']['listid'] )
-					&& in_array( $list_id, $existing_member['data']['listid'], true ) ) {
-				$is_success = self::ALREADY_SUBSCRIBED_ERROR;
+				if( !empty( $existing_user ) && in_array( $list_id, $existing_user->listIds, true ) ) //phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+					$is_success = self::ALREADY_SUBSCRIBED_ERROR;
+
+			} catch( Exception $e){
+				$is_success = true;
 			}
 		}
-	
+
 		/**
 		 * Return `true` if success, or **(string) error message** on fail
 		 *
@@ -199,7 +256,7 @@ class Hustle_SendinBlue_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		 * @param bool                                     $is_success
 		 * @param int                                      $module_id                current module_id
 		 * @param array                                    $submitted_data
-		 * @param Hustle_SendinBlue_Form_Settings $form_settings_instance
+		 * @param Hustle_Sendinblue_Form_Settings $form_settings_instance
 		 */
 		$is_success = apply_filters(
 			'hustle_provider_sendinblue_form_submitted_data_after_validation',
@@ -219,6 +276,29 @@ class Hustle_SendinBlue_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Get subscriber for providers
+	 *
+	 * This method is to be inherited
+	 * And extended by child classes.
+	 *
+	 * Make use of the property `$_subscriber`
+	 * Method to omit double api calls
+	 *
+	 * @since 4.0.2
+	 *
+	 * @param 	object 	$api
+	 * @param 	mixed  	$data
+	 * @return  mixed 	array/object API response on queried subscriber
+	 */
+	protected function get_subscriber( $api, $data ) {
+		if( empty ( $this->_subscriber ) && ! isset( $this->_subscriber[ md5( $data ) ] ) ){
+			$this->_subscriber[ md5( $data ) ] = $api->get_contact( $data );
+		}
+
+		return $this->_subscriber[ md5( $data ) ];
 	}
 
 }

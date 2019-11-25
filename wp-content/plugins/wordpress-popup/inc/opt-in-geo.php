@@ -21,6 +21,8 @@ class Opt_In_Geo {
 	 * @return string The IP Address
 	 */
 	public static function get_user_ip() {
+		//check for bot
+		if( self::_is_crawler() ) return false;
 
 		$result = (object) array(
 			'ip' => $_SERVER['REMOTE_ADDR'],
@@ -78,7 +80,11 @@ class Opt_In_Geo {
 	 * @return bool
 	 */
 	public function get_user_country() {
-		// Grab the users IP address
+
+		//check for bot
+		if( self::_is_crawler() ) return false;
+
+		// Grab the users IP address		
 		$ip = self::get_user_ip();
 
 		// See if an add-on provides the country for us.
@@ -258,12 +264,29 @@ class Opt_In_Geo {
 	}
 
 	/**
+	 * Checks if the user is a crawler/bot.
+	 *
+	 * @return bool
+	 */
+	private static function _is_crawler() {
+
+    	if ( isset( $_SERVER['HTTP_USER_AGENT'] ) && preg_match( '/bot|crawler|ia_archiver|mediapartners-google|80legs|wget|voyager|baiduspider|curl|yahoo!|slurp/i', $_SERVER['HTTP_USER_AGENT'] ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Returns country string using ip address
 	 *
 	 * @param $ip
 	 * @return string
 	 */
 	public function get_country_from_ip( $ip ) {
+		//check for bot
+		if( self::_is_crawler() ) return false;
+		
 		$ip = (string) $ip;
 
 		if ( '127.0.0.1' === $ip  ) {

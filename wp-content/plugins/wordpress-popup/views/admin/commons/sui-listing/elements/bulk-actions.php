@@ -22,8 +22,7 @@
 
 	<button
 		type="button"
-		id="hustle-apply-button"
-		class="sui-button"
+		class="sui-button hustle-bulk-apply-button"
 		data-type="<?php echo esc_attr( $module_type ); ?>"
 		data-nonce="<?php echo esc_attr( wp_create_nonce( 'hustle-bulk-action' ) ); ?>"
 		<?php disabled( true ); ?>

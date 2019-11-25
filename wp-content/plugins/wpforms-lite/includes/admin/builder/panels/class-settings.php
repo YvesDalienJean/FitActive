@@ -148,7 +148,7 @@ class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 			);
 			$recaptcha_key    = wpforms_setting( 'recaptcha-site-key' );
 			$recaptcha_secret = wpforms_setting( 'recaptcha-secret-key' );
-			$recaptcha_type   = wpforms_setting( 'recaptcha-type' );
+			$recaptcha_type   = wpforms_setting( 'recaptcha-type', 'v2' );
 			if ( ! empty( $recaptcha_key ) && ! empty( $recaptcha_secret ) ) {
 				switch ( $recaptcha_type ) {
 					case 'v2':

@@ -38,14 +38,19 @@ if ( ! class_exists( 'Hustle_Sendy_Form_Settings' ) ) :
 	public function first_step_callback( $submitted_data ) {
 
 		$message = sprintf( esc_html__( "Sendy is activated for this module.%sRemember:%s if you add new fields or change the default fields' names from the Hustle form, you must add them in your Sendy dashboard as well for them to be added.", 'wordpress-popup' ), '<br/><b>', '</b>' );
-		$step_html = Hustle_Api_Utils::get_modal_title_markup( __( 'Sendy', 'wordpress-popup' ), $message );
+		$step_html = Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'Sendy', 'wordpress-popup' ), $message );
 
 		$buttons = array(
 			'disconnect' => array(
-				'markup' => Hustle_Api_Utils::get_button_markup( __( 'Disconnect', 'wordpress-popup' ), 'sui-button-ghost', 'disconnect_form', true ),
+				'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+					__( 'Disconnect', 'wordpress-popup' ),
+					'sui-button-ghost',
+					'disconnect_form',
+					true
+				),
 			),
 			'close' => array(
-				'markup' => Hustle_Api_Utils::get_button_markup( __( 'Close', 'wordpress-popup' ), '', 'close', true ),
+				'markup' => Hustle_Provider_Utils::get_provider_button_markup( __( 'Close', 'wordpress-popup' ), '', 'close', true ),
 			),
 		);
 

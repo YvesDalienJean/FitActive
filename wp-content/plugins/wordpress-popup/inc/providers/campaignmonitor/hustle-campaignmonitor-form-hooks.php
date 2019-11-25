@@ -8,7 +8,6 @@
  */
 class Hustle_Campaignmonitor_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 
-
 	/**
 	 * Add Campaignmonitor data to entry.
 	 *
@@ -19,149 +18,152 @@ class Hustle_Campaignmonitor_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstr
 	 */
 	public function add_entry_fields( $submitted_data ) {
 
-		$addon = $this->addon;
-		$module_id = $this->module_id;
+		$addon 					= $this->addon;
+		$module_id 				= $this->module_id;
 		$form_settings_instance = $this->form_settings_instance;
 
 		/**
+		 * Filter Campaign Monitor submitted form data to be processed
+		 *
 		 * @since 4.0
+		 *
+		 * @param array                                          $submitted_data
+		 * @param int                                            $module_id                current Form ID
+		 * @param Hustle_Campaignmonitor_Form_Settings $form_settings_instance Campaign Monitor Addon Form Settings instance
 		 */
-		$submitted_data = apply_filters( 'hustle_provider_' . $addon->get_slug() . '_form_submitted_data', $submitted_data, $module_id, $form_settings_instance );
-
-		$addon_setting_values = $form_settings_instance->get_form_settings_values();
+		$submitted_data = apply_filters(
+			'hustle_provider_campaignmonitor_form_submitted_data',
+			$submitted_data,
+			$module_id,
+			$form_settings_instance
+		);
 
 		try {
 
-			$global_multi_id = $addon_setting_values['selected_global_multi_id'];
-			$api_key = $addon->get_setting( 'api_key', '', $global_multi_id );
+			$addon_setting_values 	= $form_settings_instance->get_form_settings_values();
+			$is_sent 				= false;
+			$global_multi_id 		= $addon_setting_values['selected_global_multi_id'];
+			$list_id 				= $addon_setting_values['list_id'];
+			$submitted_data 		= $this->check_legacy( $submitted_data );
+			$api 					= $addon::api( $addon->get_setting( 'api_key', '', $global_multi_id ) );
 
 			if ( empty( $submitted_data['email'] ) ) {
 				throw new Exception( __('Required Field "email" was not filled by the user.', 'wordpress-popup' ) );
 			}
 
-			$list_id = $addon_setting_values['list_id'];
-
-			$submitted_data = $this->check_legacy( $submitted_data );
-
-			$email = $submitted_data['email'];
-			$name = array();
+			$email 			= $submitted_data['email'];
+			$name 			= array();
+			$custom_fields 	= array();
+			$update_fields 	= array();
 
 			if ( isset( $submitted_data['first_name'] ) ) {
 				$name['first_name'] = $submitted_data['first_name'];
 			}
 			if ( isset( $submitted_data['last_name'] ) ) {
-				$name['last_name'] = $submitted_data['last_name'];
+				$name['last_name'] 	= $submitted_data['last_name'];
 			}
 			$name = implode( ' ', $name );
 
 			// Remove unwanted fields
-			$custom_data = array_diff_key( $submitted_data, array(
-				'first_name' => '',
-				'last_name' => '',
-				'email' => '',
-			) );
+			foreach( $submitted_data as $key => $sub_d ){
 
-			$custom_fields = array();
-			foreach( $custom_data as $key => $d ){
+				if( 'email' === $key ||
+					'first_name' === $key ||
+					'last_name' === $key || 'gdpr' === $key ) continue;
+
 				$custom_fields[] = array(
-					'Key' => $key,
-					'Value' => $d,
+					'Key' 	=> $key,
+					'Value' => $sub_d,
 				);
+
+				$_fields[$key] = $sub_d;
 			}
 
-			$api = new CS_REST_Subscribers( $list_id, array('api_key' => $api_key ));
-			$data_to_send = $email;
-			$res = $api->get( $data_to_send );
+			//currently only supports text fields
+			if ( ! empty( $_fields ) ) {
 
-			$is_sent = false;
+				$result = $api->get_list_custom_field( $list_id );
+				$api_fields = array();
 
-			if ( $res->was_successful() ) {
-
-				$data_to_send = array(
-					'EmailAddress' => $email,
-					'Name'         => $name,
-					'Resubscribe'  => true,
-					'CustomFields' => $custom_fields
-				);
-
-				$res = $api->update( $email, $data_to_send );
-				$url_request = $api->_subscribers_base_route . '.json?email=' . rawurlencode($email);
-
-				if( ! $res->was_successful() ) {
-					$details = __( 'Something went wrong. Unable to add subscriber.', 'wordpress-popup' );
-				} else {
-					$is_sent = true;
-					$details = __( 'Successfully updated member on Campaign Monitor list', 'wordpress-popup' );
+				if ( !empty( $result ) ) {
+					$api_fields = wp_list_pluck( $result, 'FieldName' );
 				}
 
-			} else {
-				// Add new Custom Fields
-				$cf_api = new CS_REST_Lists( $list_id, array('api_key' => $api_key ) );
-				$existed_custom_fields = $cf_api->get_custom_fields();
-				$new_fields = is_object( $existed_custom_fields ) && isset( $existed_custom_fields->response )
-						? array_diff( array_keys( $custom_data ), array_map( 'trim', wp_list_pluck( $existed_custom_fields->response, 'Key' ), array( '[]' ) ) )
-						: array_keys( $custom_data );
-				foreach ( $new_fields as $new_key ) {
-					$custom_field_details = array(
-						'FieldName' => $new_key,
-						'DataType' => CS_REST_CUSTOM_FIELD_TYPE_TEXT, //we only support text type for now
-						'Options' => array(),
-						'VisibleInPreferenceCenter' => false,
-					);
-					$cf_api->create_custom_field( $custom_field_details );
-				}
+				$new_fields = array_diff( array_keys( $_fields ), $api_fields );
 
-				$data_to_send = array(
-					'EmailAddress' => $email,
-					'Name'         => $name,
-					'Resubscribe'  => true,
-					'CustomFields' => $custom_fields
-				);
-				$res = $api->add( $data_to_send );
-				$url_request = $api->_subscribers_base_route . '.json';
-
-				if( ! $res->was_successful() ) {
-					$details = __( 'Something went wrong. Unable to add subscriber.', 'wordpress-popup' );
-				} else {
-					$is_sent = true;
-					$details = __( 'Successfully added or updated member on Campaign Monitor list', 'wordpress-popup' );
+				foreach ( $new_fields as $custom_field ) {
+					$api->add_list_custom_field( $list_id, array( 'FieldName' => $custom_field ) );
 				}
 			}
-			$response = array(
-				'code' => $res->http_status_code,
-				'response' => $res->response,
+
+			try{
+				$data = array(
+					'list' 	=> $addon_setting_values['list_id'],
+					'email'	=> $submitted_data['email'],
+				);
+
+				$email_exists = $this->get_subscriber( $api, $data );
+			} catch( Exception $e){
+				$email_exists = false;
+			}
+
+			//ready the data to send
+			$data_to_send = array(
+				'EmailAddress' 		=> $email,
+				'Name'         		=> $name,
+				'Resubscribe'  		=> true,
+				'CustomFields' 		=> $custom_fields,
+				'ConsentToTrack' 	=> 'unchanged'
 			);
 
-			$subscriber = $api->get( $email );
-			if ( !empty( $subscriber->response->State ) ) {
-				$member_status = $subscriber->response->State;
-			} elseif ( !empty( $subscriber->response->Message ) ) {
-				$member_status = $subscriber->response->Message;
+			if( isset( $submitted_data['gdpr'] ) && 'on' === $submitted_data['gdpr'] ){
+				$data_to_send['ConsentToTrack'] = 'Yes';
 			}
 
+			/**
+			 * Fires before adding subscriber to Campaign Monitor
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param int                                            $form_id                current Form ID
+			 * @param array                                          $submitted_data
+			 * @param Hustle_Campaignmonitor_Form_Settings $form_settings_instance Campaign Monitor Addon Form Settings instance
+			 */
+			do_action( 'hustle_provider_campaignmonitor_before_add_subscriber', $module_id, $data_to_send, $form_settings_instance );
+
+			if ( false === $email_exists ) {
+				$api->add_subscriber( $list_id, $data_to_send );
+			} else {
+				$api->update_subscriber( $list_id, $data_to_send );
+			}
+
+			/**
+			 * Fires before adding subscriber to Campaign Monitor
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param int                                            $form_id                current Form ID
+			 * @param array                                          $submitted_data
+			 * @param Hustle_Campaignmonitor_Form_Settings $form_settings_instance Campaign Monitor Addon Form Settings instance
+			 */
+			do_action( 'hustle_provider_campaignmonitor_after_add_subscriber', $module_id, $data_to_send, $form_settings_instance, $res );
 
 			$entry_fields = array(
 				array(
 					'name'  => 'status',
 					'value' => array(
-						'is_sent'       => $is_sent,
-						'description'   => $details,
-						'member_status' => $member_status,
-						'data_sent'     => $data_to_send,
-						'data_received' => $response,
-						'url_request'   => $url_request,
+						'is_sent'       => true,
+						'description'   => __( 'Successfully added or updated member on Campaign Monitor list', 'wordpress-popup' ),
+						'list_name'		=> $addon_setting_values['list_name'], // for delete reference
 					),
 				),
 			);
+
 		} catch ( Exception $e ) {
 			$entry_fields = $this->exception( $e );
 		}
 
-		if ( !empty( $addon_setting_values['list_name'] ) ) {
-			$entry_fields[0]['value']['list_name'] = $addon_setting_values['list_name'];
-		}
-
-		$entry_fields = apply_filters( 'hustle_provider_' . $addon->get_slug() . '_entry_fields',
+		$entry_fields = apply_filters( 'hustle_provider_campaignmonitor_entry_fields',
 			$entry_fields,
 			$module_id,
 			$submitted_data,
@@ -170,6 +172,7 @@ class Hustle_Campaignmonitor_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstr
 
 		return $entry_fields;
 	}
+
 
 	/**
 	 * Check whether the email is already subscribed.
@@ -187,7 +190,8 @@ class Hustle_Campaignmonitor_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstr
 		$addon 						= $this->addon;
 		$addon_setting_values 		= $form_settings_instance->get_form_settings_values();
 		$global_multi_id 			= $addon_setting_values['selected_global_multi_id'];
-		$api_key 					= $addon->get_setting( 'api_key', '', $global_multi_id );
+		$api 						= $addon::api( $addon->get_setting( 'api_key', '', $global_multi_id ) );
+
 		if ( empty( $submitted_data['email'] ) ) {
 			return __( 'Required Field "email" was not filled by the user.', 'wordpress-popup' );
 		}
@@ -201,7 +205,7 @@ class Hustle_Campaignmonitor_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstr
 			 *
 			 * @param array                                    $submitted_data
 			 * @param int                                      $module_id                current module_id
-			 * @param Hustle_Campaignmonitor_Form_Settings $form_settings_instance
+			 * @param Hustle_Local_List_Form_Settings $form_settings_instance
 			 */
 			$submitted_data = apply_filters(
 				'hustle_provider_campaignmonitor_form_submitted_data_before_validation',
@@ -210,14 +214,16 @@ class Hustle_Campaignmonitor_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstr
 				$form_settings_instance
 			);
 
-			//TODO: Handle this better once API lib is updated
-			//triggers exception if not found.
-			$list_id = $addon_setting_values['list_id'];
-			$api = new CS_REST_Subscribers( $list_id, array('api_key' => $api_key ));
-			$res = $api->get( $submitted_data['email'] );
-
-			if ( $res->was_successful() ) {
+			try{
+				$data = array(
+					'list' 	=> $addon_setting_values['list_id'],
+					'email'	=> $submitted_data['email'],
+				);
+				//triggers exception if not found set true there
+				$this->get_subscriber( $api, $data );
 				$is_success = self::ALREADY_SUBSCRIBED_ERROR;
+			} catch( Exception $e){
+				$is_success = true;
 			}
 		}
 
@@ -229,7 +235,7 @@ class Hustle_Campaignmonitor_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstr
 		 * @param bool                                     $is_success
 		 * @param int                                      $module_id                current module_id
 		 * @param array                                    $submitted_data
-		 * @param Hustle_Campaignmonitor_Form_Settings $form_settings_instance
+		 * @param Hustle_Local_List_Form_Settings $form_settings_instance
 		 */
 		$is_success = apply_filters(
 			'hustle_provider_campaignmonitor_form_submitted_data_after_validation',
@@ -245,12 +251,34 @@ class Hustle_Campaignmonitor_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstr
 			if ( ! empty( $is_success ) ) {
 				$this->_submit_form_error_message = (string) $is_success;
 			}
+
 			return $is_success;
 		}
 
 		return true;
-
 	}
 
+	/**
+	 * Get subscriber for providers
+	 *
+	 * This method is to be inherited
+	 * And extended by child classes.
+	 *
+	 * Make use of the property `$_subscriber`
+	 * Method to omit double api calls
+	 *
+	 * @since 4.0.2
+	 *
+	 * @param 	object 	$api
+	 * @param 	mixed  	$data
+	 * @return  mixed 	array/object API response on queried subscriber
+	 */
+	protected function get_subscriber( $api, $data ) {
+		if( empty ( $this->_subscriber ) && ! isset( $this->_subscriber[ md5( $data['email'] ) ] ) ){
+			$this->_subscriber[ md5( $data['email'] ) ] = $api->get_subscriber( $data['list'], $data['email'] );
+		}
+
+		return $this->_subscriber[ md5( $data['email'] ) ];
+	}
 
 }

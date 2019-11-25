@@ -80,13 +80,12 @@ depending on the form fields.',
 	<p><?php esc_html_e( 'We use iContact to manage our subscriber. Their privacy policy can be found here : https://www.icontact.com/legal/privacy.', 'wordpress-popup' ); ?></p>
 	<p><?php esc_html_e( 'We use Infusionsoft to manage our subscriber. Their privacy policy can be found here : https://www.infusionsoft.com/legal/privacy-policy.', 'wordpress-popup' ); ?></p>
 	<p><?php esc_html_e( 'We use Mad Mimi to manage our subscriber. Their privacy policy can be found here : https://madmimi.com/legal/terms.', 'wordpress-popup' ); ?></p>
-	<p><?php esc_html_e( 'We use MailChimp to manage our subscriber list. Their privacy policy can be found here : https://mailchimp.com/legal/privacy/.', 'wordpress-popup' ); ?></p>
+	<p><?php esc_html_e( 'We use Mailchimp to manage our subscriber list. Their privacy policy can be found here : https://mailchimp.com/legal/privacy/.', 'wordpress-popup' ); ?></p>
 	<p><?php esc_html_e( 'We use MailerLite to manage our subscriber. Their privacy policy can be found here : https://www.mailerlite.com/privacy-policy.', 'wordpress-popup' ); ?></p>
 	<p><?php esc_html_e( 'We use Mautic to manage our subscriber. Their privacy policy can be found here : https://www.mautic.org/privacy-policy/.', 'wordpress-popup' ); ?></p>
 	<p><?php esc_html_e( 'We use SendGrid to manage our subscriber. Their privacy policy can be found here : https://sendgrid.com/policies/privacy/.', 'wordpress-popup' ); ?></p>
 	<p><?php esc_html_e( 'We use SendinBlue to manage our subscriber. Their privacy policy can be found here : https://www.sendinblue.com/legal/privacypolicy/.', 'wordpress-popup' ); ?></p>
 	<p><?php esc_html_e( 'We use Sendy to manage our subscriber. Their privacy policy can be found here : https://sendy.co/privacy-policy.', 'wordpress-popup' ); ?></p>
-	<p><?php esc_html_e( 'We use MailChimp to manage our subscriber list. Their privacy policy can be found here : https://mailchimp.com/legal/privacy/.', 'wordpress-popup' ); ?></p>
 	<p><?php esc_html_e( 'We use Zapier to manage our integration data. Their privacy policy can be found here : https://zapier.com/privacy/.', 'wordpress-popup' ); ?></p>
 	<?php echo esc_html( $external_integrations_privacy_url_list ); ?>
 

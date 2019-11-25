@@ -6,7 +6,7 @@ Contributors: WPMUDEV
 Tags: marketing, floating social, pop-up, popups slide-in, opt-in, email, advertise, signup, mailing list, wordpress pop up plugin, pop up maker
 Requires at least: 4.6
 Tested up to: 5.2
-Stable tag: 7.0.2
+Stable tag: 7.0.3
 
 Setup email opt-in forms, popups, social share bars, and generate leads with the world-class marketing pop-up builder plugin by WPMU DEV.
 
@@ -93,7 +93,7 @@ Hustle includes three handy metrics to help you make better marketing decisions 
 
 - Pop-ups, slide-ins, widgets, embeds and after post opt-ins
 - 3 free popups ([upgrade to Hustle Pro for unlimited](https://premium.wpmudev.org/project/hustle/utm_source=wordpress.org&utm_medium=readme&utm_campaign=hustle-readme&utm_content=upgrade_to_hustle_pro_for_unlimited_1#trial))
-- 3 free slide-ins ([upgrade to Hustle Pro for unlimited](https://premium.wpmudev.org/project/hustle/utm_source=wordpress.org&utm_medium=readme&utm_campaign=hustle-readme&utm_content=upgrade_to_hustle_pro_for_unlimited_2#trial))
+- 3 free slide-ins (upgrade to Hustle Pro for unlimited](https://premium.wpmudev.org/project/hustle/utm_source=wordpress.org&utm_medium=readme&utm_campaign=hustle-readme&utm_content=upgrade_to_hustle_pro_for_unlimited_2#trial))
 - 3 free social share bars ([upgrade to Hustle Pro for unlimited](https://premium.wpmudev.org/project/hustle/utm_source=wordpress.org&utm_medium=readme&utm_campaign=hustle-readme&utm_content=upgrade_to_hustle_pro_for_unlimited_3#trial))
 - 3 free embeds ([upgrade to Hustle Pro for unlimited](https://premium.wpmudev.org/project/hustle/utm_source=wordpress.org&utm_medium=readme&utm_campaign=hustle-readme&utm_content=upgrade_to_hustle_pro_for_unlimited_3#trial))
 - Built-in designs editor for simple customization
@@ -108,7 +108,7 @@ Hustle includes three handy metrics to help you make better marketing decisions 
 - Easy management dashboard
 - New features, layouts and sass coming every month
 
-### A Note From Hummingbird
+### A Note From Hustle
 Hey! This is Hustle, your trusted popup, email opt-in, and marketing plugin for WordPress. I’m part of the WPMU DEV team, a superhero-suite of WordPress plugins, services, and support. Here are some of our other free plugins:
 
 - [Smush](https://wordpress.org/plugins/wp-smushit/) - Image Compression and Optimization
@@ -143,6 +143,37 @@ No! Hustle gives you all the same settings and options as Hustle Pro. The only d
 4. Build beautiful pop-ups with any of the 4 included layouts.
 
 == Changelog ==
+
+= 7.0.3 =
+* Add option to reset the plugin's data manually and on uninstall
+* Add "Email" to social sharing module's services
+* Add option to Anonymise the stored data periodically
+* Allow selecting the Metrics that are shown in the plugin's Dashboard page
+* Allow applying the "After submission" behavior to external forms
+* Add option to remove stored entries whe performin Account Erasure Requests
+* Add "validate" option to form fields
+* Update MadMimi to V3
+* Update Sendinblue to V3
+* Replace CampaignMonitor and Mautic libraries by custom wrappers
+* Add GDPR compliance to Sendy, Mailchimp, and ActiveCampaign
+* Allow picking the background color of the success message
+* Allow adding input manually in the datepicker field
+* Add border design settings for the "Call to Action" button
+* Fix minor UX and UI details
+* Fix module not following CPT conditions
+* Fix 'Ensure text remains visible during webfont load' in Google Pagespeed Insights
+* Fix emails sent by Hustle not using the defined sender and not displaying as HTML
+* Fix 'form' tags being stripped in frontend in some cases
+* Fix slide-in behavior when using a custom size
+* Check for crawlers before calling geo services
+* Fix conflict with HitMag theme
+* Fix White label not being applied in certain pages
+* Improve how the stored integrations' lists are retrieved
+* Improve compatibility with Forminator polls and dropdowns
+* Improve compatibility with Branda, Nextgen, and Facebook Feed Pro plugins
+* Replace the default HTML form validator by the custom one
+* Fix wildcards not working under the "Specific URL" condition
+* Fix social sharing modules looking off in Internet Explorer
 
 = 7.0.2 =
 * Add a "time" fields in forms

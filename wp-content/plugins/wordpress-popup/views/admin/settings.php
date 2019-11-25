@@ -15,14 +15,18 @@ $sections = array(
 		'label' => __( 'Emails', 'wordpress-popup' ),
 		'status' => 'show',
 		'data' => array(
-			'settings' => isset( $hustle_settings['emails'] ) ? $hustle_settings['emails'] : array(),
+			'settings' => Hustle_Settings_Admin::get_email_settings(),
 		),
+	),
+	'data' => array(
+		'label' => __( 'Data', 'wordpress-popup' ),
+		'status' => 'show',
 	),
 	'privacy' => array(
 		'label' => __( 'Viewer\'s Privacy', 'wordpress-popup' ),
 		'status' => 'show',
 		'data' => array(
-			'settings' => isset( $hustle_settings['privacy'] ) ? $hustle_settings['privacy'] : array(),
+			'settings' => Hustle_Settings_Admin::get_privacy_settings(),
 		),
 	),
 	'permissions' => array(
@@ -44,29 +48,29 @@ $sections = array(
 		'label' => __( 'reCAPTCHA', 'wordpress-popup' ),
 		'status' => 'show',
 		'data' => array(
-			'settings' => isset( $hustle_settings['recaptcha'] ) ? $hustle_settings['recaptcha'] : array(),
+			'settings' => Hustle_Settings_Admin::get_recaptcha_settings(),
 		),
 	),
 	'accessibility' => array(
 		'label' => __( 'Accessibility', 'wordpress-popup' ),
 		'status' => 'show',
 		'data' => array(
-			'settings' => isset( $hustle_settings['accessibility'] ) ? $hustle_settings['accessibility'] : array(),
+			'settings' => Hustle_Settings_Admin::get_hustle_settings( 'accessibility' ),
 		),
 	),
 	'metrics' => array(
 		'label' => __( 'Top Metrics', 'wordpress-popup' ),
-		'status' => 'hide',
+		'status' => 'show',
 		'data' => array(
-			'hustle_settings' => $hustle_settings,
+			'stored_metrics' => Hustle_Settings_Admin::get_top_metrics_settings(),
 		),
 	),
 	'unsubscribe' => array(
 		'label' => __( 'Unsubscribe', 'wordpress-popup' ),
 		'status' => 'show',
 		'data' => array(
-			'messages' => $unsubscription_messages,
-			'email'	   => $unsubscription_email,
+			'messages' => Hustle_Settings_Admin::get_unsubscribe_messages(),
+			'email'	   => Hustle_Settings_Admin::get_unsubscribe_email_settings(),
 		),
 	),
 );
@@ -115,25 +119,23 @@ foreach ( $sections as $key => $value ) {
 ?>
 	</div>
 
-<?php 
-// Global Footer
-$this->render( 'admin/footer/footer' ); ?>
-
 <?php
-// DIALOG: Delete All IPs
-$this->render( 'admin/settings/privacy/remove-ips-dialog', array() ); ?>
+// Global Footer.
+$this->render( 'admin/footer/footer' );
 
-<?php
-// NOTICE: Delete All IPs
-$this->render( 'admin/notices/notice-delete-all-ips', array() );
-// NOTICE: Delete selected IPs
-$this->render( 'admin/notices/notice-delete-ips', array() ); 
+// DIALOG: Delete All IPs.
+$this->render( 'admin/settings/privacy/dialog-ip-delete' );
+
+// NOTICE: Delete All IPs.
+//$this->render( 'admin/notices/notice-delete-all-ips' );
+
+// NOTICE: Delete selected IPs.
+//$this->render( 'admin/notices/notice-delete-ips' );
 
 // DIALOG: Dissmiss migrate tracking notice modal confirmation.
 if ( Hustle_Module_Admin::is_show_migrate_tracking_notice() ) {
 	$this->render( 'admin/dashboard/dialogs/migrate-dismiss-confirmation' );
 }
-
 ?>
 
 </main>

@@ -47,7 +47,7 @@
 				</div>
 
 				<label class="sui-label"><?php esc_html_e( 'Form options selectors', 'wordpress-popup' ); ?></label>
-				<label class="sui-label" style="font-weight: 400;"><?php esc_html_e( 'These are added through "Integrations" like MailChimp that allow extra fields for users to select custom information requested.', 'wordpress-popup' ); ?></label>
+				<label class="sui-label" style="font-weight: 400;"><?php esc_html_e( 'These are added through "Integrations" like Mailchimp that allow extra fields for users to select custom information requested.', 'wordpress-popup' ); ?></label>
 
 				<div class="sui-ace-selectors">
 

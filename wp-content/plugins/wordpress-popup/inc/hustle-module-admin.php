@@ -486,7 +486,10 @@ if ( ! class_exists( 'Hustle_Module_Admin' ) ) :
 			$optin_vars = array(
 				'social_platforms' => Opt_In_Utils::get_social_platform_names(),
 				'social_platforms_with_endpoints' => Hustle_Sshare_Model::get_sharing_endpoints(),
-				'social_platforms_with_api' => Hustle_Sshare_Model::get_networks_counter_endpoint(),
+				'social_platforms_with_api'       => Hustle_Sshare_Model::get_networks_counter_endpoint(),
+				'social_platforms_data'           => [
+					'email_message_default' => __( "I've found an excellent article on {post_url} which may interest you.", 'wordpress-popup' ),
+				],
 				'module_name' => array(
 					'popup'           => __( 'Popup', 'wordpress-popup' ),
 					'slidein'         => __( 'Slide-in', 'wordpress-popup' ),
@@ -509,6 +512,7 @@ if ( ! class_exists( 'Hustle_Module_Admin' ) ) :
 					'dont_navigate_away' => __( 'Changes are not saved, are you sure you want to navigate away?', 'wordpress-popup' ),
 					'ok' => __( 'Ok', 'wordpress-popup' ),
 					'something_went_wrong' => '<label class="wpmudev-label--notice"><span>' . __( 'Something went wrong. Please try again.', 'wordpress-popup' ) . '</span></label>',
+					'settings_was_reset' => '<label class="wpmudev-label--notice"><span>' . __( 'Plugin was successfully reset.', 'wordpress-popup' ) . '</span></label>',
 					'integraiton_required' => '<label class="wpmudev-label--notice"><span>' . __( 'An integration is required on optin module.', 'wordpress-popup' ) . '</span></label>',
 					// Used in visibility condtitions. Maybe can be removed
 					// LEIGH: No we can't remove this because we need to show module type(name) :)
@@ -528,41 +532,16 @@ if ( ! class_exists( 'Hustle_Module_Admin' ) ) :
 						'on_specific_url'             => __( 'Specific URL', 'wordpress-popup' ),
 						'visitor_has_never_commented' => __( 'Visitor Commented Before', 'wordpress-popup' ),
 						'not_in_a_country'            => __( "Visitor's Country", 'wordpress-popup' ),
-
-						// OLD
 						'only_on_not_found'      => __( '404 page', 'wordpress-popup' ),
-						'visitor_not_logged_in'  => __( 'Visitor not logged in', 'wordpress-popup' ),
-						'not_on_mobile'          => __( 'Not on mobile devices', 'wordpress-popup' ),
-						'not_from_specific_ref'  => __( 'Not from a specific referrer', 'wordpress-popup' ),
-						'not_from_internal_link' => __( 'Not from an internal link', 'wordpress-popup' ),
-						'not_on_specific_url'    => __( 'Not on specific URL', 'wordpress-popup' ),
-						'visitor_has_commented'  => __( 'Visitor has commented before', 'wordpress-popup' ),
-						'in_a_country' => __( 'In a specific Country', 'wordpress-popup' ),
 						'posts' => __( 'Posts', 'wordpress-popup' ),
 						'pages' => __( 'Pages', 'wordpress-popup' ),
 						'categories' => __( 'Categories', 'wordpress-popup' ),
 						'tags' => __( 'Tags', 'wordpress-popup' ),
 					),
 					'condition_labels' => array(
-						'only_on_not_found' => __( 'Only on 404 page', 'wordpress-popup' ),
-						'visitor_logged_in' => __( 'Only when visitor has logged in', 'wordpress-popup' ),
-						'visitor_not_logged_in' => __( 'Only when visitor has not logged in', 'wordpress-popup' ),
-						'shown_less_than' => __( '{type_name} shown less than a certain times', 'wordpress-popup' ),
 						'mobile_only' => __( 'Mobile only', 'wordpress-popup' ),
 						'desktop_only' => __( 'Desktop only', 'wordpress-popup' ),
-						'from_specific_ref' => __( 'From a specific referrer', 'wordpress-popup' ),
-						'not_from_specific_ref' => __( 'Not from a specific referrer', 'wordpress-popup' ),
-						'not_from_internal_link' => __( 'Not from an internal link', 'wordpress-popup' ),
-						'from_search_engine' => __( 'From a search engine', 'wordpress-popup' ),
 						'any_conditions' => __( 'Any with {number} conditions', 'wordpress-popup' ),
-						'on_specific_url' => __( 'On specific URLs', 'wordpress-popup' ),
-						'not_on_specific_url' => __( 'Not on specific URLs', 'wordpress-popup' ),
-						'visitor_has_commented' => __( 'Visitor has commented before', 'wordpress-popup' ),
-						'visitor_has_never_commented' => __( 'Visitor has never commented', 'wordpress-popup' ),
-						'in_a_country' => __( 'In specific countries', 'wordpress-popup' ),
-						'not_in_a_country' => __( 'Not in specific countries', 'wordpress-popup' ),
-						'posts' => __( 'On certain posts', 'wordpress-popup' ),
-						'all_posts' => __( 'All posts', 'wordpress-popup' ),
 						'number_views' => '< {number}',
 						'any' => __( 'Any', 'wordpress-popup' ),
 						'all' => __( 'All', 'wordpress-popup' ),
@@ -574,47 +553,9 @@ if ( ! class_exists( 'Hustle_Module_Admin' ) ) :
 						'logged_out' => __( 'Logged out', 'wordpress-popup' ),
 						'only_these' => __( 'Only {number}', 'wordpress-popup' ),
 						'except_these' => __( 'Any except {number}', 'wordpress-popup' ),
-						'except_these_countries' => __( 'Any except {number}', 'wordpress-popup' ),
-						'only_on_these_countries' => __( 'Only {number} countries', 'wordpress-popup' ),
-						'except_these_refs' => __( 'Any except {number} referrer', 'wordpress-popup' ),
-						'only_on_these_refs' => __( 'From {number} referrer', 'wordpress-popup' ),
-						'all_urls' => __( 'All URLs', 'wordpress-popup' ),
-						'except_these_urls' => __( 'All URLs except {number}', 'wordpress-popup' ),
-						'only_on_these_urls' => __( 'Only {number} URLs', 'wordpress-popup' ),
-						'no_posts' => __( 'No posts', 'wordpress-popup' ),
-						'only_on_these_posts' => __( 'Only {number} posts', 'wordpress-popup' ),
-						'number_posts' => __( '{number} posts', 'wordpress-popup' ),
-						'except_these_posts' => __( 'All posts except {number}', 'wordpress-popup' ),
-						'pages' => __( 'On certain pages', 'wordpress-popup' ),
-						'all_pages' => __( 'All pages', 'wordpress-popup' ),
-						'no_pages' => __( 'No pages', 'wordpress-popup' ),
-						'only_on_these_pages' => __( 'Only {number} pages', 'wordpress-popup' ),
-						'number_pages' => __( '{number} pages', 'wordpress-popup' ),
-						'except_these_pages' => __( 'All pages except {number}', 'wordpress-popup' ),
-						'categories' => __( 'On certain categories', 'wordpress-popup' ),
-						'all_categories' => __( 'All categories', 'wordpress-popup' ),
-						'no_categories' => __( 'No categories', 'wordpress-popup' ),
-						'only_on_these_categories' => __( 'Only {number} categories', 'wordpress-popup' ),
-						'number_categories' => __( '{number} categories', 'wordpress-popup' ),
-						'except_these_categories' => __( 'All categories except {number}', 'wordpress-popup' ),
-						'tags' => __( 'On certain tags', 'wordpress-popup' ),
-						'all_tags' => __( 'All tags', 'wordpress-popup' ),
-						'no_tags' => __( 'No tags', 'wordpress-popup' ),
-						'only_on_these_tags' => __( 'Only {number} tags', 'wordpress-popup' ),
-						'number_tags' => __( '{number} tags', 'wordpress-popup' ),
-						'except_these_tags' => __( 'All tags except {number}', 'wordpress-popup' ),
-						'everywhere' => __( 'Show everywhere', 'wordpress-popup' ),
 					),
 					'conditions_body' => array(
 						'only_on_not_found' => __( 'Shows the {type_name} on the 404 page.', 'wordpress-popup' ),
-						'visitor_has_commented' => __( 'Shows the {type_name} if the user has already left a comment. You may want to combine this condition with either "Visitor is logged in" or "Visitor is not logged in".', 'wordpress-popup' ),
-						'visitor_has_never_commented' => __( 'Shows the {type_name} if the user has never left a comment. You may want to combine this condition with either "Visitor is logged in" or "Visitor is not logged in".', 'wordpress-popup' ),
-						'from_search_engine' => __( 'Shows the {type_name} if the user arrived via a search engine.', 'wordpress-popup' ),
-						'not_from_internal_link' => __( 'Shows the {type_name} if the user did not arrive on this page via another page on your site.', 'wordpress-popup' ),
-						'not_on_mobile' => __( 'Shows the {type_name} to visitors that are using a normal computer or laptop (i.e. not a Phone or Tablet).', 'wordpress-popup' ),
-						'only_on_mobile' => __( '<label class="wph-label--alt">Shows the {type_name} to visitors that are using a mobile device (Phone or Tablet).</label>', 'wordpress-popup' ),
-						'visitor_not_logged_in' => __( '<label class="wph-label--alt">Shows the {type_name} if the user is not logged in to your site.</label>', 'wordpress-popup' ),
-						'visitor_logged_in' => __( '<label class="wph-label--alt">Shows the {type_name} if the user is logged in to your site.</label>', 'wordpress-popup' ),
 					),
 					'form_fields' => array(
 						'errors' => array(
@@ -663,9 +604,7 @@ if ( ! class_exists( 'Hustle_Module_Admin' ) ) :
 						'save_draft' => __( 'Save draft', 'wordpress-popup' ),
 						'publish' => __( 'Publish', 'wordpress-popup' ),
 						'dismiss' => __( 'Dismiss', 'wordpress-popup' ),
-						//'never_see_link_text' => __( 'Never see this message again.', 'wordpress-popup' ),
 						'module_created' => __( '{type_name} created successfully. Get started by adding content to your new {type_name} below.', 'wordpress-popup' ),
-						'new_integration' => __( "You're successfully connected your {provider} account and you need to Save this configuration.", 'wordpress-popup' ),
 						'tracking_enabled' => sprintf( __( 'Tracking is enabled on %s', 'wordpress-popup' ), '<strong>{module-name}</strong>' ),
 						'tracking_disabled' => sprintf( __( 'Tracking is disabled on %s', 'wordpress-popup' ), '<strong>{module-name}</strong>' ),
 					),
@@ -681,7 +620,6 @@ if ( ! class_exists( 'Hustle_Module_Admin' ) ) :
 				'pages' => $pages,
 				'is_edit' => self::is_edit(),
 				'is_new' => self::is_new(),
-				'new_integration' => self::get_new_integrated_provider(),
 				'current' => array(),
 				'is_admin' => (int) is_admin(),
 				'providers_action_nonce' => wp_create_nonce( 'hustle_provider_action' ),
@@ -838,24 +776,6 @@ if ( ! class_exists( 'Hustle_Module_Admin' ) ) :
 	 */
 		public static function is_new() {
 			return filter_input( INPUT_GET, 'new', FILTER_VALIDATE_BOOLEAN );
-		}
-
-		/**
-		 * Get new integrated provider
-		 *
-		 * @return string
-		 */
-		public static function get_new_integrated_provider() {
-			$provider = '';
-			$message = filter_input ( INPUT_GET, 'message', FILTER_SANITIZE_STRING );
-
-			if ( 'hubspot_new_integration' === $message ) {
-				$provider = 'HubSpot';
-			} elseif ( 'constant_contact_new_integration' === $message ) {
-				$provider = 'ConstantContact';
-			}
-
-			return $provider;
 		}
 
 		/**

@@ -195,6 +195,7 @@ namespace WPForms {
 
 			// Global includes.
 			require_once WPFORMS_PLUGIN_DIR . 'includes/functions.php';
+			require_once WPFORMS_PLUGIN_DIR . 'includes/functions-list.php';
 			require_once WPFORMS_PLUGIN_DIR . 'includes/class-install.php';
 			require_once WPFORMS_PLUGIN_DIR . 'includes/class-form.php';
 			require_once WPFORMS_PLUGIN_DIR . 'includes/class-fields.php';
@@ -210,6 +211,7 @@ namespace WPForms {
 			require_once WPFORMS_PLUGIN_DIR . 'includes/class-conditional-logic-core.php';
 			require_once WPFORMS_PLUGIN_DIR . 'includes/emails/class-emails.php';
 			require_once WPFORMS_PLUGIN_DIR . 'includes/integrations.php';
+			require_once WPFORMS_PLUGIN_DIR . 'includes/deprecated.php';
 
 			// Admin/Dashboard only includes, also in ajax.
 			if ( is_admin() ) {

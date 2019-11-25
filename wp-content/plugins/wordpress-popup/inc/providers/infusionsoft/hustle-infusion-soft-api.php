@@ -518,12 +518,12 @@ class Opt_In_Infusionsoft_XML_Res extends  SimpleXMLElement{
 
 		for( $i = 0; $i < $count; $i++ ){
 			$list = $this->get_value()->data->value[$i];
-			$label = (string) $list->struct->member[0]->value; 
+			$label = (string) $list->struct->member[0]->value;
 			if ( !empty( $label ) ) {
 				$id = (int) reset( $list->struct->member[1]->value );
 				$lists[ $id ] = $label;
 			}
-			
+
 		}
 
 		return $lists;

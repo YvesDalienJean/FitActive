@@ -8,7 +8,8 @@ class Hustle_Settings_Admin_Ajax {
 	public function __construct( Hustle_Settings_Admin $admin ) {
 		$this->_admin = $admin;
 
-		add_action( 'wp_ajax_hustle_remove_ips', array( $this, 'remove_ip_from_tracking_data' ) );
+		add_action( 'wp_ajax_hustle_remove_ips', array( $this, 'remove_ips_from_tables' ) );
+		add_action( 'wp_ajax_hustle_reset_settings', array( $this, 'reset_settings' ) );
 		add_action( 'wp_ajax_hustle_toggle_module_for_user', array( $this, 'toggle_module_for_user' ) );
 		// This is used in wizards. Should be moved into popup-admin-ajax instead, since there's where common ajax actions from wizards are.
 		add_action( 'wp_ajax_hustle_shortcode_render', array( $this, 'shortcode_render' ) );
@@ -43,11 +44,43 @@ class Hustle_Settings_Admin_Ajax {
 	}
 
 	/**
+	 * Reset the plugin
+	 *
+	 * @since 4.0.3
+	 */
+	public function reset_settings() {
+		Opt_In_Utils::validate_ajax_call( 'hustle_reset_settings' );
+		Opt_In_Utils::is_user_allowed_ajax( 'hustle_edit_settings' );
+
+		/**
+		 * Fires before Settings reset
+		 *
+		 * @since 4.0.3
+		 */
+		do_action( 'hustle_before_reset_settings' );
+
+		// Delete starts here.
+		Hustle_Deletion::hustle_delete_custom_options();
+		Hustle_Deletion::hustle_delete_addon_options();
+		Hustle_Deletion::hustle_clear_module_views();
+		Hustle_Deletion::hustle_clear_module_submissions();
+		Hustle_Deletion::hustle_clear_modules();
+
+		/**
+		 * Fires after Settings reset
+		 *
+		 * @since 4.0.3
+		 */
+		do_action( 'hustle_after_reset_settings' );
+
+	}
+
+	/**
 	 * Remove the requested IPs from views and conversions on batches.
 	 *
 	 * @since 3.0.6
 	 */
-	public function remove_ip_from_tracking_data() {
+	public function remove_ips_from_tables() {
 		Opt_In_Utils::validate_ajax_call( 'hustle_remove_ips' );
 		Opt_In_Utils::is_user_allowed_ajax( 'hustle_edit_settings' );
 
@@ -61,10 +94,13 @@ class Hustle_Settings_Admin_Ajax {
 		if ( 'all' === $range ) {
 			$tracking->set_null_on_all_ips();
 			$hustle_entries_admin->delete_all_ip();
+			$message = esc_html__( 'All IP addresses have been successfully deleted from the database.', 'wordpress-popup' );
+
 		} else {
-			if ( ! empty( $range ) ) {
-				$range = preg_replace( '/ /', '', $range );
-				$r = preg_split( '/[\r\n]/', $range );
+			$values = filter_input( INPUT_POST, 'ips', FILTER_SANITIZE_STRING );
+			if ( ! empty( $values ) ) {
+				$values = preg_replace( '/ /', '', $values );
+				$r = preg_split( '/[\r\n]/', $values );
 				$ios = array();
 				foreach ( $r as $one ) {
 					$is_valid = filter_var( $one, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 );
@@ -88,111 +124,14 @@ class Hustle_Settings_Admin_Ajax {
 				}
 				$tracking->set_null_on_selected_ips( $ips );
 				$hustle_entries_admin->delete_selected_ips( $ips );
+				$message = esc_html__( 'All selected IP addresses have been successfully deleted from the database.', 'wordpress-popup' );
+
+			} else {
+				$message = esc_html__( 'No IPs were deleted. You must provide at least one IP.', 'wordpress-popup' );
 			}
 		}
 
-		/**
-		 * TODO: entries!
-		 */
-
-		$module = Hustle_Module_Model::instance();
-
-		// Define the transient name.
-		$transient = 'hustle_removing_ip_data';
-
-		// Get this request offset.
-		$offset = absint( filter_input( INPUT_POST, 'offset', FILTER_SANITIZE_NUMBER_INT ) );
-
-		// Amount of database entries checked by request.
-		$increment = 50;
-
-		if ( 0 === $offset ) {
-			// Starting the first batch.
-			// Set the array of the provided IPs, the meta_id list of all existing entries,
-			// and the amount of entries we'll be checking to match the IPs so we know when to stop.
-
-			// Make sure the transient is not already set.
-			delete_transient( $transient );
-
-			// Get a meta_id array containing all views and conversions entries.
-			$id_array = $module->get_all_views_and_conversions_meta_id();
-			$total = count( $id_array );
-
-			// Get the string containing all the ips to be removed.
-			$ip_string = filter_input( INPUT_POST, 'delete_ip', FILTER_SANITIZE_STRING );
-
-			$ip_array = $this->filter_ips( $ip_string );
-
-			// Limit the number of IPs.
-			$ip_array = array_slice( $ip_array, 0, apply_filters( 'hustle_remove_selected_ips_from_tracking_limit', 10, $ip_array, $id_array ) );
-
-			$api = new Opt_In_WPMUDEV_API();
-			$salt = $api->get_nonce_value();
-
-			$data_to_save = array(
-				'total' => $total,
-				'ip_array' => $ip_array,
-				'id_array' => $id_array,
-				'salt' => $salt,
-			);
-			set_transient( $transient, $data_to_save );
-
-		} else {
-			// If it's not the first batch, retrieve the values already stored on the first batch.
-			$saved_data = get_transient( $transient );
-			$total = absint( $saved_data['total'] );
-			$ip_array = $saved_data['ip_array'];
-			$id_array = $saved_data['id_array'];
-			$salt = $saved_data['salt'];
-
-		}
-
-		// Retrieve the amount of rows updated on the previous batches
-		// to retrieve it if we're done, or keep adding rows otherwise.
-		$updated_rows = filter_input( INPUT_POST, 'updated', FILTER_SANITIZE_NUMBER_INT );
-
-		// Slice the array to get the current batch.
-		$batch = array_slice( $id_array, $offset, $increment );
-
-		// If the batch is empty, or the offset is greater than the amount of metas,
-		// delete the transient and finish the loop.
-		if ( $offset > $total || empty( $batch ) ) {
-			delete_transient( $transient );
-			wp_send_json_success( array(
-				'offset' => 'done',
-				'updated' => $updated_rows,
-			) );
-
-		} else {
-			// Process this batch of metas.
-			// Get the meta_id and meta_value from this batch that matches the passed IPs.
-			$metas = $module->get_metas_for_matching_meta_values_in_a_range( $batch, $ip_array );
-
-			foreach ( $metas as $key => $value ) {
-				// Update the IP of this meta_value and save it again.
-				$stored_value = json_decode( $value['meta_value'], true );
-
-				if ( isset( $stored_value['ip'] ) && in_array( $stored_value['ip'], $ip_array, true ) ) {
-					$stored_ip = $stored_value['ip'];
-					$stored_value['ip'] = md5( $salt . $stored_ip );
-					$updated = $module->update_any_meta( $value['meta_id'], $stored_value );
-
-					if ( $updated ) {
-						// Increase the updated_rows number to display in front at the end of the process.
-						$updated_rows++;
-					}
-				}
-			}
-
-			// Increment the offset to run the next batch.
-			$offset += $increment;
-			$response = array(
-				'offset' => $offset,
-				'updated' => $updated_rows,
-			);
-			wp_send_json_success( $response );
-
-		}
+		wp_send_json_success( [ 'message' => $message ] );
 	}
 
 	public function toggle_module_for_user() {
@@ -218,37 +157,53 @@ class Hustle_Settings_Admin_Ajax {
 	 *
 	 * @since 4.0
 	 */
-	public function save_global_privacy_settings( $data ) {
+	public function save_global_privacy_settings() {
 
-		$ip_tracking = null;
-		if ( isset( $data['ip_tracking'] ) ) {
-			$ip_tracking = filter_var( $data['ip_tracking'], FILTER_SANITIZE_STRING );
-			if ( ! preg_match( '/^(on|off)$/', $ip_tracking ) ) {
-				$ip_tracking = 'on';
-			}
-		}
-		//      $excluded_ips = array();
-		//      if ( isset( $data['excluded_ips'] ) ) {
-		//          $excluded_ips = $this->filter_ips( $data['excluded_ips'] );
-		//      }
-		$remove_all_ip = null;
-		if ( isset( $data['remove_all_ip'] ) ) {
-			$remove_all_ip = filter_var( $data['remove_all_ip'], FILTER_VALIDATE_BOOLEAN );
-		}
-		$remove_ips = array();
-		if ( isset( $data['remove_ips'] ) ) {
-			$remove_ips = $this->filter_ips( $data['remove_ips'] );
-		}
-		if ( is_null( $ip_tracking ) || is_null( $remove_all_ip ) ) {
-			wp_send_json_error();
-		}
-		$value = array(
-			'ip_tracking' => $ip_tracking,
-			'remove_all_ip' => $remove_all_ip,
-			'remove_ips' => $remove_ips,
-		//          'excluded_ips' => $excluded_ips,
+		$filter_args = array(
+			'ip_tracking'						=> FILTER_SANITIZE_STRING,
+			// Account erasure request
+			'retain_sub_on_erasure'				=> FILTER_SANITIZE_STRING,
+			// Submissions retention
+			'retain_submission_forever'			=> FILTER_SANITIZE_STRING,
+			'submissions_retention_number'		=> FILTER_SANITIZE_NUMBER_INT,
+			'submissions_retention_number_unit'	=> FILTER_SANITIZE_STRING,
+			// IPs retention
+			'retain_ip_forever'					=> FILTER_SANITIZE_STRING,
+			'ip_retention_number'				=> FILTER_SANITIZE_NUMBER_INT,
+			'ip_retention_number_unit'			=> FILTER_SANITIZE_STRING,
+			// Tracking retention
+			'retain_tracking_forever'			=> FILTER_SANITIZE_STRING,
+			'tracking_retention_number'			=> FILTER_SANITIZE_NUMBER_INT,
+			'tracking_retention_number_unit'	=> FILTER_SANITIZE_STRING,
 		);
-		Hustle_Settings_Admin::update_hustle_settings( $value, 'privacy' );
+		$data = filter_input_array( INPUT_POST, $filter_args, false );
+
+		$stored_settings = Hustle_Settings_Admin::get_privacy_settings();
+		
+		$new_settings = array_merge( $stored_settings, $data );
+
+		Hustle_Settings_Admin::update_hustle_settings( $new_settings, 'privacy' );
+		$this->send_success_notification();
+	}
+
+	/**
+	 * Saves the global privacy settings.
+	 *
+	 * @since 4.0.2
+	 */
+	public function save_global_data_settings( $data ) {
+
+		$reset_settings_uninstall = '0';
+
+		//Settings retention
+		if( isset( $data['reset_settings_uninstall'] ) && '1' ===  $data['reset_settings_uninstall'] ){
+			$reset_settings_uninstall = '1';
+		}
+
+		$value = array(
+			'reset_settings_uninstall' => $reset_settings_uninstall,
+		);
+		Hustle_Settings_Admin::update_hustle_settings( $value, 'data' );
 		$this->send_success_notification();
 	}
 
@@ -264,6 +219,9 @@ class Hustle_Settings_Admin_Ajax {
 		];
 		$old_value = Hustle_Settings_Admin::get_hustle_settings( 'emails' );
 		$new_value = filter_input( INPUT_POST, 'data', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+		if ( ! $new_value ) {
+			$new_value = array();
+		}
 
 		$value = array_merge( $old_value, $new_value );
 		$value = shortcode_atts( $default, $value );
@@ -288,26 +246,27 @@ class Hustle_Settings_Admin_Ajax {
 	 *
 	 * @since 4.0
 	 *
-	 * @param array $data
 	 * @return bool
 	 */
-	private function save_top_metrics_settings( $data ) {
+	private function save_top_metrics_settings() {
+
+		$metrics = $_POST['metrics']; // WPCS: CSRF ok.
 
 		// Only 3 metrics can be selected. No more.
-		if ( 3 < count( $data ) ) {
+		if ( 3 < count( $metrics ) ) {
 			return false;
 		}
 
 		$allowed_metric_keys = array( 'average_conversion_rate', 'today_conversions', 'last_week_conversions', 'last_month_conversions', 'total_conversions', 'most_conversions', 'inactive_modules_count', 'total_modules_count' );
 
 		$data_to_store = array();
-		foreach ( $data as $key => $value ) {
-			if ( in_array( $key, $allowed_metric_keys, true ) ) {
-				$data_to_store[] = $key;
+		foreach ( $metrics as $name ) {
+			if ( in_array( $name, $allowed_metric_keys, true ) ) {
+				$data_to_store[] = $name;
 			}
 		}
 
-		Hustle_Settings_Admin::update_hustle_settings( $data_to_store, 'selected_top_metrics' );
+		Hustle_Settings_Admin::update_hustle_settings( $data_to_store, 'top_metrics' );
 
 		return true;
 	}
@@ -514,8 +473,7 @@ class Hustle_Settings_Admin_Ajax {
 				break;
 
 			case 'top_metrics':
-				parse_str( $_POST['data'], $data ); // WPCS: CSRF ok.
-				$saved = $this->save_top_metrics_settings( $data );
+				$saved = $this->save_top_metrics_settings();
 				if ( $saved ) {
 					$this->send_success_notification();
 				} else {
@@ -568,8 +526,11 @@ class Hustle_Settings_Admin_Ajax {
 				break;
 
 			case 'privacy':
+				$this->save_global_privacy_settings();
+				break;
+			case 'data':
 				$data = isset( $_POST['data'] ) ? $_POST['data'] : array(); // WPCS: CSRF ok.
-				$this->save_global_privacy_settings( $data );
+				$this->save_global_data_settings( $data );
 				break;
 
 			default: // Failed

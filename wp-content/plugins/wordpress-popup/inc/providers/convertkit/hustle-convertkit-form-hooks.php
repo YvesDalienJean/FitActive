@@ -26,12 +26,22 @@ class Hustle_ConvertKit_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			return;
 		}
 		$form_settings_instance = $this->form_settings_instance;
-		$utils = Hustle_Provider_Utils::get_instance();
 
 		/**
+		 * Filter submitted form data to be processed
+		 *
 		 * @since 4.0
+		 *
+		 * @param array                                    $submitted_data
+		 * @param int                                      $module_id                current module_id
+		 * @param Hustle_ConvertKit_Form_Settings 	   	   $form_settings_instance
 		 */
-		$submitted_data = apply_filters( 'hustle_provider_' . $addon->get_slug() . '_form_submitted_data', $submitted_data, $module_id, $form_settings_instance );
+		$submitted_data = apply_filters( 
+			'hustle_provider_convertkit_form_submitted_data', 
+			$submitted_data, 
+			$module_id, 
+			$form_settings_instance 
+		);
 
 		$addon_setting_values = $form_settings_instance->get_form_settings_values();
 
@@ -47,7 +57,13 @@ class Hustle_ConvertKit_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 
 			$list_id = $addon_setting_values['list_id'];
 			$submitted_data = $this->check_legacy( $submitted_data );
-			$existing_member = $api->is_form_subscriber( $submitted_data['email'], $list_id );
+			$existing_member = $this->get_subscriber( 
+				$api, 
+				array( 
+					'email' 	=> $submitted_data['email'], 
+					'list_id' 	=> $list_id 
+				) 
+			);
 			$is_sent = false;
 			$member_status = __( 'Member could not be subscribed.', 'wordpress-popup' );
 
@@ -97,11 +113,44 @@ class Hustle_ConvertKit_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 					),
 				);
 				$subscribe_data['fields'] = wp_parse_args( $subscribe_data_fields, $subscribe_data['fields'] );
+
+				/**
+				 * Fires before adding subscriber
+				 *
+				 * @since 4.0.2
+				 *
+				 * @param int    $module_id
+				 * @param array  $submitted_data
+				 * @param object $form_settings_instance 
+				 */
+				do_action( 'hustle_provider_convertkit_before_add_subscriber', 
+					$module_id, 
+					$submitted_data, 
+					$form_settings_instance 
+				);
+
 				if ( false !== $existing_member ) {
 					$res = $api->update_subscriber( $existing_member, $subscribe_data );
 				} else {
 					$res = $api->subscribe( $list_id, $subscribe_data );
 				}
+
+				/**
+				 * Fires after adding subscriber
+				 *
+				 * @since 4.0.2
+				 *
+				 * @param int    $module_id
+				 * @param array  $submitted_data
+				 * @param mixed  $res
+				 * @param object $form_settings_instance 
+				 */
+				do_action( 'hustle_provider_convertkit_after_add_subscriber', 
+					$module_id, 
+					$submitted_data, 
+					$res,
+					$form_settings_instance 
+				);
 
 				if ( is_wp_error( $res ) ) {
 					$details = $res->get_error_message();
@@ -116,8 +165,6 @@ class Hustle_ConvertKit_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 				}
 			}
 
-
-			$utils = Hustle_Provider_Utils::get_instance();
 			$entry_fields = array(
 				array(
 					'name'  => 'status',
@@ -125,9 +172,6 @@ class Hustle_ConvertKit_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 						'is_sent'       => $is_sent,
 						'description'   => $details,
 						'member_status' => $member_status,
-						'data_sent'     => $utils->get_last_data_sent(),
-						'data_received' => $utils->get_last_data_received(),
-						'url_request'   => $utils->get_last_url_request(),
 					),
 				),
 			);
@@ -139,7 +183,7 @@ class Hustle_ConvertKit_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			$entry_fields[0]['value']['list_name'] = $addon_setting_values['list_name'];
 		}
 
-		$entry_fields = apply_filters( 'hustle_provider_' . $addon->get_slug() . '_entry_fields',
+		$entry_fields = apply_filters( 'hustle_provider_convertkit_entry_fields',
 			$entry_fields,
 			$module_id,
 			$submitted_data,
@@ -178,7 +222,7 @@ class Hustle_ConvertKit_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			 *
 			 * @param array                                    $submitted_data
 			 * @param int                                      $module_id                current module_id
-			 * @param Hustle_ConvertKit_Form_Settings $form_settings_instance
+			 * @param Hustle_ConvertKit_Form_Settings 		   $form_settings_instance
 			 */
 			$submitted_data = apply_filters(
 				'hustle_provider_convertkit_form_submitted_data_before_validation',
@@ -193,7 +237,14 @@ class Hustle_ConvertKit_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			$api_secret = $addon->get_setting( 'api_secret', '', $global_multi_id );
 			$api = $addon::api( $api_key, $api_secret );
 			$list_id = $addon_setting_values['list_id'];
-			$existing_member = $api->is_form_subscriber( $submitted_data['email'], $list_id );
+
+			$existing_member = $this->get_subscriber( 
+				$api, 
+				array( 
+					'email' 	=> $submitted_data['email'], 
+					'list_id' 	=> $list_id 
+				) 
+			);
 
 			if ( $existing_member )
 				$is_success = self::ALREADY_SUBSCRIBED_ERROR;
@@ -207,7 +258,7 @@ class Hustle_ConvertKit_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		 * @param bool                                     $is_success
 		 * @param int                                      $module_id                current module_id
 		 * @param array                                    $submitted_data
-		 * @param Hustle_ConvertKit_Form_Settings $form_settings_instance
+		 * @param Hustle_ConvertKit_Form_Settings 		   $form_settings_instance
 		 */
 		$is_success = apply_filters(
 			'hustle_provider_convertkit_form_submitted_data_after_validation',
@@ -227,5 +278,27 @@ class Hustle_ConvertKit_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Get subscriber for providers
+	 *
+	 * This method is to be inherited
+	 * And extended by child classes.
+	 * 
+	 * Make use of the property `$_subscriber`
+	 * Method to omit double api calls
+	 *
+	 * @since 4.0.2
+	 *
+	 * @param 	object 	$api
+	 * @param 	mixed  	$data
+	 * @return  mixed 	array/object API response on queried subscriber
+	 */
+	protected function get_subscriber( $api, $data ) {
+		if( empty ( $this->_subscriber ) && ! isset( $this->_subscriber[ md5( $data['email'] ) ] ) ){
+			$this->_subscriber[ md5( $data['email'] ) ] = $api->is_form_subscriber( $data['email'], $data['list_id'] );
+		}
+		return $this->_subscriber[ md5( $data['email'] ) ];
 	}
 }

@@ -4,23 +4,32 @@
 		<h2 class="sui-box-title"><?php esc_html_e( "Viewer's Privacy", 'wordpress-popup' ); ?></h2>
 	</div>
 
-	<div class="sui-box-body">
+	<form id="hustle-privacy-settings-form" class="sui-box-body">
 
 		<?php
-		// SETTINGS: IP Tracking
+		// SETTINGS: IP Tracking.
 		$this->render(
-			'admin/settings/privacy/ip-tracking',
+			'admin/settings/privacy/ip-address',
 			array( 'settings' => $settings )
-		); ?>
+		);
+		?>
 
 		<?php
-		// Remove IPs From Database
+		// Retaining submission and ip.
 		$this->render(
-			'admin/settings/privacy/remove-ips',
+			'admin/settings/privacy/submissions-privacy',
 			array( 'settings' => $settings )
-		); ?>
+		);
+		?>
+		<?php
+		// Retaining tracking.
+		$this->render(
+			'admin/settings/privacy/tracking-data',
+			array( 'settings' => $settings )
+		);
+		?>
 
-	</div>
+	</form>
 
 	<div class="sui-box-footer">
 

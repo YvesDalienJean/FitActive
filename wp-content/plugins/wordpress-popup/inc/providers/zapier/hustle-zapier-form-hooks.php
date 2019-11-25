@@ -24,23 +24,68 @@ class Hustle_Zapier_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		$form_settings_instance = $this->form_settings_instance;
 
 		/**
+		 * Filter submitted form data to be processed
+		 *
 		 * @since 4.0
+		 *
+		 * @param array                                         $submitted_data
+		 * @param int                                           $module_id                current Form ID
+		 * @param Hustle_Zapier_Form_Settings 			 		$form_settings_instance 
 		 */
-		$submitted_data = apply_filters( 'hustle_provider_' . $this->addon->get_slug() . '_form_submitted_data', $submitted_data, $module_id, $form_settings_instance );
+		$submitted_data = apply_filters( 
+			'hustle_provider_zapier_form_submitted_data', 
+			$submitted_data, 
+			$module_id, 
+			$form_settings_instance 
+		);
 
 		$hooks = $form_settings_instance->get_form_settings_values();
 		$entry_fields = array();
+
+		/**
+		 * Fires before adding subscriber
+		 *
+		 * @since 4.0.2
+		 *
+		 * @param int    $module_id
+		 * @param array  $submitted_data
+		 * @param object $form_settings_instance 
+		 */
+		do_action( 'hustle_provider_zapier_before_add_subscriber', 
+			$module_id, 
+			$submitted_data, 
+			$form_settings_instance 
+		);
 
 		foreach ( $hooks as $key => $hook ) {
 			$entry_fields[] = $this->call_hook( $key, $hook, $submitted_data );
 		}
 
-		return $entry_fields = apply_filters( 'hustle_provider_' . $this->addon->get_slug() . '_entry_fields',
+		/**
+		 * Fires before adding subscriber
+		 *
+		 * @since 4.0.2
+		 *
+		 * @param int    $module_id
+		 * @param array  $submitted_data
+		 * @param array  $entry_fields
+		 * @param object $form_settings_instance 
+		 */
+		do_action( 'hustle_provider_zapier_after_add_subscriber', 
+			$module_id, 
+			$submitted_data,
+			$entry_fields,
+			$form_settings_instance 
+		);
+
+		$entry_fields = apply_filters( 'hustle_provider_zapier_entry_fields',
 			$entry_fields,
 			$module_id,
 			$submitted_data,
 			$form_settings_instance
 		);
+
+		return $entry_fields;
 	}
 
 	private function call_hook( $key, $connection_settings, $submitted_data ) {
@@ -65,17 +110,12 @@ class Hustle_Zapier_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 	}
 
 	private function get_status( $key, $status = false, $message = '', $connection_name = '' ) {
-		$utils = Hustle_Provider_Utils::get_instance();
-
 		return array(
 			'name'  => 'status-' . $key,
 			'value' => array(
 				'is_sent'         => $status,
 				'description'     => $message,
 				'connection_name' => $connection_name,
-				'data_sent'       => $utils->get_last_data_sent(),
-				'data_received'   => $utils->get_last_data_received(),
-				'url_request'     => $utils->get_last_url_request(),
 			),
 		);
 	}

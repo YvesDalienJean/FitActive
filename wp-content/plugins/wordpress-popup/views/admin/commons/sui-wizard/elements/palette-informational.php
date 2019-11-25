@@ -85,6 +85,11 @@ $palette_info = array(
 				'name'    => esc_html__( 'Default', 'wordpress-popup' ),
 				'current' => true,
 				'colors'  => array(
+					'cta_button_border'     => array(
+						'name'  => esc_html__( 'Border color', 'wordpress-popup' ),
+						'value' => 'cta_button_static_bo',
+						'alpha' => 'true',
+					),
 					'cta_button_background' => array(
 						'name'  => esc_html__( 'Background color', 'wordpress-popup' ),
 						'value' => 'cta_button_static_bg',
@@ -101,6 +106,11 @@ $palette_info = array(
 				'name'    => esc_html__( 'Hover', 'wordpress-popup' ),
 				'current' => false,
 				'colors'  => array(
+					'cta_button_border_hover'     => array(
+						'name'  => esc_html__( 'Border color', 'wordpress-popup' ),
+						'value' => 'cta_button_hover_bo',
+						'alpha' => 'true',
+					),
 					'cta_button_background_hover' => array(
 						'name'  => esc_html__( 'Background color', 'wordpress-popup' ),
 						'value' => 'cta_button_hover_bg',
@@ -117,6 +127,11 @@ $palette_info = array(
 				'name'    => esc_html__( 'Active', 'wordpress-popup' ),
 				'current' => false,
 				'colors'  => array(
+					'cta_button_border_active' => array(
+						'name'  => esc_html__( 'Border color', 'wordpress-popup' ),
+						'value' => 'cta_button_active_bo',
+						'alpha' => 'true',
+					),
 					'cta_button_background_active' => array(
 						'name'  => esc_html__( 'Background color', 'wordpress-popup' ),
 						'value' => 'cta_button_active_bg',

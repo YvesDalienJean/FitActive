@@ -11,6 +11,9 @@ if ( 'label' === $type ) { ?>
 		<?php Opt_In::render_attributes( isset( $attributes ) ? $attributes : array() ); ?>
 	>
 		<?php echo $value; // phpcs:ignore ?>
+		<?php if ( isset( $note ) && ! empty( $note ) ) { ?>
+			<span class="sui-label-note"><?php echo $note; // phpcs:ignore ?></span>
+		<?php } ?>
 	</label>
 
 <?php
@@ -43,16 +46,32 @@ if ( 'label' === $type ) { ?>
 		<?php Opt_In::render_attributes( isset( $attributes ) ? $attributes : array() ); ?>
 	>
         <?php
-		foreach ( $options as $option ) :
-			$option = (array) $option;
-			$value 	= isset( $option['value'] ) ? $option['value'] : '';
-			$label 	= !empty( $option['label'] ) ? $option['label'] : '&#8205;';
+		foreach ( $options as $value => $label ) :
+			$label 	= !empty( $label ) ? $label : '&#8205;';
 			$_selected = is_array( $selected ) && empty( $selected ) ? '' : $selected;
             ?>
             <option <?php selected( $_selected, $value ); ?> value="<?php echo esc_attr( $value ); ?>"><?php echo esc_attr( $label ); ?></option>
         <?php endforeach; ?>
     </select>
 
+<?php
+// FIELD TYPE: Multiple Select
+} else if ( 'multiselect' === $type ) { ?>
+	<select
+		<?php echo empty( $name )? '' : 'name="' . esc_attr( $name ) . '"'; ?>
+		<?php echo empty( $id )? '' : 'id="' . esc_attr( $id ) . '"'; ?>
+		<?php echo empty( $class )? '' : 'class="' . esc_attr( $class ) . '"'; ?>
+		<?php Opt_In::render_attributes( isset( $attributes ) ? $attributes : array() ); ?>
+	>
+        <?php
+		$_selected 	= empty( $selected ) ? array() : $selected;
+		foreach ( $options as $value => $label ) :
+			$label 		= !empty( $label ) ? $label : '&#8205;';
+			$selected   = is_array( $_selected ) && in_array( absint( $value ), $_selected, true ) ? 'selected' : '';
+		?>
+           	<option  <?php echo esc_attr( $selected ); ?> value="<?php echo esc_attr( $value ); ?>"><?php echo esc_attr( $label ); ?></option>
+        <?php endforeach; ?>
+    </select>
 <?php
 // FIELD TYPE: Link
 } else if ( 'link' === $type ) { ?>
@@ -72,14 +91,9 @@ if ( 'label' === $type ) { ?>
 		class="<?php if ( empty( $is_not_field_wrapper ) ) echo 'sui-form-field '; ?><?php if ( isset( $class ) ) echo esc_attr( $class ); ?>"
 		<?php echo isset( $style ) ? 'style="' . esc_attr( $style ) . '"' : ''; ?>
 	>
-        <?php foreach( (array) $elements as $element ) { ?>
-            <?php
-            $params = $element;
-            if( isset( $apikey ) && 'optin_api_key' === $element['id'] )
-				$params['value'] = $apikey;
-				self::static_render("general/option", $params);
-            ?>
-        <?php } ?>
+        <?php foreach( (array) $elements as $element ) {
+			self::static_render("general/option", $element);
+        } ?>
     </div>
 
 <?php
@@ -99,10 +113,9 @@ if ( 'label' === $type ) { ?>
 		$_selected = '';
 	}
 
-	foreach ( $options as $option ) {
+	foreach ( $options as $value => $label ) {
 
-		$option = (array) $option;
-		$id     = esc_attr( $id . "-" . str_replace( " ", "-", strtolower( $option['value'] ) ) ); // phpcs:ignore
+		$id     = esc_attr( $id . "-" . str_replace( " ", "-", strtolower( $value ) ) );
 		$label_before = isset( $label_before ) ? $label_before : false;
 		?>
 
@@ -114,15 +127,15 @@ if ( 'label' === $type ) { ?>
 			<input
 				type="radio"
 				<?php echo isset( $name ) ? 'name="' . esc_attr( $name ) . '"' : ''; ?>
-				<?php echo isset( $option['value'] ) ? 'value="' . esc_attr( $option['value'] ) . '"' : ''; ?>
+				<?php echo 'value="' . esc_attr( $value ) . '"'; ?>
 				<?php echo isset( $id ) ? 'id="' . esc_attr( $id ) . '"' : ''; ?>
 				<?php Opt_In::render_attributes( isset( $item_attributes ) ? $item_attributes :  array() ); ?>
-				<?php selected( $_selected, $option['value'] ); ?>
+				<?php selected( $_selected, $value ); ?>
 			/>
 
 			<span aria-hidden="true"></span>
 
-			<?php echo isset( $option['label'] ) ? '<span>' . esc_html( $option['label'] ) . '</span>' : ''; ?>
+			<?php echo !empty( $label ) ? '<span>' . esc_html( $label ) . '</span>' : ''; ?>
 
 		</label>
 
@@ -161,11 +174,10 @@ if ( 'label' === $type ) { ?>
 		$_selected = $selected;
 	}
 
-	foreach ( $options as $option ) {
+	foreach ( $options as $value => $label ) {
 
-		$option  = (array) $option;
-		$id      = esc_attr( $id . "-" . str_replace( " ", "-", strtolower( $option['value'] ) ) ); // phpcs:ignore
-		$checked = is_array( $_selected ) ? in_array( $option['value'], $_selected ) ? checked(true, true, false) : "" : checked( $_selected, $option['value'], false ); // phpcs:ignore
+		$id      = esc_attr( $id . "-" . str_replace( " ", "-", strtolower( $value ) ) ); // phpcs:ignore
+		$checked = is_array( $_selected ) ? in_array( $value, $_selected ) ? checked(true, true, false) : "" : checked( $_selected, $value, false ); // phpcs:ignore
 		?>
 
 		<label
@@ -176,7 +188,7 @@ if ( 'label' === $type ) { ?>
 			<input
 				type="checkbox"
 				<?php echo isset( $name ) ? 'name="' . esc_attr( $name ) . '"' : ''; ?>
-				<?php echo isset( $option['value'] ) ? 'value="' . esc_attr( $option['value'] ) . '"' : ''; ?>
+				<?php echo 'value="' . esc_attr( $value ) . '"'; ?>
 				<?php echo isset( $id ) ? 'id="' . esc_attr( $id ) . '"' : ''; ?>
 				<?php Opt_In::render_attributes( isset( $item_attributes ) ? $item_attributes :  array() ); ?>
 				<?php echo esc_html( $checked ); ?>
@@ -184,7 +196,7 @@ if ( 'label' === $type ) { ?>
 
 			<span aria-hidden="true"></span>
 
-			<?php echo isset( $option['label'] ) ? '<span>' . esc_html( $option['label'] ) . '</span>' : ''; ?>
+			<?php echo !empty( $label ) ? '<span>' . esc_html( $label ) . '</span>' : ''; ?>
 
 		</label>
 
@@ -300,7 +312,10 @@ if ( 'label' === $type ) { ?>
 		</button>
 
 	</div>
-
+<?php
+// FIELD TYPE: Raw
+} else if ( 'raw' === $type ) { ?>
+	<?php echo $value; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 <?php } else { ?>
 	<?php echo isset( $icon ) ? '<div class="sui-control-with-icon">' : ''; ?>
 
@@ -317,4 +332,4 @@ if ( 'label' === $type ) { ?>
 		<?php echo isset( $icon ) ? '<i class="sui-icon-' . esc_attr( $icon ) . '" aria-hidden="true"></i>' : ''; ?>
 
 	<?php echo isset( $icon ) ? '</div>' : ''; ?>
-<?php } ?>
+<?php }

@@ -166,6 +166,7 @@ if ( ! class_exists( 'Hustle_Infusion_Soft' ) ) :
 				                     && $this->validate_credentials( $submitted_data['api_key'], $submitted_data['account_name'] );
 				if ( ! $api_key_validated ) {
 					$error_message = $this->provider_connection_falied();
+					$api_key_valid = $api_account_name_valid = false;
 					$has_errors = true;
 				}
 
@@ -189,10 +190,10 @@ if ( ! class_exists( 'Hustle_Infusion_Soft' ) ) :
 				if ( ! $has_errors ) {
 
 					return array(
-						'html'         => Hustle_Api_Utils::get_modal_title_markup( __( 'InfusionSoft Added', 'wordpress-popup' ), __( 'You can now go to your forms and assign them to this integration', 'wordpress-popup' ) ),
+						'html'         => Hustle_Provider_Utils::get_integration_modal_title_markup( __( 'InfusionSoft Added', 'wordpress-popup' ), __( 'You can now go to your pop-ups, slide-ins and embeds and assign them to this integration', 'wordpress-popup' ) ),
 						'buttons'      => array(
 							'close' => array(
-								'markup' => Hustle_Api_Utils::get_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
+								'markup' => Hustle_Provider_Utils::get_provider_button_markup( __( 'Close', 'wordpress-popup' ), 'sui-button-ghost', 'close' ),
 							),
 						),
 						'redirect'     => false,
@@ -279,7 +280,7 @@ if ( ! class_exists( 'Hustle_Infusion_Soft' ) ) :
 				),
 			);
 
-			$step_html = Hustle_Api_Utils::get_modal_title_markup(
+			$step_html = Hustle_Provider_Utils::get_integration_modal_title_markup(
 				__( 'Configure InfusionSoft', 'wordpress-popup' ),
 				sprintf(
 					__( 'Log in to your account to get your %1$sAPI key (encrypted)%2$s and %3$saccount name%2$s.', 'wordpress-popup' ),
@@ -291,22 +292,37 @@ if ( ! class_exists( 'Hustle_Infusion_Soft' ) ) :
 			if ( $has_errors ) {
 				$step_html .= '<span class="sui-notice sui-notice-error"><p>' . esc_html( $error_message ) . '</p></span>';
 			}
-			$step_html .= Hustle_Api_Utils::get_html_for_options( $options );
+			$step_html .= Hustle_Provider_Utils::get_html_for_options( $options );
 
 			$is_edit = $this->settings_are_completed( $global_multi_id );
 			if ( $is_edit ) {
 				$buttons = array(
 					'disconnect' => array(
-						'markup' => Hustle_Api_Utils::get_button_markup( __( 'Disconnect', 'wordpress-popup' ), 'sui-button-ghost', 'disconnect', true ),
+						'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+							__( 'Disconnect', 'wordpress-popup' ),
+							'sui-button-ghost',
+							'disconnect',
+							true
+						),
 					),
 					'save' => array(
-						'markup' => Hustle_Api_Utils::get_button_markup( __( 'Save', 'wordpress-popup' ), '', 'connect', true ),
+						'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+							__( 'Save', 'wordpress-popup' ),
+							'',
+							'connect',
+							true
+						),
 					),
 				);
 			} else {
 				$buttons = array(
 					'connect' => array(
-						'markup' => Hustle_Api_Utils::get_button_markup( __( 'Connect', 'wordpress-popup' ), '', 'connect', true ),
+						'markup' => Hustle_Provider_Utils::get_provider_button_markup(
+							__( 'Connect', 'wordpress-popup' ),
+							'sui-button-right',
+							'connect',
+							true
+						),
 					),
 				);
 
@@ -340,12 +356,12 @@ if ( ! class_exists( 'Hustle_Infusion_Soft' ) ) :
 				$_lists = self::api( $api_key, $account_name )->get_lists();
 
 				if ( is_wp_error( $_lists ) && ! empty( $_lists ) ) {
-					Hustle_Api_Utils::maybe_log( __METHOD__, __( 'Invalid InfusionSoft credentials.', 'wordpress-popup' ) );
+					Hustle_Provider_Utils::maybe_log( __METHOD__, __( 'Invalid InfusionSoft credentials.', 'wordpress-popup' ) );
 					return false;
 				}
 
 			} catch ( Exception $e ) {
-				Hustle_Api_Utils::maybe_log( __METHOD__, $e->getMessage() );
+				Hustle_Provider_Utils::maybe_log( __METHOD__, $e->getMessage() );
 				return false;
 			}
 

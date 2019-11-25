@@ -58,7 +58,7 @@ if ( is_plugin_active( 'wp-seopress-pro/seopress-pro.php' ) ) {
 
                     jQuery('.sp-suggest-btn').click(function(e) {
                         e.preventDefault();
-                        if($('#seopress_analysis_target_kw_meta').val().length == 0){
+                        if(jQuery('#seopress_analysis_target_kw_meta').val().length == 0){
                             jQuery('#seopress_analysis_target_kw_meta').val(jQuery(this).text() + ',');
                         } else {
                             str = jQuery('#seopress_analysis_target_kw_meta').val();
@@ -365,8 +365,8 @@ if ( is_plugin_active( 'wp-seopress-pro/seopress-pro.php' ) ) {
                     
                     if (!empty($seopress_analysis_data['0']['outbound_links'])) {
                         $count = count($seopress_analysis_data['0']['outbound_links']);
-                        
-                        echo '<p>'.sprintf( 'We found %d outbound links in your page. Internet is built on the principle of hyperlink. It is therefore perfectly normal to make links between different websites. However, avoid making links to low quality sites, SPAM... If you are not sure about the quality of a site, add the attribute "nofollow" to your link. <br>Below, the list:', 'wp-seopress', $count ).'</p>';
+
+                        echo '<p>'.sprintf( __('We found %s outbound links in your page. Internet is built on the principle of hyperlink. It is therefore perfectly normal to make links between different websites. However, avoid making links to low quality sites, SPAM... If you are not sure about the quality of a site, add the attribute "nofollow" to your link. <br>Below, the list:', 'wp-seopress'), $count ).'</p>';
                         echo '<ul>';
                             foreach ($seopress_analysis_data['0']['outbound_links'] as $links) {
                                 foreach ($links as $href => $link) {

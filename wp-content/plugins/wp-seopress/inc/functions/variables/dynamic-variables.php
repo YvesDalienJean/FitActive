@@ -7,10 +7,11 @@ global $term;
 
 $seopress_titles_title_template ='';
 $seopress_titles_description_template ='';
-$seopress_paged ='';
+$seopress_paged ='1';
 $the_author_meta ='';
 $sep = '';
 $seopress_excerpt ='';
+$seopress_content ='';
 $post_category ='';
 $post_tag ='';
 $get_search_query ='';
@@ -38,19 +39,18 @@ if (seopress_titles_sep_option()) {
     $sep = '-';
 }
 
-if (get_query_var('paged') >='1') {
-    $seopress_paged = get_query_var('paged');
-}
-
 if (!is_404() && $post !='') {
     if (has_excerpt($post->ID)) {
         $seopress_excerpt = get_the_excerpt();
+        $seopress_content = get_post_field('post_content', $post->ID);
     }
 }
 
-if (get_query_var('paged') >='1') {
+if (get_query_var('paged') >'1') {
     $seopress_paged = get_query_var('paged');
     $seopress_paged = apply_filters('seopress_paged', $seopress_paged);
+} else {
+    $seopress_paged = '';
 }
 
 if (is_singular() && isset($post->post_author)){
@@ -68,11 +68,13 @@ if (is_author() && NULL !== get_queried_object()) {
 if (is_single() && has_category()) {
     $post_category_array = get_the_terms(get_the_id(), 'category');
     $post_category = $post_category_array[0]->name;
+    $post_category = apply_filters('seopress_titles_cat', $post_category);
 }
 
 if (is_single() && has_tag()) {
     $post_tag_array = get_the_terms(get_the_id(), 'post_tag');
     $post_tag = $post_tag_array[0]->name;
+    $post_tag = apply_filters('seopress_titles_tag', $post_tag);
 }
 
 if (get_search_query() !='') {
@@ -94,9 +96,19 @@ if ($seopress_excerpt !='') {
     $seopress_get_the_excerpt = null;
 }
 
+if ($post !='') {
+    if (get_post_field('post_content', $post->ID) !='') {
+        $seopress_content = wp_trim_words(esc_attr(stripslashes_deep(wp_filter_nohtml_kses(wp_strip_all_tags(strip_shortcodes(get_post_field('post_content', $post->ID), true))))), $seopress_excerpt_length);
+    } else {
+        $seopress_content = null;
+    }
+} else {
+    $seopress_content = null;
+}
+
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 if ( is_plugin_active( 'woocommerce/woocommerce.php' )) {
-    if (is_product()) {
+    if (is_singular(array('product'))) {
         //Woo Cat product
         $woo_single_cats = get_the_terms( $post->ID, 'product_cat' );
                             
@@ -105,9 +117,11 @@ if ( is_plugin_active( 'woocommerce/woocommerce.php' )) {
             $woo_single_cat = array();
             
             foreach ( $woo_single_cats as $term ) {
-                $woo_single_cat[] = $term->name;
+                $woo_single_cat[$term->term_id] = $term->name;
             }
-                            
+
+            $woo_single_cat = apply_filters('seopress_titles_product_cat', $woo_single_cat);
+
             $woo_single_cat_html = stripslashes_deep(wp_filter_nohtml_kses(join( ", ", $woo_single_cat )));
         }
 
@@ -119,8 +133,10 @@ if ( is_plugin_active( 'woocommerce/woocommerce.php' )) {
             $woo_single_tag = array();
             
             foreach ( $woo_single_tags as $term ) {
-                $woo_single_tag[] = $term->name;
+                $woo_single_tag[$term->term_id] = $term->name;
             }
+
+            $woo_single_tag = apply_filters('seopress_titles_product_tag', $woo_single_tag);
 
             $woo_single_tag_html = stripslashes_deep(wp_filter_nohtml_kses(join( ", ", $woo_single_tag )));
         }
@@ -144,10 +160,14 @@ $seopress_titles_template_variables_array = array(
     '%%sitetitle%%',
     '%%sitename%%',
     '%%tagline%%',
+    '%%sitedesc%%',
     '%%title%%',
     '%%post_title%%',
     '%%post_excerpt%%',
+    '%%excerpt%%',
+    '%%post_content%%',
     '%%post_date%%',
+    '%%date%%',
     '%%post_modified_date%%',
     '%%post_author%%',
     '%%post_category%%',
@@ -187,9 +207,13 @@ $seopress_titles_template_replace_array = array(
     get_bloginfo('name'), 
     get_bloginfo('name'), 
     get_bloginfo('description'),
+    get_bloginfo('description'),
     the_title_attribute('echo=0'),
     the_title_attribute('echo=0'),
     $seopress_get_the_excerpt,
+    $seopress_get_the_excerpt,
+    $seopress_content,
+    get_the_date(),
     get_the_date(),
     get_the_modified_date(),
     $the_author_meta,

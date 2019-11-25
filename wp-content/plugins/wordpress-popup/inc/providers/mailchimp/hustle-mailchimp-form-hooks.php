@@ -28,14 +28,24 @@ class Hustle_Mailchimp_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		$form_settings_instance = $this->form_settings_instance;
 
 		/**
+		 * Filter submitted form data to be processed
+		 *
 		 * @since 4.0
+		 *
+		 * @param array                                    $submitted_data
+		 * @param int                                      $module_id                current module_id
+		 * @param Hustle_Mailchimp_Form_Settings 	   	   $form_settings_instance
 		 */
-		$submitted_data = apply_filters( 'hustle_provider_' . $addon->get_slug() . '_form_submitted_data', $submitted_data, $module_id, $form_settings_instance );
+		$submitted_data = apply_filters( 
+			'hustle_provider_mailchimp_form_submitted_data', 
+			$submitted_data, 
+			$module_id, 
+			$form_settings_instance 
+		);
 
-		$addon_setting_values = $form_settings_instance->get_form_settings_values();
-
-		$global_multi_id = $addon_setting_values['selected_global_multi_id'];
-		$api_key = $addon->get_setting( 'api_key', '', $global_multi_id );
+		$addon_setting_values 	= $form_settings_instance->get_form_settings_values();
+		$global_multi_id 		= $addon_setting_values['selected_global_multi_id'];
+		$api_key 				= $addon->get_setting( 'api_key', '', $global_multi_id );
 
 		try {
 			$api = $addon->get_api( $api_key );
@@ -58,7 +68,7 @@ class Hustle_Mailchimp_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			$submitted_data = $this->check_legacy( $submitted_data );
 			$merge_vals = array();
 			$interests = array();
-
+			$gdpr = false;
 			if ( isset( $submitted_data['first_name'] ) ) {
 				$merge_vals['MERGE1'] = $submitted_data['first_name'];
 				$merge_vals['FNAME'] = $submitted_data['first_name'];
@@ -66,6 +76,10 @@ class Hustle_Mailchimp_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			if ( isset( $submitted_data['last_name'] ) ) {
 				$merge_vals['MERGE2'] = $submitted_data['last_name'];
 				$merge_vals['LNAME'] = $submitted_data['last_name'];
+			}
+			if ( isset( $submitted_data['gdpr'] ) ){
+				$gdpr = ( 'on' === $submitted_data['gdpr'] ? true : false );
+				unset( $submitted_data['gdpr'] );
 			}
 			// Add extra fields
 			$merge_data = array_diff_key( $submitted_data, array(
@@ -119,6 +133,7 @@ class Hustle_Mailchimp_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 				}
 			}
 
+
 			$subscribe_data = array(
 				'email_address' => $email,
 				'status'        => $sub_status
@@ -128,6 +143,14 @@ class Hustle_Mailchimp_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			}
 			if ( ! empty( $interests ) ) {
 				$subscribe_data['interests'] = $interests;
+			}
+
+			//tags
+			$static_segments 	 = isset( $addon_setting_values['tags'] ) ? $addon_setting_values['tags'] : '' ;
+			$static_segments_val = ! empty( $static_segments ) ? array_values( $static_segments ) : '';
+
+			if( ! empty( $static_segments_val ) ){
+				$subscribe_data['tags'] = $static_segments_val;
 			}
 
 			$error_detail = __( 'Something went wrong.', 'wordpress-popup' );
@@ -220,6 +243,7 @@ class Hustle_Mailchimp_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 						$form_settings_instance,
 						$list_id
 					);
+
 					$response = $api->subscribe( $list_id, $subscribe_data );
 
 					// TODO: handle errors here.
@@ -235,10 +259,31 @@ class Hustle_Mailchimp_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 				$error_detail = $e->getMessage();
 			}
 
-			$utils = Hustle_Provider_Utils::get_instance();
+			//check if gdpr field is present and also enabled on malichimp api
+			if( true === $gdpr && isset( $response->marketing_permissions ) ){
+				$marketing = $response->marketing_permissions;
+				$permissions = array( 'Email' );
+				
+				/**
+				 * Marketing permission filter
+				 *
+				 * Filter marketing permissions from mailchimp here.
+				 * Currently only `Email` opt-in is supported on mailchimp
+				 * but this filter can be used to add your desired optin.
+				 *
+				 * @since 4.0.2
+				 *
+				 * @param array $permissions
+				 */
+				$current_permission = apply_filters( 'huslte_mailchimp_provider_marketing_permission', $permissions );
+
+				$marketing_permissions = $this->get_marketing_permission( $marketing, $current_permission );
+				$marketing_data['marketing_permissions'] = $marketing_permissions;
+				$response = $api->update_subscription( $list_id, $email, $marketing_data );
+			}
 
 			// If there's extra information to display in the success entry description, add it.
-			$success_message = __( 'Successfully added or updated member on MailChimp list.', 'wordpress-popup' );
+			$success_message = __( 'Successfully added or updated member on Mailchimp list.', 'wordpress-popup' );
 			if ( ! empty( $success_message_extra ) ) {
 				$success_message = $success_message . $success_message_extra;
 			}
@@ -250,9 +295,6 @@ class Hustle_Mailchimp_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 						'is_sent'       => $is_sent,
 						'description'   => $is_sent ? $success_message : $error_detail,
 						'member_status' => $member_status,
-						'data_sent'     => $utils->get_last_data_sent(),
-						'data_received' => $utils->get_last_data_received(),
-						'url_request'   => $utils->get_last_url_request(),
 					),
 				),
 			);
@@ -361,7 +403,13 @@ class Hustle_Mailchimp_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			);
 
 			//triggers exception if not found.
-			$is_sub = $api->check_email( $addon_setting_values['list_id'], $submitted_data['email'] );
+			$is_sub = $this->get_subscriber( 
+				$api,
+				array(
+					'email' 	=> $submitted_data['email'],
+					'list_id' 	=> $addon_setting_values['list_id'],
+				)
+			);
 
 			if( ! is_wp_error( $is_sub ) )
 				$is_success = self::ALREADY_SUBSCRIBED_ERROR;
@@ -395,7 +443,29 @@ class Hustle_Mailchimp_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		}
 
 		return true;
+	}
 
+	/**
+	 * Get subscriber for providers
+	 *
+	 * This method is to be inherited
+	 * And extended by child classes.
+	 * 
+	 * Make use of the property `$_subscriber`
+	 * Method to omit double api calls
+	 *
+	 * @since 4.0.2
+	 *
+	 * @param 	object 	$api
+	 * @param 	mixed  	$data
+	 * @return  mixed 	array/object API response on queried subscriber
+	 */
+	protected function get_subscriber( $api, $data ) {
+		if( empty ( $this->_subscriber ) && ! isset( $this->_subscriber[ md5( $data['email'] ) ] ) ){
+			$this->_subscriber[ md5( $data['email'] ) ] = $api->check_email( $data['list_id'], $data['email'] );
+		}
+
+		return $this->_subscriber[ md5( $data['email'] ) ];
 	}
 
 	/**
@@ -413,5 +483,33 @@ class Hustle_Mailchimp_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 
 		return $submitted_data;
 	}
+
+	/**
+	 * Get marketing permissions
+	 *
+	 *
+	 * @since 4.0.2
+	 *
+	 * @param 	object 	$api
+	 * @param 	mixed  	$data
+	 * @return  mixed 	array of enabled markeing permissions
+	 */
+	protected function get_marketing_permission( $marketing, $current ) {
+		$permissions = array();
+		if( ! empty( $marketing ) && ! empty( $current ) ){
+			foreach ( $marketing as $key => $value ) {
+				if( in_array( $value->text, $current, true ) ){
+					$permissions[] = array(
+						'marketing_permission_id' => $value->marketing_permission_id,
+						'enabled'				  => true
+					);
+					unset( $current[$value->text] ); //duplicate saftey
+				}
+			}
+			return $permissions;
+		}
+		return false;
+	}
+
 }
 

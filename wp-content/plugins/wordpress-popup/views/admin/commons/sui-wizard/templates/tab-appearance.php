@@ -16,19 +16,9 @@
 
 		<div class="sui-actions-right">
 
-			<?php if ( 'embedded' === $module_type ) { ?>
-
-				<button class="sui-button sui-button-icon-right wpmudev-button-navigation" data-direction="next">
-					<?php esc_html_e( 'Display Options', 'wordpress-popup' ); ?> <i class="sui-icon-arrow-right" aria-hidden="true"></i>
-				</button>
-
-			<?php } else { ?>
-
-				<button class="sui-button sui-button-icon-right wpmudev-button-navigation" data-direction="next">
-					<?php esc_html_e( 'Visibility', 'wordpress-popup' ); ?> <i class="sui-icon-arrow-right" aria-hidden="true"></i>
-				</button>
-
-			<?php } ?>
+			<button class="sui-button sui-button-icon-right wpmudev-button-navigation" data-direction="next">
+				<?php echo 'embedded' === $module_type ? esc_html_e( 'Display Options', 'wordpress-popup' ) : esc_html_e( 'Visibility', 'wordpress-popup' ); ?> <i class="sui-icon-arrow-right" aria-hidden="true"></i>
+			</button>
 
 		</div>
 
@@ -69,6 +59,13 @@
 		);
 
 	} ?>
+
+	<?php
+	// SETTING: CTA Button Design
+	self::static_render(
+		'admin/commons/sui-wizard/tab-appearance/cta-design',
+		array( 'settings' => $settings )
+	); ?>
 
 	<?php
 	// SETTING: Colors Palette

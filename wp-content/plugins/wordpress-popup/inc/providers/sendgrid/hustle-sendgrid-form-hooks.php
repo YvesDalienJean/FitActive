@@ -24,9 +24,20 @@ class Hustle_Sendgrid_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		$form_settings_instance = $this->form_settings_instance;
 
 		/**
+		 * Filter submitted form data to be processed
+		 *
 		 * @since 4.0
+		 *
+		 * @param array                                    	$submitted_data
+		 * @param int                                      	$module_id                current module_id
+		 * @param Hustle_Sendgrid_Form_Settings 	   	   	$form_settings_instance
 		 */
-		$submitted_data = apply_filters( 'hustle_provider_' . $addon->get_slug() . '_form_submitted_data', $submitted_data, $module_id, $form_settings_instance );
+		$submitted_data = apply_filters( 
+			'hustle_provider_sendgrid_form_submitted_data', 
+			$submitted_data, 
+			$module_id, 
+			$form_settings_instance 
+		);
 
 		$addon_setting_values = $form_settings_instance->get_form_settings_values();
 
@@ -45,7 +56,13 @@ class Hustle_Sendgrid_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			$is_sent = false;
 			$member_status = __( 'Member could not be subscribed.', 'wordpress-popup' );
 
-			$existing_member = $api->email_exists( $submitted_data['email'], $list_id );
+			$existing_member 	= $this->get_subscriber( 
+				$api, 
+				array(
+					'email' 	=> $submitted_data['email'], 
+					'list_id' 	=> $list_id 
+				)
+			);
 
 			// Add extra fields
 			$extra_data = array_diff_key( $submitted_data, array(
@@ -69,11 +86,43 @@ class Hustle_Sendgrid_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 				$addon->add_custom_fields( $custom_fields, $api );
 			}
 
+			/**
+			 * Fires before adding subscriber
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param int    $module_id
+			 * @param array  $submitted_data
+			 * @param object $form_settings_instance 
+			 */
+			do_action( 'hustle_provider_sendgrid_before_add_subscriber', 
+				$module_id, 
+				$submitted_data, 
+				$form_settings_instance 
+			);
+
 			if ( $existing_member ) {
 				$res = $api->update_recipient( $submitted_data );
 			} else {
 				$res = $api->create_and_add_recipient_to_list( $list_id, $submitted_data );
 			}
+
+			/**
+			 * Fires before adding subscriber
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param int    $module_id
+			 * @param array  $submitted_data
+			 * @param mixed  $res
+			 * @param object $form_settings_instance 
+			 */
+			do_action( 'hustle_provider_sendgrid_after_add_subscriber', 
+				$module_id, 
+				$submitted_data,
+				$res,
+				$form_settings_instance 
+			);
 
 			if ( is_wp_error( $res ) ) {
 				$details = $res->get_error_message();
@@ -83,7 +132,6 @@ class Hustle_Sendgrid_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 				$member_status = __( 'OK', 'wordpress-popup' );
 			}
 
-			$utils = Hustle_Provider_Utils::get_instance();
 			$entry_fields = array(
 				array(
 					'name'  => 'status',
@@ -91,9 +139,6 @@ class Hustle_Sendgrid_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 						'is_sent'       => $is_sent,
 						'description'   => $details,
 						'member_status' => $member_status,
-						'data_sent'     => $utils->get_last_data_sent(),
-						'data_received' => $utils->get_last_data_received(),
-						'url_request'   => $utils->get_last_url_request(),
 					),
 				),
 			);
@@ -105,7 +150,7 @@ class Hustle_Sendgrid_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			$entry_fields[0]['value']['list_name'] = $addon_setting_values['list_name'];
 		}
 
-		$entry_fields = apply_filters( 'hustle_provider_' . $addon->get_slug() . '_entry_fields',
+		$entry_fields = apply_filters( 'hustle_provider_sendgrid_entry_fields',
 			$entry_fields,
 			$module_id,
 			$submitted_data,
@@ -158,7 +203,13 @@ class Hustle_Sendgrid_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			$api_key 			= $addon->get_setting( 'api_key', '', $global_multi_id );
 			$api 				= $addon::api( $api_key );
 			$list_id 			= $addon_setting_values['list_id'];
-			$existing_member 	= $api->email_exists( $submitted_data['email'], $list_id );
+			$existing_member 	= $this->get_subscriber( 
+				$api, 
+				array(
+					'email' 	=> $submitted_data['email'], 
+					'list_id' 	=> $list_id 
+				)
+			);
 
 			if ( $existing_member )
 				$is_success = self::ALREADY_SUBSCRIBED_ERROR;
@@ -193,6 +244,29 @@ class Hustle_Sendgrid_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 
 		return true;
 
+	}
+
+	/**
+	 * Get subscriber for providers
+	 *
+	 * This method is to be inherited
+	 * And extended by child classes.
+	 * 
+	 * Make use of the property `$_subscriber`
+	 * Method to omit double api calls
+	 *
+	 * @since 4.0.2
+	 *
+	 * @param 	object 	$api
+	 * @param 	mixed  	$data
+	 * @return  mixed 	array/object API response on queried subscriber
+	 */
+	protected function get_subscriber( $api, $data ) {
+		if( empty ( $this->_subscriber ) && ! isset( $this->_subscriber[ md5( $data['email'] ) ] ) ){
+			$this->_subscriber[ md5( $data['email'] ) ] = $api->email_exists( $data['email'], $data['list_id'] );
+		}
+
+		return $this->_subscriber[ md5( $data['email'] ) ];
 	}
 
 }

@@ -1087,7 +1087,7 @@ function seopress_titles_nosnippet_bypass() {
 	}
 }
 if (get_option('blog_public') !='0') {// Discourage search engines from indexing this site is OFF
-	if (seopress_titles_noindex_bypass() || seopress_titles_nofollow_bypass() || seopress_titles_noodp_bypass() || seopress_titles_noarchive_bypass() || seopress_titles_nosnippet_bypass() || has_filter('seopress_titles_robots')) {
+	//if (seopress_titles_noindex_bypass() || seopress_titles_nofollow_bypass() || seopress_titles_noodp_bypass() || seopress_titles_noarchive_bypass() || seopress_titles_nosnippet_bypass() || has_filter('seopress_titles_robots')) {
 		function seopress_titles_advanced_robots_hook() {
 
 			$seopress_comma_array = array();
@@ -1133,6 +1133,12 @@ if (get_option('blog_public') !='0') {// Discourage search engines from indexing
 				array_push($seopress_comma_array, $seopress_titles_nosnippet);
 			}
 
+			//new meta robots
+			if (!in_array('noindex', $seopress_comma_array) && !in_array('nosnippet', $seopress_comma_array)) {
+				$seopress_titles_max_snippet = 'max-snippet:-1, max-image-preview:large, max-video-preview:-1';
+				array_push($seopress_comma_array, $seopress_titles_max_snippet);
+			}
+
 			$seopress_titles_robots = '<meta name="robots" content="';
 
 			$seopress_comma_count = count($seopress_comma_array);
@@ -1153,7 +1159,7 @@ if (get_option('blog_public') !='0') {// Discourage search engines from indexing
 		    echo $seopress_titles_robots;
 		}	
 		add_action( 'wp_head', 'seopress_titles_advanced_robots_hook', 1 );
-	}
+	//}
 }
 
 //noimageindex
@@ -1306,3 +1312,21 @@ if (function_exists('seopress_titles_noindex_bypass') && seopress_titles_noindex
 		add_action( 'wp_head', 'seopress_titles_canonical_hook', 1 );
 	}
 }
+
+//Author meta
+function seopress_titles_author() {
+	global $post;
+	if (is_singular() && isset($post->post_author)){
+		$user_login = get_the_author_meta('user_login', $post->post_author);
+		$the_author_meta = get_the_author_meta('display_name', $post->post_author);
+		if ($the_author_meta !=$user_login && $the_author_meta !='' && $user_login !='') {
+			$html = '<meta name="author" content="'.$the_author_meta.'">';
+			$html .= "\n";
+
+			$html = apply_filters( 'seopress_titles_author', $html );
+
+			echo $html;
+		}
+	}
+}
+add_action('wp_head', 'seopress_titles_author', 1);

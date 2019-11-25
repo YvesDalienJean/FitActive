@@ -48,6 +48,12 @@ class Hustle_ConvertKit_Api {
 
 		$res = wp_remote_request( $url, $_args );
 
+		//logging data
+		$utils = Hustle_Provider_Utils::get_instance();
+		$utils->_last_url_request 	= $url;
+		$utils->_last_data_sent 	= $_args;
+		$utils->_last_data_received = $res;
+
 		if ( !is_wp_error( $res ) && is_array( $res ) ) {
 
 			if( $res['response']['code'] <= 204 )
@@ -148,11 +154,6 @@ class Hustle_ConvertKit_Api {
 		);
 		$res =  $this->_post( $url, $args );
 
-		$utils = Hustle_Provider_Utils::get_instance();
-		$utils->_last_data_received = $res;
-		$utils->_last_url_request = trailingslashit( $this->_endpoint ) . $url;
-		$utils->_last_data_sent = $args;
-
 		return empty( $res ) ? __("Successfully added custom field", 'wordpress-popup') : $res;
 	}
 
@@ -169,11 +170,6 @@ class Hustle_ConvertKit_Api {
 			"body" =>  $data,
 		);
 		$res =  $this->_post( $url, $args );
-
-		$utils = Hustle_Provider_Utils::get_instance();
-		$utils->_last_data_received = $res;
-		$utils->_last_url_request = trailingslashit( $this->_endpoint ) . $url;
-		$utils->_last_data_sent = $args;
 
 		return empty( $res ) ? __("Successful subscription", 'wordpress-popup') : $res;
 	}
@@ -194,11 +190,6 @@ class Hustle_ConvertKit_Api {
 			"body" =>  $data,
 		);
 		$res =  $this->_put( $url, $args );
-
-		$utils = Hustle_Provider_Utils::get_instance();
-		$utils->_last_data_received = $res;
-		$utils->_last_url_request = trailingslashit( $this->_endpoint ) . $url;
-		$utils->_last_data_sent = $args;
 
 		return empty( $res ) ? __("Successful subscription", 'wordpress-popup') : $res;
 	}
@@ -245,7 +236,7 @@ class Hustle_ConvertKit_Api {
 		$utils->_last_data_sent 	= $args;
 
 		if ( is_wp_error( $res ) ) {
-			Hustle_Api_Utils::maybe_log( 'There was an error retrieving the subscribers from Convertkit: ' . $res->get_error_message() );
+			Hustle_Provider_Utils::maybe_log( 'There was an error retrieving the subscribers from Convertkit: ' . $res->get_error_message() );
 			return false;
 		} elseif( empty( $res->subscriptions ) ) {
 			return false;

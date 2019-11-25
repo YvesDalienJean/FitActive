@@ -65,7 +65,8 @@
 }
 
 /* Field description */
-.wpforms-container .wpforms-field-description {
+.wpforms-container .wpforms-field-description,
+.wpforms-container .wpforms-field-limit-text {
 	font-size: 0.85em;
 	margin: 5px 0 0 0;
 }
@@ -880,8 +881,10 @@ div.wpforms-container-full .wpforms-notice.wpforms-error .wpforms-notice-action:
 /* Small devices */
 @media only screen and (max-width: 600px) {
 
-	/* Аvoid horizontal scroll on mobiles */
-	.wpforms-container .wpforms-field {
+	/* Avoid horizontal scroll on mobiles.
+	   Skip for phone field, otherwise country dropdown (Smart format) would be cropped.
+	*/
+	.wpforms-container .wpforms-field:not(.wpforms-field-phone) {
 		overflow-x: hidden;
 	}
 	.wpforms-container .wpforms-field > * {

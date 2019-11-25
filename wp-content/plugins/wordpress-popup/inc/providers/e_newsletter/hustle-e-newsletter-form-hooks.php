@@ -23,9 +23,20 @@ class Hustle_E_Newsletter_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract
 		$form_settings_instance = $this->form_settings_instance;
 
 		/**
+		 * Filter submitted form data to be processed
+		 *
 		 * @since 4.0
+		 *
+		 * @param array                                    $submitted_data
+		 * @param int                                      $module_id                current module_id
+		 * @param Hustle_E_Newsletter_Form_Settings 	   $form_settings_instance
 		 */
-		$submitted_data = apply_filters( 'hustle_provider_' . $this->addon->get_slug() . '_form_submitted_data', $submitted_data, $module_id, $form_settings_instance );
+		$submitted_data = apply_filters( 
+			'hustle_provider_e_newsletter_form_submitted_data', 
+			$submitted_data, 
+			$module_id, 
+			$form_settings_instance 
+		);
 
 		$addon_setting_values = $form_settings_instance->get_form_settings_values();
 
@@ -55,7 +66,39 @@ class Hustle_E_Newsletter_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract
 
 			$err = new WP_Error();
 
+			/**
+			 * Fires before adding subscriber
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param int    $module_id
+			 * @param array  $submitted_data
+			 * @param object $form_settings_instance 
+			 */
+			do_action( 'hustle_provider_e_newsletter_before_add_subscriber', 
+				$module_id, 
+				$submitted_data, 
+				$form_settings_instance 
+			);
+
 			$insert_data = $e_newsletter->create_update_member_user( "",  $_data, $subscribe );
+
+			/**
+			 * Fires after adding subscriber
+			 *
+			 * @since 4.0.2
+			 *
+			 * @param int    $module_id
+			 * @param array  $submitted_data
+			 * @param mixed  $res
+			 * @param object $form_settings_instance 
+			 */
+			do_action( 'hustle_provider_e_newsletter_after_add_subscriber', 
+				$module_id, 
+				$submitted_data, 
+				$insert_data,
+				$form_settings_instance 
+			);
 
 			if( isset( $insert_data['results'] ) && in_array( "member_inserted", (array) $insert_data['results'], true )  ) {
 				$e_newsletter->add_members_to_groups( $insert_data['member_id'], $groups );
@@ -105,7 +148,7 @@ class Hustle_E_Newsletter_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract
 			$entry_fields = $this->exception( $e );
 		}
 
-		$entry_fields = apply_filters( 'hustle_provider_' . $addon->get_slug() . '_entry_fields',
+		$entry_fields = apply_filters( 'hustle_provider_e_newsletter_entry_fields',
 			$entry_fields,
 			$module_id,
 			$submitted_data,
@@ -152,8 +195,9 @@ class Hustle_E_Newsletter_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract
 				$form_settings_instance
 			);
 
+			$existing_email = $this->get_subscriber( $addon, $submitted_data['email'] );
 			//triggers exception if not found.
-			if ( $addon->is_member( $submitted_data['email'] ) )
+			if ( $existing_email )
 				$is_success = self::ALREADY_SUBSCRIBED_ERROR;
 		}
 		
@@ -185,6 +229,28 @@ class Hustle_E_Newsletter_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract
 		}
 
 		return true;
+	}
+
+	/**
+	 * Get subscriber for providers
+	 *
+	 * This method is to be inherited
+	 * And extended by child classes.
+	 * 
+	 * Make use of the property `$_subscriber`
+	 * Method to omit double api calls
+	 *
+	 * @since 4.0.2
+	 *
+	 * @param 	object 	$api
+	 * @param 	mixed  	$data
+	 * @return  mixed 	array/object API response on queried subscriber
+	 */
+	protected function get_subscriber( $api, $data ) {
+		if( empty ( $this->_subscriber ) && ! isset( $this->_subscriber[ md5( $data ) ] ) ){
+			$this->_subscriber[ md5( $data ) ] =  $api->is_member( $data ) ;
+		}
+		return $this->_subscriber[ md5( $data ) ];
 	}
 
 }

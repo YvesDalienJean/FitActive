@@ -275,6 +275,48 @@ class Hustle_Entry_Model {
 	}
 
 	/**
+	 * Update Meta
+	 *
+	 * @since 4.0.2
+	 *
+	 * @param             $meta_id
+	 * @param string      $meta_key      - the meta key
+	 * @param bool|object $default_value - the default value
+	 * @param string      $date_updated
+	 * @param string      $date_created
+	 *
+	 * @return bool|string
+	 */
+	public function update_meta( $meta_id, $meta_key, $default_value = false, $date_updated = '', $date_created = '' ) {
+		global $wpdb;
+
+		$updated_meta = array(
+			'entry_id'   => $this->entry_id,
+			'meta_key'   => $meta_key,
+			'meta_value' => $default_value,
+		);
+
+		if ( ! empty( $date_updated ) ) {
+			$updated_meta['date_updated'] = $date_updated;
+		}
+
+		if ( ! empty( $date_created ) ) {
+			$updated_meta['date_created'] = $date_created;
+		}
+
+		$wpdb->update(
+			$this->table_meta_name,
+			$updated_meta,
+			array(
+				'meta_id' => $meta_id,
+			)
+		);
+		$cache_key = get_class( $this );
+		wp_cache_delete( $this->entry_id, $cache_key );
+		$this->get( $this->entry_id );
+	}
+	
+	/**
 	 * Save entry
 	 *
 	 * @since 4.0
@@ -993,5 +1035,52 @@ class Hustle_Entry_Model {
 		}
 		$entries = implode( ', ', $entries );
 		self::delete_by_entries( $module_id, $entries );
+	}
+
+	/**
+	 * Get entries older than $date_created
+	 *
+	 * @since 4.0.2
+	 *
+	 * @param $date_created
+	 *
+	 * @return array
+	 */
+	public static function get_older_entry_ids( $date_created ) {
+		global $wpdb;
+		$entries_table = Hustle_Db::entries_table();
+		$query = "SELECT e.entry_id AS entry_id
+					FROM {$entries_table} e
+					WHERE e.date_created < %s";
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$query = $wpdb->prepare( $query, $date_created );
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		return $wpdb->get_col( $query ); 
+	}
+
+	/**
+	 * Get entries by email
+	 *
+	 * @since 4.0.2
+	 *
+	 * @param $email
+	 *
+	 * @return array
+	 */
+	public static function get_entries_by_email( $email ) {
+		global $wpdb;
+		$meta_table = Hustle_Db::entries_meta_table();
+		$query = "SELECT m.entry_id AS entry_id
+				FROM {$meta_table} m
+				WHERE (m.meta_key LIKE %s)
+				AND m.meta_value = %s
+				GROUP BY m.entry_id";
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$query = $wpdb->prepare( $query, 'email', $email );
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		return $wpdb->get_col( $query ); 
 	}
 }

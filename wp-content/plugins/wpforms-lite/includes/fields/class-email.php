@@ -338,8 +338,9 @@ class WPForms_Field_Email extends WPForms_Field {
 			printf(
 				'<input type="email" %s %s>',
 				wpforms_html_attributes( $primary['id'], $primary['class'], $primary['data'], $primary['attr'] ),
-				$primary['required']
+				esc_attr( $primary['required'] )
 			);
+			$this->field_display_error( 'primary', $field );
 
 		// Confirmation email field configuration.
 		} else {
@@ -380,9 +381,9 @@ class WPForms_Field_Email extends WPForms_Field {
 	 * Formats and sanitizes field.
 	 *
 	 * @since 1.3.0
-	 * @param int $field_id
-	 * @param array $field_submit
-	 * @param array $form_data
+	 * @param int   $field_id     Field ID.
+	 * @param mixed $field_submit Field value that was submitted.
+	 * @param array $form_data    Form data and settings.
 	 */
 	public function format( $field_id, $field_submit, $form_data ) {
 
@@ -407,14 +408,20 @@ class WPForms_Field_Email extends WPForms_Field {
 	/**
 	 * Validates field on form submit.
 	 *
-	 * @param int   $field_id
-	 * @param array $field_submit
-	 * @param array $form_data
+	 * @param int   $field_id     Field ID.
+	 * @param mixed $field_submit Field value that was submitted.
+	 * @param array $form_data    Form data and settings.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {
 		$form_id = $form_data['id'];
 
 		parent::validate( $field_id, $field_submit, $form_data );
+
+		if ( ! is_array( $field_submit ) && ! empty( $field_submit ) ) {
+			$field_submit = array(
+				'primary' => $field_submit,
+			);
+		}
 
 		if ( ! empty( $field_submit['primary'] ) && ! is_email( $field_submit['primary'] ) ) {
 			wpforms()->process->errors[ $form_id ][ $field_id ]['primary'] = esc_html__( 'The provided email is not valid.', 'wpforms-lite' );

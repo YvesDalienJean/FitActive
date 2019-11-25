@@ -10,7 +10,7 @@ class Hustle_Local_List_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 
 	/**
 	 * Check whether the email is already subscribed.
-	 * 
+	 *
 	 * @since 4.0
 	 *
 	 * @param $submitted_data
@@ -83,7 +83,7 @@ class Hustle_Local_List_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 	 * We're adding the local list's entries in the front-ajax file because
 	 * we need all integrations' hook to run first in order to add their data
 	 * to entries. Move that behavior to this file if we want to do it here instead,
-	 * as it should be. 
+	 * as it should be.
 	 * Hustle_Module_Modal::add_local_subscription() doesn't exist anymore.
 	 * We're handling entries with hustle_Entry_Model class.
 	 */
@@ -131,9 +131,6 @@ class Hustle_Local_List_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 	//					'value' => array(
 	//						'is_sent'       => false,
 	//						'description'   => $res->get_error_message(),
-	//						'data_sent'     => 'nope',
-	//						'data_received' => 'nope',
-	//						'url_request'   => 'nope',
 	//					),
 	//				),
 	//			);
@@ -145,9 +142,6 @@ class Hustle_Local_List_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 	//					'value' => array(
 	//						'is_sent'       => true,
 	//						'description'   => __( 'Successfully added or updated member on Local list', 'wordpress-popup' ),
-	//						'data_sent'     => 'yap',
-	//						'data_received' => 'yap',
-	//						'url_request'   => 'yap',
 	//					),
 	//				),
 	//			);

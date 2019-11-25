@@ -356,22 +356,52 @@
     display: inline;
 }
 
-#seopress_cpt .wrap-seopress-counters,#seopress_pro_cpt .wrap-seopress-counters {
+#seopress_cpt .wrap-seopress-counters, #seopress_pro_cpt .wrap-seopress-counters {
     text-align: right;
-    background: #eee;
+    background: #e9ecef;
     padding: 2px 5px;
     display: flex;
-    box-shadow: 0 1px 1px rgba(0,0,0,.2);
     font-size: 12px;
     justify-content: flex-end;
+    border-radius: 0 0 .25rem .25rem;
 }
 
-#seopress_cpt #seopress_titles_desc_counters,#seopress_cpt #seopress_titles_title_counters,#seopress_pro_cpt #seopress_rich_snippets_articles_counters,#seopress_pro_cpt #seopress_rich_snippets_courses_counters {
+#seopress_cpt .sp-progress, #seopress_pro_cpt .sp-progress {
+    display: -ms-flexbox;
+    display: flex;
+    height: 1rem;
+    overflow: hidden;
+    font-size: .75rem;
+    background-color: #e9ecef;
+    border-radius: .25rem .25rem 0 0;
+}
+
+#seopress_cpt .sp-progress-bar, #seopress_pro_cpt .sp-progress-bar {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -ms-flex-pack: center;
+    justify-content: center;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    background-color: #0085ba;
+    transition: width .6s ease;
+}
+
+#seopress_cpt #seopress_titles_desc_counters,
+#seopress_cpt #seopress_titles_title_counters,
+#seopress_pro_cpt #seopress_rich_snippets_articles_counters,
+#seopress_pro_cpt #seopress_rich_snippets_courses_counters {
     display: inline;
     margin-right: 5px;
 }
 
-#seopress_cpt #seopress_titles_desc_counters_val,#seopress_cpt #seopress_titles_title_counters_val,#seopress_pro_cpt #seopress_rich_snippets_articles_counters_val,#seopress_pro_cpt #seopress_rich_snippets_courses_counters_val {
+#seopress_cpt #seopress_titles_desc_counters_val,
+#seopress_cpt #seopress_titles_title_counters_val,
+#seopress_pro_cpt #seopress_rich_snippets_articles_counters_val,
+#seopress_pro_cpt #seopress_rich_snippets_courses_counters_val {
     display: inline;
     font-weight: 700;
 }
@@ -380,15 +410,18 @@
     width: 95%;
 }
 
-.fixed .column-seopress_w3c,.fixed .column-seopress_words {
+.fixed .column-seopress_w3c,
+.fixed .column-seopress_words {
     width: 5%;
 }
 
-.fixed .column-seopress_nofollow,.fixed .column-seopress_noindex {
+.fixed .column-seopress_nofollow,
+.fixed .column-seopress_noindex {
     width: 10%;
 }
 
-#seopress_content_analysis .ui-tabs,#seopress_cpt .ui-tabs {
+#seopress_content_analysis .ui-tabs,
+#seopress_cpt .ui-tabs {
     position: relative;
     padding: 0;
     border: none;
@@ -650,7 +683,7 @@ body.seopress-styles {
     margin: 0;
 }
 
-.seopress-styles .seopress-option #seopress-yoast-migrate, .seopress-styles .seopress-option #seopress-aio-migrate, .seopress-styles .seopress-option #seopress-seo-framework-migrate, .seopress-styles .seopress-option #submit {
+.seopress-styles .seopress-option #seopress-yoast-migrate, .seopress-styles .seopress-option #seopress-aio-migrate, .seopress-styles .seopress-option #seopress-seo-framework-migrate, .seopress-styles .seopress-option #seopress-rk-migrate, .seopress-styles .seopress-option #seopress-squirrly-migrate, .seopress-styles .seopress-option #submit {
     color: #fff;
     text-decoration: none;
     border: none;
@@ -670,7 +703,7 @@ body.seopress-styles {
     z-index: 10;
 }
 
-.seopress-styles .seopress-option #seopress-yoast-migrate:hover, .seopress-styles .seopress-option #seopress-aio-migrate:hover, .seopress-styles .seopress-option #seopress-seo-framework-migrate:hover, .seopress-styles .seopress-option #submit:hover {
+.seopress-styles .seopress-option #seopress-yoast-migrate:hover, .seopress-styles .seopress-option #seopress-aio-migrate:hover, .seopress-styles .seopress-option #seopress-seo-framework-migrate:hover, .seopress-styles .seopress-option #seopress-rk-migrate:hover, .seopress-styles .seopress-option #seopress-squirrly-migrate:hover, .seopress-styles .seopress-option #submit:hover {
     text-decoration: none;
     color: #FFF;
     background: #232323;
@@ -1019,7 +1052,7 @@ body.seopress-styles {
 }
 
 .seopress-page-list {
-    margin: 0;
+    margin: 1.5rem 0px;
 }
 
 .seopress-option .dashicons,.seopress-page-list .dashicons {
@@ -1333,7 +1366,20 @@ body.seopress-styles {
     -webkit-font-smoothing: initial;
 }
 
-#seopress_cpt .tag-title,.seopress-button,.seopress-option .tag-title {
+.seopress-option .seopress_wrap_single_cpt .feature-state,
+.seopress-option .seopress_wrap_tax .feature-state {
+    padding: 2px 12px;
+    margin: 0 0 0.5rem 0.5rem;
+}
+
+.seopress-option #tab_seopress_titles_single h2,
+.seopress-option #tab_seopress_titles_tax h2 {
+    margin: 2em 0 1em 0;
+    border-top: 1px solid #eee;
+    padding: 1em 0 0 0;
+}
+
+#seopress_cpt .tag-title,.seopress-button,.seopress-option .tag-title,#seopress_pro_cpt .tag-title {
     cursor: pointer;
     font-weight: 500;
     border-radius: 4px;
@@ -1378,14 +1424,14 @@ body.seopress-styles {
     width: calc(100% - 20px);
 }
 
-#seopress_cpt .wrap-tags,.seopress-option .wrap-tags {
+#seopress_cpt .wrap-tags,.seopress-option .wrap-tags,#seopress_pro_cpt .wrap-tags {
     position: relative;
     display: inline-block;
     width: 100%;
     margin-bottom: 10px;
 }
 
-#seopress_cpt .tag-title,.seopress-option .tag-title {
+#seopress_cpt .tag-title,.seopress-option .tag-title,#seopress_pro_cpt .tag-title {
     padding: 4px 8px;
     position: relative;
     top: 5px;
@@ -1400,13 +1446,15 @@ body.seopress-styles {
     box-shadow: 0 0 0 .5px rgba(50,50,93,.17),0 2px 5px 0 rgba(50,50,93,.12),0 3px 9px 0 rgba(50,50,93,.08),0 1px 1.5px 0 rgba(0,0,0,.08),0 1px 2px 0 rgba(0,0,0,.08);
 }
 
-#seopress_cpt .tag-title:active,#seopress_cpt .tag-title:focus,#seopress_cpt .tag-title:hover,.seopress-option .tag-title:active,.seopress-option .tag-title:focus,.seopress-option .tag-title:hover {
+#seopress_pro_cpt .tag-title:active,#seopress_pro_cpt .tag-title:focus,#seopress_pro_cpt .tag-title:hover,
+#seopress_cpt .tag-title:active,#seopress_cpt .tag-title:focus,#seopress_cpt .tag-title:hover,
+.seopress-option .tag-title:active,.seopress-option .tag-title:focus,.seopress-option .tag-title:hover {
     background: #232323;
     color: #fff;
     user-select: none;
 }
 
-#seopress_cpt .tag-title .dashicons,.seopress-option .tag-title .dashicons {
+#seopress_cpt .tag-title .dashicons,.seopress-option .tag-title .dashicons, #seopress_pro_cpt .tag-title .dashicons {
     padding: 0;
     height: 16px;
     width: 16px;
@@ -1561,6 +1609,13 @@ body.seopress-styles {
     opacity: 0;
 }
 
+.seopress_wrap_single_cpt input.toggle,
+.seopress_wrap_tax input.toggle {
+    margin: 0;
+    border: none;
+    min-width: 0;
+}
+
 #seopress-content input.toggle+label,.seopress-option input.toggle+label {
     display: inline-block;
     position: relative;
@@ -1607,14 +1662,39 @@ body.seopress-styles {
     transition: .25s ease-in-out;
 }
 
+.seopress_wrap_single_cpt input.toggle+label,
+.seopress_wrap_single_cpt input.toggle+label:before,
+.seopress_wrap_tax input.toggle+label,
+.seopress_wrap_tax input.toggle+label:before {
+    width: 40px;
+    height: 20px;
+}
+
+.seopress_wrap_single_cpt input.toggle+label:after,
+.seopress_wrap_tax input.toggle+label:after {
+    width: 20px;
+    height: 20px;
+}
+
 #seopress-content input.toggle[data-toggle="1"]+label:before,.seopress-option input.toggle[data-toggle="1"]+label:before {
     width: 50px;
     background: rgba(19,191,17,1);
 }
 
+.seopress_wrap_single_cpt input.toggle[data-toggle="1"]+label:before,
+.seopress_wrap_tax input.toggle[data-toggle="1"]+label:before {
+    width: 40px;
+    background: rgb(49, 151, 211);
+}
+
 #seopress-content input.toggle[data-toggle="1"]+label:after,.seopress-option input.toggle[data-toggle="1"]+label:after {
     left: 20px;
     box-shadow: inset 0 0 0 1px rgba(19,191,17,1),0 2px 4px rgba(0,0,0,.2);
+}
+
+.seopress_wrap_single_cpt input.toggle[data-toggle="1"]+label:after,
+.seopress_wrap_tax input.toggle[data-toggle="1"]+label:after {
+    box-shadow: inset 0 0 0 1px rgb(49, 151, 211), 0 2px 4px rgba(0,0,0,.2);
 }
 
 #seopress-content .seopress-page-list {

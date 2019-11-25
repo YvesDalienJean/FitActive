@@ -156,6 +156,30 @@ $editor_css = '<style>' . $editor_css. '</style>';
 									</div>
 
 								</div>
+								<div class="sui-form-field">
+									<label for="auto_email_time" class="sui-label"><?php esc_html_e( 'Delay', 'wordpress-popup' ); ?></label>
+
+									<div class="sui-row" >
+										<div class="sui-col-md-6">
+											<input type="number"
+												name="schedule_auto_email_time"
+												data-attribute="schedule_auto_email_time"
+												value="{{ schedule_auto_email_time }}"
+												placeholder="0"
+												class="sui-form-control" />
+										</div>
+
+										<div class="sui-col-md-6">
+											<select name="schedule_auto_email_unit" data-attribute="schedule_auto_email_unit">
+												<option value="seconds" {{ _.selected( ('seconds' === schedule_auto_email_unit), true) }}><?php esc_html_e( 'seconds', 'wordpress-popup' ); ?></option>
+												<option value="minutes" {{ _.selected( ('minutes' === schedule_auto_email_unit), true) }}><?php esc_html_e( 'minutes', 'wordpress-popup' ); ?></option>
+												<option value="hours" {{ _.selected( ('hours' === schedule_auto_email_unit), true) }}><?php esc_html_e( 'hours', 'wordpress-popup' ); ?></option>
+												<option value="days" {{ _.selected( ('days' === schedule_auto_email_unit), true) }}><?php esc_html_e( 'days', 'wordpress-popup' ); ?></option>
+											</select>
+										</div>
+
+									</div>
+								</div>
 
 							</div>
 

@@ -24,9 +24,20 @@ class Hustle_Icontact_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		$form_settings_instance = $this->form_settings_instance;
 
 		/**
+		 * Filter submitted form data to be processed
+		 *
 		 * @since 4.0
+		 *
+		 * @param array                                    $submitted_data
+		 * @param int                                      $module_id                current module_id
+		 * @param Hustle_Icontact_Form_Settings 	   	   $form_settings_instance
 		 */
-		$submitted_data = apply_filters( 'hustle_provider_' . $addon->get_slug() . '_form_submitted_data', $submitted_data, $module_id, $form_settings_instance );
+		$submitted_data = apply_filters( 
+			'hustle_provider_icontact_form_submitted_data', 
+			$submitted_data, 
+			$module_id, 
+			$form_settings_instance 
+		);
 
 		$addon_setting_values = $form_settings_instance->get_form_settings_values();
 
@@ -84,7 +95,16 @@ class Hustle_Icontact_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 					$merge_vals = array_merge( $merge_vals, $extra_data );
 				}
 
-				if ( $addon->_is_subscribed( $api, $list_id, $email ) ) {
+				$existing_member 	= $this->get_subscriber( 
+					$addon, 
+					array(
+						'api'	  => $api,
+						'list_id' => $addon_setting_values['list_id'], 
+						'email'   => $submitted_data['email'] 
+					)
+				);
+
+				if ( $existing_member ) {
 
 					# ---------------------------------------------------------
 					# Omitting Icontact update method
@@ -101,13 +121,48 @@ class Hustle_Icontact_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
  					$details = __( 'This email address has already subscribed.', 'wordpress-popup' );
 
 				} else {
+
 					$subscribe_data = array(
 						'email'     => $email,
 						'status'    => 'normal'
 					);
+
 					$subscribe_data = array_merge( $subscribe_data, $merge_vals );
+					
+					/**
+					 * Fires before adding subscriber
+					 *
+					 * @since 4.0.2
+					 *
+					 * @param int    $module_id
+					 * @param array  $submitted_data
+					 * @param object $form_settings_instance 
+					 */
+					do_action( 'hustle_provider_icontact_before_add_subscriber', 
+						$module_id, 
+						$submitted_data, 
+						$form_settings_instance 
+					);
 
 					$response = $api->add_subscriber( $list_id, $subscribe_data, $status, $confirmation_message_id );
+
+					/**
+					 * Fires after adding subscriber
+					 *
+					 * @since 4.0.2
+					 *
+					 * @param int    $module_id
+					 * @param array  $submitted_data
+					 * @param mixed  $response
+					 * @param object $form_settings_instance 
+					 */
+					do_action( 'hustle_provider_icontact_after_add_subscriber', 
+						$module_id,
+						$submitted_data,
+						$response,
+						$form_settings_instance
+					);
+
 					if ( is_wp_error( $response ) ) {
 						$details = $response->get_error_message();
 					} else {
@@ -118,7 +173,7 @@ class Hustle_Icontact_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			}
 
 			$utils = Hustle_Provider_Utils::get_instance();
-			$last_data_received = $utils->get_last_data_received();
+			$last_data_received = $utils->get_last_data_received( false );
 			$entry_fields = array(
 				array(
 					'name'  => 'status',
@@ -126,9 +181,6 @@ class Hustle_Icontact_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 						'is_sent'       => $is_sent,
 						'description'   => $details,
 						'member_status' => !empty( $last_data_received['contacts'][0]['status'] ) ? $last_data_received['contacts'][0]['status'] : $member_status,
-						'data_sent'     => $utils->get_last_data_sent(),
-						'data_received' => $last_data_received,
-						'url_request'   => $utils->get_last_url_request(),
 					),
 				),
 			);
@@ -183,7 +235,7 @@ class Hustle_Icontact_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			 *
 			 * @param array                                    $submitted_data
 			 * @param int                                      $module_id                current module_id
-			 * @param Hustle_Icontact_Form_Settings $form_settings_instance
+			 * @param Hustle_Icontact_Form_Settings 		   $form_settings_instance
 			 */
 			$submitted_data = apply_filters(
 				'hustle_provider_icontact_form_submitted_data_before_validation',
@@ -199,7 +251,14 @@ class Hustle_Icontact_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			$password 			= $addon->get_setting( 'password', '', $global_multi_id );
 			$api 				= $addon::api( $app_id, $password, $username );
 
-			$existing_member 	= $addon->_is_subscribed( $api, $addon_setting_values['list_id'], $submitted_data['email'] );
+			$existing_member 	= $this->get_subscriber( 
+				$addon, 
+				array(
+					'api'	  => $api,
+					'list_id' => $addon_setting_values['list_id'], 
+					'email'   => $submitted_data['email'] 
+				)
+			);
 
 			if ( $existing_member )
 				$is_success = self::ALREADY_SUBSCRIBED_ERROR;
@@ -235,4 +294,27 @@ class Hustle_Icontact_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		return true;
 	}
 
+	/**
+	 * Get subscriber for providers
+	 *
+	 * This method is to be inherited
+	 * And extended by child classes.
+	 * 
+	 * Make use of the property `$_subscriber`
+	 * Method to omit double api calls
+	 *
+	 * @since 4.0.2
+	 *
+	 * @param 	object 	$api
+	 * @param 	mixed  	$data
+	 * @return  mixed 	array/object API response on queried subscriber
+	 */
+	protected function get_subscriber( $api, $data ){
+
+		if( empty ( $this->_subscriber ) && ! isset( $this->_subscriber[ md5( $data['email'] ) ] ) ){
+			$this->_subscriber[ md5( $data['email'] ) ] = $api->_is_subscribed( $data['api'], $data['list_id'], $data['email'] );
+		}
+
+		return $this->_subscriber[ md5( $data['email'] ) ];
+	}
 }

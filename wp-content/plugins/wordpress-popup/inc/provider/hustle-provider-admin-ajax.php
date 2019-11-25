@@ -35,6 +35,7 @@ class Hustle_Provider_Admin_Ajax {
 			add_action( 'wp_ajax_hustle_provider_settings', array( $this, 'settings' ) );
 			add_action( 'wp_ajax_hustle_provider_form_settings', array( $this , 'form_settings' ) );
 			add_action( 'wp_ajax_hustle_provider_form_deactivate', array( $this, 'form_deactivate' ) );
+			add_action( 'wp_ajax_hustle_refresh_email_lists', array( $this, 'refresh_email_lists' ) );
 			add_action( 'wp_ajax_hustle_provider_insert_local_list', array( $this, 'insert_local_list' ) );
 
 			self::$is_ajax_hooked = true;
@@ -128,6 +129,51 @@ class Hustle_Provider_Admin_Ajax {
 			'not_connected' => $not_connected_html,
 		) );
 
+	}
+
+	/**
+	 * Refresh email lists
+	 *
+	 * @since 4.0.2
+	 */
+	public function refresh_email_lists() {
+		$this->validate_ajax();
+
+		$module_id = filter_input( INPUT_POST, 'id' );
+		$slug = filter_input( INPUT_POST, 'slug' );
+		$type = filter_input( INPUT_POST, 'type' );
+
+		$provider = Hustle_Provider_Utils::get_provider_by_slug( $slug );
+
+		if ( ! $provider ) {
+			wp_send_json_error( __( 'Provider not found', 'wordpress-popup' ) );
+		}
+
+		$class_name = $provider->get_form_settings_class_name();
+		if ( empty( $class_name ) || !class_exists( $class_name ) ) {
+			wp_send_json_error( __( 'Settings class not found', 'wordpress-popup' ) );
+		}
+		$form_settings_instance = new $class_name( $provider, '' );
+		$lists = $form_settings_instance->get_global_multi_lists( true, $module_id, $type );
+
+		$list_id = empty( $type ) || 'forms' !== $type ? 'list_id' : 'form_id';
+		$options = array(
+			'list'  => array(
+				'id'       => $list_id,
+				'type'     => 'select',
+				'name'     => $list_id,
+				'default'  => '',
+				'options'  => $lists,
+				'value'    => '',
+				'selected' => '',
+				'class'    => 'sui-select',
+			),
+		);
+		$select = Hustle_Provider_Utils::get_html_for_options( $options );
+
+		wp_send_json_success( array(
+			'select' => $select,
+		) );
 	}
 
 	/**

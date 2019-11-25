@@ -38,7 +38,8 @@ class Hustle_Init {
 			$hustle_settings_admin = new Hustle_Settings_Admin( $hustle );
 			new Hustle_Settings_Admin_Ajax( $hustle_settings_admin );
 		}
-
+		
+		new Hustle_General_Data_Protection();
 		// Front
 		$module_front = new Hustle_Module_Front($hustle);
 		$module_front_ajax = new Hustle_Module_Front_Ajax($hustle);

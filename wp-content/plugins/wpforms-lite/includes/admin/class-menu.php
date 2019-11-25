@@ -132,6 +132,16 @@ class WPForms_Admin_Menu {
 			WPForms_About::SLUG,
 			array( $this, 'admin_page' )
 		);
+
+		// Community submenu page.
+		add_submenu_page(
+			'wpforms-overview',
+			esc_html__( 'Community', 'wpforms-lite' ),
+			esc_html__( 'Community', 'wpforms-lite' ),
+			$menu_cap,
+			WPForms\Admin\Pages\Community::SLUG,
+			array( $this, 'admin_page' )
+		);
 	}
 
 	/**

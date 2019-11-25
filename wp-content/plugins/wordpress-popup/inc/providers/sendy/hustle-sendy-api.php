@@ -48,6 +48,7 @@ class Hustle_Sendy_API {
 			) );
 		}
 
+		//logging data
 		$utils = Hustle_Provider_Utils::get_instance();
 		$utils->_last_url_request = $url;
 		$utils->_last_data_received = $response;
@@ -81,16 +82,15 @@ class Hustle_Sendy_API {
 	}
 
 	public function subscribe( $data ) {
-		$response = $this->make_request( self::SUBSCRIBE, array_filter( array_merge( $data, array(
-			'list'      => $this->list_id,
-			'boolean'   => 'true',
-		) ) ) );
 
-		if ( is_wp_error( $response ) ) {
-			return $response;
+		if( empty( $data ) || ! isset( $data['email'] ) ){
+			return new WP_Error( 'invalid_data', __( 'Invalid or empty data supplied', 'wordpress-popup'  ) );
 		}
 
-		if ( '1' === $response ) {
+		$data['list'] = $this->list_id;
+		$response = $this->make_request( self::SUBSCRIBE, array_filter( $data ) );
+
+		if( !is_wp_error( $response ) ){
 			return true;
 		}
 
@@ -98,6 +98,7 @@ class Hustle_Sendy_API {
 	}
 
 	public function subscriber_status( $email ) {
+
 		$response = $this->make_request( self::SUBSCRIBER_STATUS, array_filter( array(
 			'email'   	=> $email,
 		) ), 'POST' );
